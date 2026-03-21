@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Bulochka Sandbox</title>
+
+<style>
+body {
+    margin: 0;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+    color: white;
+}
+
+/* ФОН */
+.background {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    animation: fade 1s;
+}
+
+/* затемнение */
+.overlay {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+}
+
+/* ЦЕНТР */
+.center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+/* НАЗВАНИЕ */
+h1 {
+    font-size: 50px;
+    margin-bottom: 20px;
+}
+
+/* ПРОГРЕСС */
+.progress-bar {
+    width: 400px;
+    height: 25px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.progress {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+}
+
+.percent {
+    margin-top: 10px;
+}
+
+/* СОЦСЕТИ (слева) */
+.socials {
+    position: absolute;
+    top: 50%;
+    left: 20px;
+    transform: translateY(-50%);
+}
+
+.socials a {
+    display: block;
+    margin: 10px 0;
+    padding: 10px;
+    background: rgba(255,255,255,0.1);
+    text-decoration: none;
+    color: white;
+    border-radius: 10px;
+    transition: 0.3s;
+}
+
+.socials a:hover {
+    background: rgba(255,255,255,0.3);
+}
+</style>
+
+</head>
+<body>
+
+<div class="background" id="bg"></div>
+<div class="overlay"></div>
+
+<!-- СОЦСЕТИ -->
+
+<div class="socials">
+    <a href="https://discord.gg/FvpuBFcC" target="_blank">Discord</a>
+    <a href="https://youtube.com/" target="_blank">YouTube</a>
+    <a href="https://t.me/" target="_blank">Telegram</a>
+</div>
+
+<!-- ЦЕНТР -->
+
+<div class="center">
+    <h1>| Bulochka Sandbox |</h1>
+
+```
+<div class="progress-bar">
+    <div class="progress" id="bar"></div>
+</div>
+
+<div class="percent" id="percent">0%</div>
+```
+
+</div>
+
+<script>
+/* ФОНЫ (свои картинки вставь) */
+let images = [
+    "bg1.jpg",
+    "bg2.jpg",
+    "bg3.jpg"
+];
+
+let index = 0;
+let bg = document.getElementById("bg");
+
+/* смена фона */
+function changeBG() {
+    bg.style.backgroundImage = "url('" + images[index] + "')";
+    index++;
+    if (index >= images.length) index = 0;
+}
+
+setInterval(changeBG, 5000);
+changeBG();
+
+/* загрузка */
+let percent = 0;
+let bar = document.getElementById("bar");
+let text = document.getElementById("percent");
+
+function fakeLoad() {
+    if (percent < 100) {
+        percent += Math.random() * 4;
+        if (percent > 100) percent = 100;
+
+        bar.style.width = percent + "%";
+        text.innerText = Math.floor(percent) + "%";
+
+        setTimeout(fakeLoad, 120);
+    }
+}
+
+fakeLoad();
+</script>
+
+</body>
+</html>
