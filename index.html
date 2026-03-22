@@ -138,15 +138,6 @@ function SetStatusChanged(status) {
     document.getElementById("serverInfo").innerHTML = status;
 }
 
-// ===== ИМИТАЦИЯ ЗАГРУЗКИ ФАЙЛОВ =====
-let files = [
-    "14/143 (29.587 MB) 'Glide // BTR-82A | Russian Infantry Fighting Vehicle'",
-    "15/143 (30.123 MB) 'Textures // Russian Armor Pack'",
-    "16/143 (31.456 MB) 'Models // Soviet Tanks'",
-    "17/143 (32.012 MB) 'Sound // Explosion Pack'",
-    "18/143 (32.654 MB) 'Lua // Custom Scripts'"
-];
-
 let fileIndex = 0;
 function loadNextFile() {
     if(fileIndex < files.length){
