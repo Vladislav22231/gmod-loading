@@ -51,29 +51,8 @@ h1 {
 
 .serverInfo {
     margin-bottom: 15px;
-    font-size: 16px;
-    opacity: 0.9;
-}
-
-.progress-bar {
-    width: 420px;
-    height: 25px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 20px;
-    overflow: hidden;
-    margin: auto;
-}
-
-.progress {
-    height: 100%;
-    width: 0%;
-    background: linear-gradient(90deg, #3b82f6, #60a5fa);
-    box-shadow: 0 0 15px #3b82f6;
-    transition: 0.2s;
-}
-
-.percent {
-    margin-top: 10px;
+    font-size: 18px;
+    opacity: 0.95;
 }
 
 @keyframes glow {
@@ -95,20 +74,14 @@ h1 {
         Пока ты ждешь загрузку, посмотри кадры нашего сервера 
     </div>
 
-    <!-- РЕАЛЬНЫЕ ДАННЫЕ СЕРВЕРА -->
+    <!-- ТОЛЬКО ТЕКСТ -->
     <div class="serverInfo" id="serverInfo">
-        Получение данных сервера...
+        Подключение к серверу...
     </div>
-
-    <div class="progress-bar">
-        <div class="progress" id="bar"></div>
-    </div>
-
-    <div class="percent" id="percent">0%</div>
 </div>
 
 <script>
-/* ===== ФОНЫ (ИСПРАВЛЕНО: теперь через ссылки) ===== */
+/* ===== СЛАЙД-ШОУ ===== */
 let images = [
     "https://vladislav22231.github.io/gmod-loading/Screenshot_83.png",
     "https://vladislav22231.github.io/gmod-loading/Screenshot_84.png",
@@ -128,41 +101,26 @@ function changeBG() {
 setInterval(changeBG, 5000);
 changeBG();
 
-/* ===== ФЕЙКОВЫЙ ПРОГРЕСС (КАК БЫЛО) ===== */
-let percent = 0;
-let bar = document.getElementById("bar");
-let text = document.getElementById("percent");
-
-function fakeLoad() {
-    if(percent < 100){
-        percent += Math.random() * 3;
-        if(percent > 100) percent = 100;
-
-        bar.style.width = percent + "%";
-        text.innerText = Math.floor(percent) + "%";
-
-        setTimeout(fakeLoad, 120);
-    }
-}
-
-fakeLoad();
-
 /* ===== ДАННЫЕ GMod ===== */
+
+// инфа о сервере
 function GameDetails(servername, serverurl, mapname, maxplayers, steamid) {
     document.getElementById("serverInfo").innerHTML =
         "🗺 Карта: " + mapname + "<br>" +
         "👥 Макс игроков: " + maxplayers;
 }
 
+// загрузка файлов
 function DownloadingFile(file) {
     document.getElementById("serverInfo").innerHTML =
-        "📥 Загрузка: " + file;
+        "📥 Загрузка:<br>" + file;
 }
 
+// статус
 function SetStatusChanged(status) {
     document.getElementById("serverInfo").innerHTML = status;
 }
 </script>
 
 </body>
-</html> 
+</html>
