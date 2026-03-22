@@ -11,23 +11,45 @@ body { margin:0; overflow:hidden; font-family:Arial,sans-serif; color:white; }
 h1 { font-size:48px; margin-bottom:10px; text-shadow:0 0 20px rgba(255,255,255,0.4); animation:glow 2s infinite alternate; }
 .info { margin-bottom:10px; font-size:18px; }
 .serverInfo { margin-bottom:15px; font-size:18px; opacity:0.9; }
+
+/* Лог загрузки */
+.load-log {
+    width:420px;
+    max-height:120px;
+    margin:10px auto;
+    padding:5px 10px;
+    background: rgba(0,0,0,0.4);
+    border-radius:10px;
+    overflow-y:auto;
+    font-family: monospace;
+    font-size:14px;
+    text-align:left;
+}
+
+/* Прогресс-бар */
 .progress-bar { width:420px; height:25px; background:rgba(255,255,255,0.2); border-radius:20px; overflow:hidden; margin:auto; }
 .progress { height:100%; width:0%; background:linear-gradient(90deg,#3b82f6,#60a5fa); box-shadow:0 0 15px #3b82f6; transition:0.2s; }
 .percent { margin-top:10px; }
+
 @keyframes glow { from { text-shadow:0 0 10px rgba(255,255,255,0.2); } to { text-shadow:0 0 25px rgba(255,255,255,0.8); } }
 </style>
 </head>
 <body>
+
 <div class="background" id="bg"></div>
 <div class="overlay"></div>
+
 <div class="center">
     <h1>|PixelCanvas|Sandbox||UA||</h1>
     <div class="info">Пока ты ждешь загрузку, посмотри кадры нашего сервера</div>
-    
-    <div class="serverInfo"> 
+
+    <div class="serverInfo">
         👥 Онлайн: <span id="players">Загрузка...</span><br>
-        🗺 Карта: <span id="map">Загрузка...</span>
+        🗺 Карта: <span id="map">Загрузка...</span><br>
+        🎮 Режим: <span id="gamemode">Загрузка...</span>
     </div>
+
+    <div class="load-log" id="loadLog"></div>
 
     <div class="progress-bar">
         <div class="progress" id="bar"></div>
@@ -36,47 +58,57 @@ h1 { font-size:48px; margin-bottom:10px; text-shadow:0 0 20px rgba(255,255,255,0
 </div>
 
 <script>
-// ===== ФОНЫ =====
+// ===== Фоны =====
 let images = [
     "https://vladislav22231.github.io/gmod-loading/Screenshot_83.png",
     "https://vladislav22231.github.io/gmod-loading/Screenshot_84.png",
     "https://vladislav22231.github.io/gmod-loading/Screenshot_85.png",
     "https://vladislav22231.github.io/gmod-loading/Screenshot_87.png"
 ];
-let index = 0;
-let bg = document.getElementById("bg");
-function changeBG() {
-    bg.style.backgroundImage = "url('" + images[index] + "')";
-    index = (index + 1) % images.length;
-}
-setInterval(changeBG, 5000);
+let index=0;
+let bg=document.getElementById("bg");
+function changeBG(){ bg.style.backgroundImage="url('"+images[index]+"')"; index=(index+1)%images.length; }
+setInterval(changeBG,5000);
 changeBG();
 
 // ===== ПРОГРЕСС =====
-let percent = 0;
-let bar = document.getElementById("bar");
-let text = document.getElementById("percent");
-function fakeLoad() {
-    if(percent < 100){
-        percent += Math.random() * 3;
-        if(percent > 100) percent = 100;
-        bar.style.width = percent + "%";
-        text.innerText = Math.floor(percent) + "%";
-        setTimeout(fakeLoad, 120);
+let percent=0;
+let bar=document.getElementById("bar");
+let text=document.getElementById("percent");
+function fakeLoad(){
+    if(percent<100){
+        percent+=Math.random()*3;
+        if(percent>100) percent=100;
+        bar.style.width=percent+"%";
+        text.innerText=Math.floor(percent)+"%";
+        setTimeout(fakeLoad,120);
     }
 }
 fakeLoad();
 
-// ===== ОНЛАЙН И КАРТА ЧЕРЕЗ GMod NET =====
-if(typeof gmod !== "undefined" && gmod.net) {
+// ===== Лог загрузки и информация сервера через GMod net =====
+let loadLog=document.getElementById("loadLog");
+
+if(typeof gmod!=="undefined" && gmod.net){
+    // Лог загрузки
+    gmod.net.Receive("SendLoadLog", function(line){
+        let div=document.createElement("div");
+        div.textContent=line;
+        loadLog.appendChild(div);
+        loadLog.scrollTop=loadLog.scrollHeight;
+    });
+
+    // Информация о сервере
     gmod.net.Receive("SendServerInfo", function(data){
-        let info = JSON.parse(data);
-        document.getElementById("players").innerText = info.players + " / " + info.maxPlayers;
-        document.getElementById("map").innerText = info.map;
+        let info=JSON.parse(data);
+        document.getElementById("players").innerText=info.players+" / "+info.maxPlayers;
+        document.getElementById("map").innerText=info.map;
+        document.getElementById("gamemode").innerText=info.gamemode;
     });
 } else {
-    document.getElementById("players").innerText = "0 / 20";
-    document.getElementById("map").innerText = "Gm_Mobenix_Winter";
+    document.getElementById("players").innerText="0 / 20";
+    document.getElementById("map").innerText="Gm_Mobenix_Winter";
+    document.getElementById("gamemode").innerText="sandbox";
 }
 </script>
 </body>
