@@ -108,7 +108,7 @@ h1 {
 </div>
 
 <script>
-/* ===== ФОНЫ (ИСПРАВЛЕНО: теперь через ссылки) ===== */
+/* ===== ФОНЫ ===== */
 let images = [
     "https://vladislav22231.github.io/gmod-loading/Screenshot_83.png",
     "https://vladislav22231.github.io/gmod-loading/Screenshot_84.png",
@@ -128,41 +128,55 @@ function changeBG() {
 setInterval(changeBG, 5000);
 changeBG();
 
-/* ===== ФЕЙКОВЫЙ ПРОГРЕСС (КАК БЫЛО) ===== */
-let percent = 0;
-let bar = document.getElementById("bar");
-let text = document.getElementById("percent");
+/* ===== РЕАЛЬНЫЙ ПРОГРЕСС GMod ===== */
 
-function fakeLoad() {
-    if(percent < 100){
-        percent += Math.random() * 3;
-        if(percent > 100) percent = 100;
+let totalFiles = 0;
+let neededFiles = 0;
 
-        bar.style.width = percent + "%";
-        text.innerText = Math.floor(percent) + "%";
-
-        setTimeout(fakeLoad, 120);
-    }
+// всего файлов
+function SetFilesTotal(total) {
+    totalFiles = total;
 }
 
-fakeLoad();
+// сколько осталось
+function SetFilesNeeded(needed) {
+    neededFiles = needed;
+}
 
-/* ===== ДАННЫЕ GMod ===== */
+// обновление загрузки
+function DownloadingFile(file) {
+
+    if (totalFiles <= 0) {
+        document.getElementById("serverInfo").innerHTML = "Подготовка загрузки...";
+        return;
+    }
+
+    let downloaded = totalFiles - neededFiles;
+    let percent = Math.floor((downloaded / totalFiles) * 100);
+
+    document.getElementById("bar").style.width = percent + "%";
+    document.getElementById("percent").innerText = percent + "%";
+
+    document.getElementById("serverInfo").innerHTML =
+        "📥 " + downloaded + "/" + totalFiles + "<br>" + file;
+}
+
+// инфа о сервере
 function GameDetails(servername, serverurl, mapname, maxplayers, steamid) {
     document.getElementById("serverInfo").innerHTML =
         "🗺 Карта: " + mapname + "<br>" +
         "👥 Макс игроков: " + maxplayers;
 }
 
-function DownloadingFile(file) {
-    document.getElementById("serverInfo").innerHTML =
-        "📥 Загрузка: " + file;
-}
-
+// статус
 function SetStatusChanged(status) {
     document.getElementById("serverInfo").innerHTML = status;
 }
-</script>
 
-</body>
-</html>
+// когда всё скачано
+function SetFilesDownloaded() {
+    document.getElementById("bar").style.width = "100%";
+    document.getElementById("percent").innerText = "100%";
+    document.getElementById("serverInfo").innerHTML = "Загрузка завершена!";
+}
+</script>
