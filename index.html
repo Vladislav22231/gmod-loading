@@ -152,4 +152,19 @@ fakeLoad();
 function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
     document.getElementById("serverInfo").innerHTML =
         "🗺 Карта: " + mapname + "<br>" +
-        "👥 Макс игроков: " +
+        "👥 Макс игроков: " + maxplayers + "<br>" +
+        "🎮 Режим: " + gamemode;
+}
+
+function DownloadingFile(file) {
+    document.getElementById("serverInfo").innerHTML =
+        "📥 Загрузка: " + file;
+}
+
+function SetStatusChanged(status) {
+    document.getElementById("serverInfo").innerHTML = status;
+}
+</script>
+
+</body>
+</html>
