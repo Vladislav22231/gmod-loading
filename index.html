@@ -95,9 +95,8 @@ h1 {
         Пока ты ждешь загрузку, посмотри кадры нашего сервера 
     </div>
 
-    <!-- РЕАЛЬНЫЕ ДАННЫЕ СЕРВЕРА -->
     <div class="serverInfo" id="serverInfo">
-        Получение данных сервера...
+        Подключение к серверу...
     </div>
 
     <div class="progress-bar">
@@ -108,7 +107,7 @@ h1 {
 </div>
 
 <script>
-/* ===== ФОНЫ (ИСПРАВЛЕНО: теперь через ссылки) ===== */
+// ===== СЛАЙД-ШОУ =====
 let images = [
     "https://vladislav22231.github.io/gmod-loading/Screenshot_83.png",
     "https://vladislav22231.github.io/gmod-loading/Screenshot_84.png",
@@ -121,46 +120,62 @@ let bg = document.getElementById("bg");
 
 function changeBG() {
     bg.style.backgroundImage = "url('" + images[index] + "')";
-    index++;
-    if(index >= images.length) index = 0;
+    index = (index + 1) % images.length;
 }
 
 setInterval(changeBG, 5000);
 changeBG();
 
-/* ===== ФЕЙКОВЫЙ ПРОГРЕСС (КАК БЫЛО) ===== */
-let percent = 0;
-let bar = document.getElementById("bar");
-let text = document.getElementById("percent");
 
-function fakeLoad() {
-    if(percent < 100){
-        percent += Math.random() * 3;
-        if(percent > 100) percent = 100;
+// ====== РЕАЛЬНАЯ ЗАГРУЗКА GMod ======
 
-        bar.style.width = percent + "%";
-        text.innerText = Math.floor(percent) + "%";
+let totalFiles = 0;
+let neededFiles = 0;
 
-        setTimeout(fakeLoad, 120);
+// сколько всего файлов
+function SetFilesTotal(total) {
+    totalFiles = total;
+}
+
+// сколько осталось скачать
+function SetFilesNeeded(needed) {
+    neededFiles = needed;
+}
+
+// при скачивании файла
+function DownloadingFile(file) {
+    let downloaded = totalFiles - neededFiles;
+
+    if (totalFiles > 0) {
+        let percent = Math.floor((downloaded / totalFiles) * 100);
+
+        document.getElementById("bar").style.width = percent + "%";
+        document.getElementById("percent").innerText = percent + "%";
+
+        document.getElementById("serverInfo").innerHTML =
+            "📥 " + downloaded + "/" + totalFiles + "<br>" + file;
+    } else {
+        document.getElementById("serverInfo").innerHTML = "Подготовка загрузки...";
     }
 }
 
-fakeLoad();
-
-/* ===== ДАННЫЕ GMod ===== */
+// инфа о сервере
 function GameDetails(servername, serverurl, mapname, maxplayers, steamid) {
     document.getElementById("serverInfo").innerHTML =
         "🗺 Карта: " + mapname + "<br>" +
         "👥 Макс игроков: " + maxplayers;
 }
 
-function DownloadingFile(file) {
-    document.getElementById("serverInfo").innerHTML =
-        "📥 Загрузка: " + file;
-}
-
+// статус
 function SetStatusChanged(status) {
     document.getElementById("serverInfo").innerHTML = status;
+}
+
+// когда всё скачалось
+function SetFilesDownloaded() {
+    document.getElementById("bar").style.width = "100%";
+    document.getElementById("percent").innerText = "100%";
+    document.getElementById("serverInfo").innerHTML = "Загрузка завершена!";
 }
 </script>
 
