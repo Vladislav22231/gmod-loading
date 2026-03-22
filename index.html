@@ -38,4 +38,118 @@ body {
 }
 
 h1 {
-    font
+    font-size: 48px;
+    margin-bottom: 10px;
+    text-shadow: 0 0 20px rgba(255,255,255,0.4);
+    animation: glow 2s infinite alternate;
+}
+
+.info {
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+.info a {
+    color: #60a5fa;
+    text-decoration: none;
+}
+
+.info a:hover {
+    text-decoration: underline;
+}
+
+.serverInfo {
+    margin-bottom: 15px;
+    font-size: 16px;
+    opacity: 0.9;
+}
+
+.progress-bar {
+    width: 420px;
+    height: 25px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 20px;
+    overflow: hidden;
+    margin: auto;
+}
+
+.progress {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    box-shadow: 0 0 15px #3b82f6;
+    transition: 0.2s;
+}
+
+.percent {
+    margin-top: 10px;
+}
+
+/* анимация */
+@keyframes glow {
+    from { text-shadow: 0 0 10px rgba(255,255,255,0.2); }
+    to { text-shadow: 0 0 25px rgba(255,255,255,0.8); }
+}
+</style>
+
+</head>
+<body>
+
+<div class="background" id="bg"></div>
+<div class="overlay"></div>
+
+<div class="center">
+    <h1>|PixelCanvas|Sandbox||UA||</h1>
+
+    <div class="info">
+        Пока ты ждешь загрузку, зайди в наш 
+        Discord сервер
+    </div>
+
+    <!-- РЕАЛЬНЫЕ ДАННЫЕ СЕРВЕРА -->
+    <div class="serverInfo" id="serverInfo">
+        Получение данных сервера...
+    </div>
+
+    <div class="progress-bar">
+        <div class="progress" id="bar"></div>
+    </div>
+
+    <div class="percent" id="percent">0%</div>
+</div>
+
+<script>
+/* Фоны */
+let images = ["Screenshot_83.png","Screenshot_84.png","Screenshot_85.png","Screenshot_87.png"];
+let index = 0;
+let bg = document.getElementById("bg");
+
+function changeBG() {
+    bg.style.backgroundImage = "url('" + images[index] + "')";
+    index++;
+    if(index >= images.length) index = 0;
+}
+setInterval(changeBG, 5000);
+changeBG();
+
+/* ПРОГРЕСС-БАР */
+let percent = 0;
+let bar = document.getElementById("bar");
+let text = document.getElementById("percent");
+
+function fakeLoad() {
+    if(percent < 100){
+        percent += Math.random() * 3;
+        if(percent>100) percent=100;
+        bar.style.width = percent + "%";
+        text.innerText = Math.floor(percent) + "%";
+        setTimeout(fakeLoad,120);
+    }
+}
+fakeLoad();
+
+/* ==== РЕАЛЬНЫЕ ДАННЫЕ GMod ==== */
+function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
+    document.getElementById("serverInfo").innerHTML =
+        "🗺 Карта: " + mapname + "<br>" +
+        "👥 Макс игроков: " +
