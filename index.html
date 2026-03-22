@@ -49,18 +49,9 @@ h1 {
     font-size: 18px;
 }
 
-.info a {
-    color: #60a5fa;
-    text-decoration: none;
-}
-
-.info a:hover {
-    text-decoration: underline;
-}
-
 .serverInfo {
     margin-bottom: 15px;
-    font-size: 16px;
+    font-size: 18px;
     opacity: 0.9;
 }
 
@@ -85,14 +76,13 @@ h1 {
     margin-top: 10px;
 }
 
-/* анимация */
 @keyframes glow {
     from { text-shadow: 0 0 10px rgba(255,255,255,0.2); }
     to { text-shadow: 0 0 25px rgba(255,255,255,0.8); }
 }
 </style>
-
 </head>
+
 <body>
 
 <div class="background" id="bg"></div>
@@ -102,13 +92,12 @@ h1 {
     <h1>|PixelCanvas|Sandbox||UA||</h1>
 
     <div class="info">
-        Пока ты ждешь загрузку, Посмотри кадры нашего сервера. 
-        
+        Пока ты ждешь загрузку, посмотри кадры нашего сервера
     </div>
 
-    <!-- РЕАЛЬНЫЕ ДАННЫЕ СЕРВЕРА -->
-    <div class="serverInfo" id="serverInfo">
-        Получение данных сервера...
+    <!-- ОНЛАЙН -->
+    <div class="serverInfo">
+        👥 Онлайн: <span id="players">Загрузка...</span>
     </div>
 
     <div class="progress-bar">
@@ -119,8 +108,14 @@ h1 {
 </div>
 
 <script>
-/* Фоны */
-let images = ["Screenshot_83.png","Screenshot_84.png","Screenshot_85.png","Screenshot_87.png"];
+/* ФОНЫ */
+let images = [
+    "https://vladislav22231.github.io/gmod-loading/Screenshot_83.png",
+    "https://vladislav22231.github.io/gmod-loading/Screenshot_84.png",
+    "https://vladislav22231.github.io/gmod-loading/Screenshot_85.png",
+    "https://vladislav22231.github.io/gmod-loading/Screenshot_87.png"
+];
+
 let index = 0;
 let bg = document.getElementById("bg");
 
@@ -132,7 +127,7 @@ function changeBG() {
 setInterval(changeBG, 5000);
 changeBG();
 
-/* ПРОГРЕСС-БАР */
+/* ПРОГРЕСС */
 let percent = 0;
 let bar = document.getElementById("bar");
 let text = document.getElementById("percent");
@@ -140,30 +135,30 @@ let text = document.getElementById("percent");
 function fakeLoad() {
     if(percent < 100){
         percent += Math.random() * 3;
-        if(percent>100) percent=100;
+        if(percent > 100) percent = 100;
         bar.style.width = percent + "%";
         text.innerText = Math.floor(percent) + "%";
-        setTimeout(fakeLoad,120);
+        setTimeout(fakeLoad, 120);
     }
 }
 fakeLoad();
 
-/* ==== РЕАЛЬНЫЕ ДАННЫЕ GMod ==== */
-function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
-    document.getElementById("serverInfo").innerHTML =
-        "🗺 Карта: " + mapname + "<br>" +
-        "👥 Макс игроков: " + maxplayers + "<br>" +
-        "🎮 Режим: " + gamemode;
+/* ОНЛАЙН ИГРОКОВ */
+function updatePlayers() {
+    fetch("https://api.battlemetrics.com/servers?filter[game]=gmod&filter[search]=178.150.168.239:27015")
+    .then(res => res.json())
+    .then(data => {
+        let players = data.data[0].attributes.players;
+        let max = data.data[0].attributes.maxPlayers;
+        document.getElementById("players").innerText = players + " / " + max;
+    })
+    .catch(() => {
+        document.getElementById("players").innerText = "0 / 0";
+    });
 }
 
-function DownloadingFile(file) {
-    document.getElementById("serverInfo").innerHTML =
-        "📥 Загрузка: " + file;
-}
-
-function SetStatusChanged(status) {
-    document.getElementById("serverInfo").innerHTML = status;
-}
+setInterval(updatePlayers, 10000);
+updatePlayers();
 </script>
 
 </body>
