@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
@@ -10,7 +11,6 @@ body {
     overflow: hidden;
     font-family: Arial, sans-serif;
     color: white;
-    background-color: black;
 }
 
 .background {
@@ -50,6 +50,15 @@ h1 {
     font-size: 18px;
 }
 
+.info a {
+    color: #60a5fa;
+    text-decoration: none;
+}
+
+.info a:hover {
+    text-decoration: underline;
+}
+
 .serverInfo {
     margin-bottom: 15px;
     font-size: 16px;
@@ -77,46 +86,89 @@ h1 {
     margin-top: 10px;
 }
 
+/* соцсети */
+.socials {
+    position: absolute;
+    top: 50%;
+    left: 20px;
+    transform: translateY(-50%);
+}
+
+.socials a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0;
+    padding: 10px;
+    background: rgba(255,255,255,0.1);
+    text-decoration: none;
+    color: white;
+    border-radius: 10px;
+    transition: 0.3s;
+}
+
+.socials a:hover {
+    background: rgba(255,255,255,0.3);
+    transform: translateX(5px);
+}
+
+.socials img {
+    width: 20px;
+}
+
 /* анимация */
 @keyframes glow {
     from { text-shadow: 0 0 10px rgba(255,255,255,0.2); }
     to { text-shadow: 0 0 25px rgba(255,255,255,0.8); }
 }
 </style>
+
 </head>
 <body>
 
 <div class="background" id="bg"></div>
 <div class="overlay"></div>
 
+<!-- СОЦСЕТИ -->
+
+<div class="socials">
+    <a href="https://discord.gg/JEm3XCBC" target="_blank">
+        <img src="https://cdn-icons-png.flaticon.com/512/2111/2111370.png"> Discord
+    </a>
+    <a href="https://www.youtube.com/@MGEGacher" target="_blank">
+        <img src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png"> YouTube
+    </a>
+    <a href="t.me/PixelCanvasSandboxServer">
+        <img src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png"> Telegram
+    </a>
+</div>
+
 <div class="center">
     <h1>|PixelCanvas|Sandbox||UA||</h1>
-        <span class="ua-blue">U</span><span class="ua-yellow">A</span>||
-    </h1>
-    <div class="info">
-        Пока ты ждешь загрузку, посмотри кадры нашего сервера
-    </div>
 
-    <!-- РЕАЛЬНЫЕ ДАННЫЕ СЕРВЕРА -->
-    <div class="serverInfo" id="serverInfo">
-        Получение данных сервера...
-    </div>
+```
+<div class="info">
+    Пока ты ждешь загрузку, зайди в наш 
+    <a href="https://discord.gg/JEm3XCBC" target="_blank">Discord сервер</a>
+</div>
 
-    <div class="progress-bar">
-        <div class="progress" id="bar"></div>
-    </div>
+<!-- РЕАЛЬНЫЕ ДАННЫЕ СЕРВЕРА -->
+<div class="serverInfo" id="serverInfo">
+    Получение данных сервера...
+</div>
 
-    <div class="percent" id="percent">0%</div>
+<div class="progress-bar">
+    <div class="progress" id="bar"></div>
+</div>
+
+<div class="percent" id="percent">0%</div>
+```
+
 </div>
 
 <script>
 /* Фоны */
-let images = [
-    "https://vladislav22231.github.io/gmod-loading/Screenshot_83.png",
-    "https://vladislav22231.github.io/gmod-loading/Screenshot_84.png",
-    "https://vladislav22231.github.io/gmod-loading/Screenshot_85.png",
-    "https://vladislav22231.github.io/gmod-loading/Screenshot_87.png"
-];
+let images = ["Screenshot_83.png","Screenshot_84.png","Screenshot_85.png","Screenshot_87.png"];
 let index = 0;
 let bg = document.getElementById("bg");
 
