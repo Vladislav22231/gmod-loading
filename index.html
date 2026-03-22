@@ -92,6 +92,7 @@ h1 {
 </div>
 
 <script>
+<script>
 // ===== ФОНОВОЕ СЛАЙД-ШОУ =====
 let images = [
     "https://vladislav22231.github.io/gmod-loading/Screenshot_83.png",
@@ -99,59 +100,66 @@ let images = [
     "https://vladislav22231.github.io/gmod-loading/Screenshot_85.png",
     "https://vladislav22231.github.io/gmod-loading/Screenshot_87.png"
 ];
+
 let index = 0;
 let bg = document.getElementById("bg");
+
 function changeBG() {
     bg.style.backgroundImage = "url('" + images[index] + "')";
     index = (index + 1) % images.length;
 }
+
 setInterval(changeBG, 5000);
 changeBG();
 
-// ===== ПРОГРЕСС-БАР =====
-let percent = 0;
-let bar = document.getElementById("bar");
-let text = document.getElementById("percent");
-function fakeLoad() {
-    if(percent < 100){
-        percent += Math.random()*3;
-        if(percent>100) percent=100;
-        bar.style.width = percent+"%";
-        text.innerText = Math.floor(percent)+"%";
-        setTimeout(fakeLoad,120);
-    }
-}
-fakeLoad();
+// ===== РЕАЛЬНАЯ ЗАГРУЗКА GMod =====
 
-// ===== РЕАЛЬНЫЕ ДАННЫЕ GMod (имитация) =====
+// обновление прогресса (САМОЕ ГЛАВНОЕ)
+function SetFilesTotal(total) {
+    window.totalFiles = total;
+}
+
+function SetFilesNeeded(needed) {
+    window.neededFiles = needed;
+}
+
+// вызывается при скачивании файла
+function DownloadingFile(file) {
+    let total = window.totalFiles || 1;
+    let needed = window.neededFiles || 0;
+
+    let downloaded = total - needed;
+    let percent = Math.floor((downloaded / total) * 100);
+
+    // обновляем бар
+    document.getElementById("bar").style.width = percent + "%";
+    document.getElementById("percent").innerText = percent + "%";
+
+    // текст загрузки
+    document.getElementById("serverInfo").innerHTML =
+        "📥 " + downloaded + "/" + total + "<br>" + file;
+}
+
+// инфа о сервере
 function GameDetails(servername, serverurl, mapname, maxplayers, steamid) {
     document.getElementById("serverInfo").innerHTML =
         "🗺 Карта: " + mapname + "<br>" +
         "👥 Макс игроков: " + maxplayers;
 }
 
-function DownloadingFile(file) {
-    document.getElementById("serverInfo").innerHTML = "📥 Загрузка: " + file;
-}
-
+// статус (например "Sending client info...")
 function SetStatusChanged(status) {
     document.getElementById("serverInfo").innerHTML = status;
 }
 
-let fileIndex = 0;
-function loadNextFile() {
-    if(fileIndex < files.length){
-        DownloadingFile(files[fileIndex]);
-        fileIndex++;
-        setTimeout(loadNextFile, 700); // каждые 0.7 секунд
-    } else {
-        SetStatusChanged("Загрузка завершена!");
-    }
+// когда всё загрузилось
+function SetFilesDownloaded() {
+    document.getElementById("bar").style.width = "100%";
+    document.getElementById("percent").innerText = "100%";
+    document.getElementById("serverInfo").innerHTML = "Загрузка завершена!";
 }
-
-// Запуск имитации после 1 секунды
-setTimeout(loadNextFile, 1000);
 </script>
+
 
 </body>
 </html>
