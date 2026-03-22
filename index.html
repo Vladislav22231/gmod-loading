@@ -143,23 +143,25 @@ function fakeLoad() {
 }
 fakeLoad();
 
+<script>
 /* ОНЛАЙН ИГРОКОВ */
 function updatePlayers() {
     fetch("https://api.battlemetrics.com/servers?filter[game]=gmod&filter[search]=178.150.168.239:27015")
     .then(res => res.json())
     .then(data => {
         let players = data.data[0].attributes.players;
-        let max = data.data[0].attributes.maxPlayers;
+        let max = 20; // фикс максимум на 20
         document.getElementById("players").innerText = players + " / " + max;
     })
     .catch(() => {
-        document.getElementById("players").innerText = "0 / 0";
+        document.getElementById("players").innerText = "0 / 20";
     });
 }
 
 setInterval(updatePlayers, 10000);
 updatePlayers();
 </script>
+
 
 </body>
 </html>
