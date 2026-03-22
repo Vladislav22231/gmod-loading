@@ -4,71 +4,17 @@
 <meta charset="UTF-8">
 <title>PixelCanvas</title>
 <style>
-body {
-    margin: 0;
-    overflow: hidden;
-    font-family: Arial, sans-serif;
-    color: white;
-}
-.background {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    background-size: cover;
-    background-position: center;
-    transition: 1s;
-    filter: brightness(0.7);
-}
-.overlay {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle, rgba(0,0,0,0.3), rgba(0,0,0,0.9));
-}
-.center {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-}
-h1 {
-    font-size: 48px;
-    margin-bottom: 10px;
-    text-shadow: 0 0 20px rgba(255,255,255,0.4);
-    animation: glow 2s infinite alternate;
-}
-.info {
-    margin-bottom: 10px;
-    font-size: 18px;
-}
-.serverInfo {
-    margin-bottom: 15px;
-    font-size: 18px;
-    opacity: 0.9;
-}
-.progress-bar {
-    width: 420px;
-    height: 25px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 20px;
-    overflow: hidden;
-    margin: auto;
-}
-.progress {
-    height: 100%;
-    width: 0%;
-    background: linear-gradient(90deg, #3b82f6, #60a5fa);
-    box-shadow: 0 0 15px #3b82f6;
-    transition: 0.2s;
-}
-.percent {
-    margin-top: 10px;
-}
-@keyframes glow {
-    from { text-shadow: 0 0 10px rgba(255,255,255,0.2); }
-    to { text-shadow: 0 0 25px rgba(255,255,255,0.8); }
-}
+body { margin:0; overflow:hidden; font-family:Arial,sans-serif; color:white; }
+.background { position:fixed; width:100%; height:100%; background-size:cover; background-position:center; transition:1s; filter:brightness(0.7);}
+.overlay { position:fixed; width:100%; height:100%; background:radial-gradient(circle, rgba(0,0,0,0.3), rgba(0,0,0,0.9)); }
+.center { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; }
+h1 { font-size:48px; margin-bottom:10px; text-shadow:0 0 20px rgba(255,255,255,0.4); animation:glow 2s infinite alternate; }
+.info { margin-bottom:10px; font-size:18px; }
+.serverInfo { margin-bottom:15px; font-size:18px; opacity:0.9; }
+.progress-bar { width:420px; height:25px; background:rgba(255,255,255,0.2); border-radius:20px; overflow:hidden; margin:auto; }
+.progress { height:100%; width:0%; background:linear-gradient(90deg,#3b82f6,#60a5fa); box-shadow:0 0 15px #3b82f6; transition:0.2s; }
+.percent { margin-top:10px; }
+@keyframes glow { from { text-shadow:0 0 10px rgba(255,255,255,0.2); } to { text-shadow:0 0 25px rgba(255,255,255,0.8); } }
 </style>
 </head>
 <body>
@@ -78,7 +24,6 @@ h1 {
     <h1>|PixelCanvas|Sandbox||UA||</h1>
     <div class="info">Пока ты ждешь загрузку, посмотри кадры нашего сервера</div>
     
-    <!-- Онлайн и карта -->
     <div class="serverInfo"> 
         👥 Онлайн: <span id="players">Загрузка...</span><br>
         🗺 Карта: <span id="map">Загрузка...</span>
@@ -91,7 +36,7 @@ h1 {
 </div>
 
 <script>
-/* ===== ФОНЫ ===== */
+// ===== ФОНЫ =====
 let images = [
     "https://vladislav22231.github.io/gmod-loading/Screenshot_83.png",
     "https://vladislav22231.github.io/gmod-loading/Screenshot_84.png",
@@ -102,13 +47,12 @@ let index = 0;
 let bg = document.getElementById("bg");
 function changeBG() {
     bg.style.backgroundImage = "url('" + images[index] + "')";
-    index++;
-    if(index >= images.length) index = 0;
+    index = (index + 1) % images.length;
 }
 setInterval(changeBG, 5000);
 changeBG();
 
-/* ===== ПРОГРЕСС ===== */
+// ===== ПРОГРЕСС =====
 let percent = 0;
 let bar = document.getElementById("bar");
 let text = document.getElementById("percent");
@@ -123,35 +67,17 @@ function fakeLoad() {
 }
 fakeLoad();
 
-/* ===== ОНЛАЙН И КАРТА ===== */
-function updatePlayers() {
-    fetch("https://api.battlemetrics.com/servers?filter[game]=gmod&filter[search]=178.150.168.239:27015")
-    .then(res => res.json())
-    .then(data => {
-        if(data.data.length > 0){
-            let server = data.data[0].attributes;
-            let players = server.players;
-            let max = server.maxPlayers;
-            let map = server.mapName || "Неизвестно";
-
-            // Ограничение до 20 игроков
-            if(max > 20) max = 20;
-            if(players > max) players = max;
-
-            document.getElementById("players").innerText = players + " / " + max;
-            document.getElementById("map").innerText = map;
-        } else {
-            document.getElementById("players").innerText = "0 / 20";
-            document.getElementById("map").innerText = "Неизвестно";
-        }
-    })
-    .catch(() => {
-        document.getElementById("players").innerText = "0 / 20";
-        document.getElementById("map").innerText = "Неизвестно";
+// ===== ОНЛАЙН И КАРТА ЧЕРЕЗ GMod NET =====
+if(typeof gmod !== "undefined" && gmod.net) {
+    gmod.net.Receive("SendServerInfo", function(data){
+        let info = JSON.parse(data);
+        document.getElementById("players").innerText = info.players + " / " + info.maxPlayers;
+        document.getElementById("map").innerText = info.map;
     });
+} else {
+    document.getElementById("players").innerText = "0 / 20";
+    document.getElementById("map").innerText = "Неизвестно";
 }
-setInterval(updatePlayers, 10000);
-updatePlayers();
 </script>
 </body>
 </html>
