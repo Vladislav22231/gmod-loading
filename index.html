@@ -19,7 +19,7 @@
     width:100%;
     height:100%;
     object-fit:cover;
-    z-index:0;
+    z-index:-1;
     filter:brightness(.65);
 }
   bg.onerror = function(){
@@ -30,7 +30,8 @@ bg.onload = function(){
     console.log("Картинка загружена");
 };
     
-  .center{position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);text-align:center;padding:24px 32px;background:var(--glass);border:1px solid rgba(232,77,255,.25);backdrop-filter:blur(6px);border-radius:14px}
+  .center{position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);text-align:center;padding:24px 32px;background:var(--glass);border:1px solid rgba(232,77,255,.25);backdrop-filter:blur(6px);border-radius:14px} z-index:10;
+}
   h1{font-weight:800;letter-spacing:.5px;margin:0 0 6px;font-size:56px;background:linear-gradient(90deg,var(--accent),var(--cyan));-webkit-background-clip:text;color:transparent}
   .subtitle{font-weight:600;color:var(--text);opacity:.9}
   .links{position:absolute;left:24px;top:24px;display:flex;flex-direction:column;gap:12px}
@@ -59,7 +60,7 @@ bg.onload = function(){
         0 0 30px #00e0ff;
 }
   .pct{margin-top:8px;color:var(--muted);font-size:14px}
-  @media (max-width:720px){h1{font-size:36px}.progress{width:90vw}.panel{position:static;margin:16px}.center{transform:none;position:static;margin:80px 16px}}
+  @media (max-width:400px){h1{font-size:36px}.progress{width:90vw}.panel{position:static;margin:16px}.center{transform:none;position:static;margin:80px 16px}}
 </style>
 </head>
 <body>
@@ -112,7 +113,14 @@ let current = 0;
 function changeBG() {
     bg.src = images[current];
     current = (current + 1) % images.length;
-}
+  
+  bg.onerror = function(){
+    console.log("Картинка не загрузилась");
+};
+
+bg.onload = function(){
+    console.log("Картинка загружена");
+};
 
 changeBG();
 setInterval(changeBG, 5000);
