@@ -105,20 +105,20 @@ const pct = document.getElementById("pct");
 const slides = document.querySelectorAll(".bg img");
 let currentSlide = 0;
 
-slides.forEach(img => {
-    img.onload = () => console.log("Загружено:", img.src);
-});
+slides[currentSlide].style.display = "block";
 
-function changeSlide() {
+setInterval(function(){
 
-    slides[currentSlide].classList.remove("active");
+    slides[currentSlide].style.display = "none";
 
-    currentSlide = (currentSlide + 1) % slides.length;
+    currentSlide++;
 
-    slides[currentSlide].classList.add("active");
-}
+    if(currentSlide >= slides.length)
+        currentSlide = 0;
 
-setInterval(changeSlide, 5000);
+    slides[currentSlide].style.display = "block";
+
+},5000);
 
 // =====================
 // Полоса загрузки
