@@ -35,7 +35,7 @@ html, body {
     position: relative;
 }
 
-/* СИНЕ-ФИОЛЕТОВЫЙ ФОН (+20% ЯРКОСТИ) */
+/* СИНЕ-ФИОЛЕТОВЫЙ ФОН (БАЛАНС 25%) */
 body::before {
     content: '';
     position: fixed;
@@ -44,24 +44,23 @@ body::before {
     right: 0;
     bottom: 0;
     background-image: 
-        radial-gradient(circle at 20% 45%, rgba(145, 32, 205, 0.27) 0%, rgba(68, 12, 135, 0.1) 45%, transparent 70%),
-        radial-gradient(circle at 15% 20%, rgba(190, 55, 220, 0.18) 0%, transparent 40%),
-        radial-gradient(circle at 85% 75%, rgba(0, 190, 230, 0.15) 0%, transparent 50%),
-        radial-gradient(circle at 50% 80%, rgba(12, 40, 95, 0.24) 0%, transparent 60%);
+        radial-gradient(circle at 20% 45%, rgba(148, 33, 210, 0.28) 0%, rgba(70, 13, 140, 0.1) 45%, transparent 70%),
+        radial-gradient(circle at 15% 20%, rgba(192, 58, 222, 0.19) 0%, transparent 40%),
+        radial-gradient(circle at 85% 75%, rgba(0, 192, 232, 0.16) 0%, transparent 50%),
+        radial-gradient(circle at 50% 80%, rgba(13, 42, 100, 0.25) 0%, transparent 60%);
     z-index: 1;
-    /* Плавное дышащее свечение */
     animation: breathingGlow 8s ease-in-out infinite alternate;
 }
 
 @keyframes breathingGlow {
     0% {
-        opacity: 0.42;
+        opacity: 0.44;
     }
     50% {
-        opacity: 0.74;
+        opacity: 0.76;
     }
     100% {
-        opacity: 0.48;
+        opacity: 0.50;
     }
 }
 
