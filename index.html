@@ -22,6 +22,14 @@
     z-index:0;
     filter:brightness(.65);
 }
+  bg.onerror = function(){
+    console.log("Картинка не загрузилась");
+};
+
+bg.onload = function(){
+    console.log("Картинка загружена");
+};
+    
   .center{position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);text-align:center;padding:24px 32px;background:var(--glass);border:1px solid rgba(232,77,255,.25);backdrop-filter:blur(6px);border-radius:14px}
   h1{font-weight:800;letter-spacing:.5px;margin:0 0 6px;font-size:56px;background:linear-gradient(90deg,var(--accent),var(--cyan));-webkit-background-clip:text;color:transparent}
   .subtitle{font-weight:600;color:var(--text);opacity:.9}
@@ -99,6 +107,7 @@ const images = [
 ];
 
 const bg = document.getElementById("bg");
+let current = 0;
 
 function changeBG() {
     bg.src = images[current];
