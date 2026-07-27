@@ -26,42 +26,14 @@ body {
     font-family: 'Inter', Arial, Helvetica, sans-serif;
     color: var(--text);
     background: #06070a;
+    /* Статичный фон ровно как на скриншоте №2 */
+    background-image: 
+        radial-gradient(circle at 50% 45%, rgba(180, 50, 255, 0.25) 0%, rgba(100, 20, 200, 0.1) 35%, transparent 70%),
+        radial-gradient(circle at 20% 20%, rgba(232, 77, 255, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(0, 224, 255, 0.1) 0%, transparent 40%);
     overflow: hidden;
     user-select: none;
     height: 100vh;
-    position: relative;
-}
-
-/* Движущийся и мерцающий фоновый свет */
-.animated-bg {
-    position: absolute;
-    inset: -20%;
-    z-index: 1;
-    background-image: 
-        radial-gradient(circle at 50% 50%, rgba(180, 50, 255, 0.4) 0%, rgba(100, 20, 200, 0.15) 35%, transparent 70%),
-        radial-gradient(circle at 20% 20%, rgba(232, 77, 255, 0.25) 0%, transparent 45%),
-        radial-gradient(circle at 80% 80%, rgba(0, 224, 255, 0.2) 0%, transparent 45%);
-    filter: blur(20px);
-    animation: moveGlow 12s ease-in-out infinite alternate;
-}
-
-@keyframes moveGlow {
-    0% {
-        transform: translate(0, 0) scale(1);
-        opacity: 0.8;
-    }
-    33% {
-        transform: translate(4%, -3%) scale(1.08);
-        opacity: 1;
-    }
-    66% {
-        transform: translate(-3%, 4%) scale(0.95);
-        opacity: 0.85;
-    }
-    100% {
-        transform: translate(2%, 2%) scale(1.05);
-        opacity: 0.95;
-    }
 }
 
 /* Общий стиль стеклянных панелей */
@@ -89,31 +61,47 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
     color: var(--text);
     text-decoration: none;
     padding: 10px 18px;
     font-size: 14px;
     font-weight: 600;
-    border: 1px solid rgba(0, 224, 255, .25);
+    border: 1px solid rgba(0, 224, 255, .3);
     border-radius: 10px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s ease;
     cursor: pointer;
-    position: relative;
-    overflow: hidden;
+    /* Постоянная мягкая анимация свечения ТОЛЬКО для кнопок */
+    animation: btnGlow 3s ease-in-out infinite alternate;
 }
 
-/* Анимация и свечение при наведении на кнопки */
+/* Настройки уникального неонового цвета для каждой кнопки */
+.btn-discord {
+    animation-delay: 0s;
+}
+
+.btn-telegram {
+    animation-delay: 1.5s; /* Рассинхрон анимации, чтобы смотрелось живее */
+}
+
+/* Анимация пульсации границ и свечения кнопок */
+@keyframes btnGlow {
+    0% {
+        box-shadow: 0 0 5px rgba(0, 224, 255, 0.2), inset 0 0 5px rgba(0, 224, 255, 0.1);
+        border-color: rgba(0, 224, 255, 0.3);
+    }
+    100% {
+        box-shadow: 0 0 18px rgba(232, 77, 255, 0.45), inset 0 0 8px rgba(232, 77, 255, 0.25);
+        border-color: rgba(232, 77, 255, 0.6);
+    }
+}
+
+/* Эффект при наведении на кнопки */
 .btn:hover {
-    background: rgba(0, 224, 255, 0.15);
+    background: rgba(0, 224, 255, 0.2);
     border-color: var(--cyan);
-    transform: translateY(-3px) scale(1.03);
-    box-shadow: 0 0 15px rgba(0, 224, 255, 0.4), 0 0 25px rgba(232, 77, 255, 0.3);
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 0 22px rgba(0, 224, 255, 0.6);
     color: #ffffff;
-}
-
-.btn:active {
-    transform: translateY(-1px) scale(0.98);
 }
 
 /* Центральный блок */
@@ -218,13 +206,10 @@ h1.title {
 </head>
 <body>
 
-<!-- Живой анимированный фон -->
-<div class="animated-bg"></div>
-
-<!-- Кнопки Соцсетей -->
+<!-- Кнопки Соцсетей с индивидуальной анимацией -->
 <div class="social-buttons">
-    <a href="https://discord.gg/UmGHaVrZ" target="_blank" class="btn glass-panel">Discord</a>
-    <a href="https://t.me/PixelCanvasSandboxServer" target="_blank" class="btn glass-panel">Telegram</a>
+    <a href="https://discord.gg/UmGHaVrZ" target="_blank" class="btn btn-discord glass-panel">Discord</a>
+    <a href="https://t.me/PixelCanvasSandboxServer" target="_blank" class="btn btn-telegram glass-panel">Telegram</a>
 </div>
 
 <!-- Центральное меню -->
