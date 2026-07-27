@@ -12,17 +12,7 @@
   }
   *{box-sizing:border-box}html,body{height:100%;margin:0}
   body{font-family:Inter,Arial,Helvetica,sans-serif;color:var(--text);background:#000;overflow:hidden}
- .bg{
-    position:fixed;
-    inset:0;
-    z-index:-1;
-
-    background-size:cover;
-    background-position:center;
-    background-repeat:no-repeat;
-
-    transition:background-image 1s ease;
-}
+  .bg{position:fixed;inset:0;z-index:-1}
   .bg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(0px) brightness(.65);opacity:0;transition:opacity 1s ease}
   .bg img.active{opacity:1}
   .center{position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);text-align:center;padding:24px 32px;background:var(--glass);border:1px solid rgba(232,77,255,.25);backdrop-filter:blur(6px);border-radius:14px}
@@ -41,14 +31,30 @@
     border-radius:999px;
     overflow:hidden;
     border:1px solid rgba(255,255,255,.12);
+    box-shadow:0 0 20px rgba(232,77,255,.25);
 }
-  .bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--cyan));transition:width .2s ease}
+  .bar{
+    height:100%;
+    width:0;
+    background:linear-gradient(90deg,#e84dff,#00e0ff);
+    transition:width .2s ease;
+    box-shadow:
+        0 0 8px #e84dff,
+        0 0 18px #00e0ff,
+        0 0 30px #00e0ff;
+}
   .pct{margin-top:8px;color:var(--muted);font-size:14px}
   @media (max-width:720px){h1{font-size:36px}.progress{width:90vw}.panel{position:static;margin:16px}.center{transform:none;position:static;margin:80px 16px}}
 </style>
 </head>
 <body>
-  <div class="bg" id="bg"></div>
+  <div class="bg">
+<img src="https://vladislav22231.github.io/gmod-loading/Screenshot_83.png" class="active">
+<img src="https://vladislav22231.github.io/gmod-loading/Screenshot_84.png">
+<img src="https://vladislav22231.github.io/gmod-loading/Screenshot_85.png">
+<img src="https://vladislav22231.github.io/gmod-loading/Screenshot_87.png">
+</div>
+
  <div class="links">
     <a class="link" href="https://discord.gg/UmGHaVrZ" target="_blank">Discord</a>
     <a class="link" href="https://t.me/PixelCanvasSandboxServer" target="_blank">Telegram</a>
@@ -78,56 +84,76 @@
     </div>
 </div>
 
-<script>}
+<script>
+const bar = document.getElementById("bar");
+const pct = document.getElementById("pct");
+// =====================
+// Слайдшоу
+// =====================
+const slides = document.querySelectorAll(".bg img");
+let currentSlide = 0;
+
+function changeSlide() {
+
+    slides[currentSlide].classList.remove("active");
+
+    currentSlide++;
+
+    if (currentSlide >= slides.length)
+        currentSlide = 0;
+
+    slides[currentSlide].classList.add("active");
+}
+
+setInterval(changeSlide, 5000);
 
 // =====================
 // Полоса загрузки
 // =====================
-const bar = document.getElementById('bar');
-const pct = document.getElementById('pct');
+const stages = {
+    "Sending client info": 10,
+    "Receiving server info": 20,
+    "Starting Lua": 40,
+    "Downloading": 70,
+    "Mounting Addons": 90
+};
 
 window.SetStatusChanged = function(status) {
+
     pct.textContent = status;
+
+    for (const key in stages) {
+
+        if (status.includes(key)) {
+
+            bar.style.width = stages[key] + "%";
+            return;
+        }
+    }
 };
 
 window.DownloadingFile = function(file) {
     pct.textContent = "📥 " + file;
 };
 
-let totalFiles = 0;
+window.GameDetails = function(servername, serverurl, mapname, maxplayers, steamid) {
+    document.getElementById("map").textContent = mapname;
+};
 
 window.SetFilesTotal = function(total) {
-    totalFiles = total;
+    window.totalFiles = total;
 };
 
 window.SetFilesNeeded = function(needed) {
+    if (!window.totalFiles) return;
 
-    if (totalFiles <= 0) return;
-
-    const percent = Math.floor(((totalFiles - needed) / totalFiles) * 100);
+    const loaded = window.totalFiles - needed;
+    const percent = Math.floor((loaded / window.totalFiles) * 100);
 
     bar.style.width = percent + "%";
     pct.textContent = "Загрузка файлов... " + percent + "%";
 };
-const images = [
-    "https://vladislav22231.github.io/gmod-loading/Screenshot_83.png",
-    "https://vladislav22231.github.io/gmod-loading/Screenshot_84.png",
-    "https://vladislav22231.github.io/gmod-loading/Screenshot_85.png",
-    "https://vladislav22231.github.io/gmod-loading/Screenshot_87.png"
-];
 
-const bg = document.getElementById("bg");
-let current = 0;
-
-function changeBG() {
-    bg.style.backgroundImage = `url('${images[current]}')`;
-    bg.style.backgroundSize = "cover";
-    bg.style.backgroundPosition = "center";
-    current = (current + 1) % images.length;
-}
-
-changeBG();
-setInterval(changeBG, 5000);
 // =====================
 // Получение данных сервера
 // =====================
@@ -174,6 +200,3 @@ window.GameDetails = function(servername, serverurl, mapname, maxplayers, steami
     document.getElementById("map").textContent = mapname;
 
 }
-
-
-</script>
