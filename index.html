@@ -35,7 +35,7 @@ html, body {
     position: relative;
 }
 
-/* СИНЕ-ФИОЛЕТОВЫЙ ФОН (+30% ЯРКОСТИ/НАСЫЩЕННОСТИ) */
+/* СИНЕ-ФИОЛЕТОВЫЙ ФОН (+20% ЯРКОСТИ) */
 body::before {
     content: '';
     position: fixed;
@@ -44,24 +44,24 @@ body::before {
     right: 0;
     bottom: 0;
     background-image: 
-        radial-gradient(circle at 20% 45%, rgba(155, 35, 220, 0.32) 0%, rgba(75, 15, 150, 0.12) 45%, transparent 70%),
-        radial-gradient(circle at 15% 20%, rgba(200, 60, 230, 0.22) 0%, transparent 40%),
-        radial-gradient(circle at 85% 75%, rgba(0, 200, 240, 0.18) 0%, transparent 50%),
-        radial-gradient(circle at 50% 80%, rgba(15, 45, 110, 0.28) 0%, transparent 60%);
+        radial-gradient(circle at 20% 45%, rgba(145, 32, 205, 0.27) 0%, rgba(68, 12, 135, 0.1) 45%, transparent 70%),
+        radial-gradient(circle at 15% 20%, rgba(190, 55, 220, 0.18) 0%, transparent 40%),
+        radial-gradient(circle at 85% 75%, rgba(0, 190, 230, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 50% 80%, rgba(12, 40, 95, 0.24) 0%, transparent 60%);
     z-index: 1;
-    /* Плавное дыхание в идеальном балансе прозрачности */
+    /* Плавное дышащее свечение */
     animation: breathingGlow 8s ease-in-out infinite alternate;
 }
 
 @keyframes breathingGlow {
     0% {
-        opacity: 0.48;
+        opacity: 0.42;
     }
     50% {
-        opacity: 0.82;
+        opacity: 0.74;
     }
     100% {
-        opacity: 0.55;
+        opacity: 0.48;
     }
 }
 
