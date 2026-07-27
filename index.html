@@ -28,40 +28,39 @@ body {
     background: var(--bg);
     overflow: hidden;
     user-select: none;
+    width: 100vw;
     height: 100vh;
     position: relative;
 }
 
-/* Мягкие плавающие неоновые пятна (без яркой заливки) */
-body::before {
-    content: '';
+/* ОТДЕЛЬНЫЙ СЛОЙ ДЛЯ ЖИВОГО ФОНА */
+.bg-animation {
     position: absolute;
     top: -20%;
     left: -20%;
     width: 140%;
     height: 140%;
-    /* Приглушенные точечные градиенты с высокой прозрачностью */
-    background-image: 
-        radial-gradient(circle at 45% 50%, rgba(160, 40, 220, 0.18) 0%, transparent 50%),
-        radial-gradient(circle at 20% 30%, rgba(232, 77, 255, 0.12) 0%, transparent 40%),
-        radial-gradient(circle at 80% 70%, rgba(0, 224, 255, 0.12) 0%, transparent 40%);
     z-index: 1;
-    /* Медленная плавная анимация движения и «дыхания» */
-    animation: smoothGlow 16s ease-in-out infinite alternate;
+    pointer-events: none;
+    background-image: 
+        radial-gradient(circle at 45% 50%, rgba(140, 30, 200, 0.22) 0%, transparent 55%),
+        radial-gradient(circle at 20% 25%, rgba(0, 224, 255, 0.15) 0%, transparent 45%),
+        radial-gradient(circle at 80% 75%, rgba(232, 77, 255, 0.15) 0%, transparent 45%);
+    animation: smoothGlow 14s ease-in-out infinite alternate;
 }
 
 @keyframes smoothGlow {
     0% {
         transform: translate(0, 0) scale(1);
-        opacity: 0.7;
+        opacity: 0.6;
     }
     50% {
-        transform: translate(-3%, 2%) scale(1.08);
+        transform: translate(-2%, 2%) scale(1.05);
         opacity: 1;
     }
     100% {
-        transform: translate(3%, -2%) scale(0.95);
-        opacity: 0.6;
+        transform: translate(2%, -2%) scale(0.95);
+        opacity: 0.7;
     }
 }
 
@@ -78,8 +77,8 @@ body::before {
 /* Кнопки слева вверху */
 .social-buttons {
     position: absolute;
-    top: 24px;
-    left: 24px;
+    top: 32px;
+    left: 32px;
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -92,7 +91,7 @@ body::before {
     justify-content: center;
     color: var(--text);
     text-decoration: none;
-    padding: 10px 18px;
+    padding: 10px 20px;
     font-size: 14px;
     font-weight: 600;
     border: 1px solid rgba(0, 224, 255, .3);
@@ -102,13 +101,8 @@ body::before {
     animation: btnGlow 3s ease-in-out infinite alternate;
 }
 
-.btn-discord {
-    animation-delay: 0s;
-}
-
-.btn-telegram {
-    animation-delay: 1.5s;
-}
+.btn-discord { animation-delay: 0s; }
+.btn-telegram { animation-delay: 1.5s; }
 
 @keyframes btnGlow {
     0% {
@@ -129,17 +123,23 @@ body::before {
     color: #ffffff;
 }
 
+/* КОНТЕЙНЕР ДЛЯ СТРОГОГО ЦЕНТРИРОВАНИЯ */
+.main-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
 /* Центральный блок */
 .center-card {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -55%);
     width: 780px;
-    max-width: 95vw;
-    padding: 26px 30px;
+    max-width: 90vw;
+    padding: 30px;
     text-align: center;
-    z-index: 10;
 }
 
 h1.title {
@@ -183,7 +183,7 @@ h1.title {
 }
 
 .status-text {
-    margin-top: 10px;
+    margin-top: 12px;
     font-size: 14px;
     color: var(--muted);
     white-space: nowrap;
@@ -191,12 +191,13 @@ h1.title {
     text-overflow: ellipsis;
 }
 
+/* Инфо-блок снизу справа */
 .info-card {
     position: absolute;
-    right: 24px;
-    bottom: 24px;
+    right: 32px;
+    bottom: 32px;
     min-width: 340px;
-    padding: 16px 18px;
+    padding: 18px 20px;
     font-size: 14px;
     z-index: 10;
 }
@@ -204,7 +205,7 @@ h1.title {
 .info-row {
     display: flex;
     justify-content: space-between;
-    margin: 4px 0;
+    margin: 5px 0;
     color: var(--muted);
 }
 
@@ -217,16 +218,12 @@ h1.title {
     overflow: hidden;
     text-overflow: ellipsis;
 }
-
-@media (max-width: 768px) {
-    h1.title { font-size: 36px; }
-    .subtitle { font-size: 10px; }
-    .center-card { transform: none; position: static; margin: 80px 16px; width: auto; }
-    .info-card { position: static; margin: 16px; }
-}
 </style>
 </head>
 <body>
+
+<!-- Живой фоновый слой -->
+<div class="bg-animation"></div>
 
 <!-- Кнопки Соцсетей -->
 <div class="social-buttons">
@@ -234,16 +231,18 @@ h1.title {
     <a href="https://t.me/PixelCanvasSandboxServer" target="_blank" class="btn btn-telegram glass-panel">Telegram</a>
 </div>
 
-<!-- Центральное меню -->
-<div class="center-card glass-panel">
-    <h1 class="title">PixelSandbox</h1>
-    <div class="subtitle">• UA Украинский Sandbox • 100+ аддонов • Безграничные возможности • Активное сообщество •</div>
+<!-- Оболочка для точного центрирования главного блока -->
+<div class="main-wrapper">
+    <div class="center-card glass-panel">
+        <h1 class="title">PixelSandbox</h1>
+        <div class="subtitle">• UA Украинский Sandbox • 100+ аддонов • Безграничные возможности • Активное сообщество •</div>
 
-    <div class="progress-container">
-        <div class="progress-bar" id="bar"></div>
+        <div class="progress-container">
+            <div class="progress-bar" id="bar"></div>
+        </div>
+
+        <div class="status-text" id="status">Подключение... 0%</div>
     </div>
-
-    <div class="status-text" id="status">Подключение... 0%</div>
 </div>
 
 <!-- Инфо-блок снизу справа -->
