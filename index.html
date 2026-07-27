@@ -14,13 +14,13 @@
   body{font-family:Inter,Arial,Helvetica,sans-serif;color:var(--text);background:#000;overflow:hidden}
 .bg{
     position:fixed;
-    inset:0;
-    z-index:-1;
-    background-size:cover;
-    background-position:center;
-    background-repeat:no-repeat;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    z-index:0;
     filter:brightness(.65);
-    transition:background-image 1s ease;
 }
   .center{position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);text-align:center;padding:24px 32px;background:var(--glass);border:1px solid rgba(232,77,255,.25);backdrop-filter:blur(6px);border-radius:14px}
   h1{font-weight:800;letter-spacing:.5px;margin:0 0 6px;font-size:56px;background:linear-gradient(90deg,var(--accent),var(--cyan));-webkit-background-clip:text;color:transparent}
@@ -55,7 +55,7 @@
 </style>
 </head>
 <body>
-<div class="bg" id="bg"></div>
+<img class="bg" id="bg">
  <div class="links">
     <a class="link" href="https://discord.gg/UmGHaVrZ" target="_blank">Discord</a>
     <a class="link" href="https://t.me/PixelCanvasSandboxServer" target="_blank">Telegram</a>
@@ -99,10 +99,9 @@ const images = [
 ];
 
 const bg = document.getElementById("bg");
-let current = 0;
 
 function changeBG() {
-    bg.style.backgroundImage = "url('" + images[current] + "')";
+    bg.src = images[current];
     current = (current + 1) % images.length;
 }
 
