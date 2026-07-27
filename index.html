@@ -90,14 +90,22 @@ const pct = document.getElementById("pct");
 // =====================
 // Слайдшоу
 // =====================
-const slides = [...document.querySelectorAll('.bg img')];
-let i = 0;
+const slides = document.querySelectorAll(".bg img");
+let currentSlide = 0;
 
-setInterval(() => {
-    slides[i].classList.remove('active');
-    i = (i + 1) % slides.length;
-    slides[i].classList.add('active');
-}, 6000);
+function changeSlide() {
+
+    slides[currentSlide].classList.remove("active");
+
+    currentSlide++;
+
+    if (currentSlide >= slides.length)
+        currentSlide = 0;
+
+    slides[currentSlide].classList.add("active");
+}
+
+setInterval(changeSlide, 5000);
 
 // =====================
 // Полоса загрузки
