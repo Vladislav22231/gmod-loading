@@ -1,4 +1,4 @@
-<!doctype html>
+вот код <!doctype html>
 <html lang="ru">
 <head>
 <meta charset="utf-8">
@@ -31,28 +31,18 @@
     border-radius:999px;
     overflow:hidden;
     border:1px solid rgba(255,255,255,.12);
-    box-shadow:0 0 20px rgba(232,77,255,.25);
 }
-  .bar{
-    height:100%;
-    width:0;
-    background:linear-gradient(90deg,#e84dff,#00e0ff);
-    transition:width .2s ease;
-    box-shadow:
-        0 0 8px #e84dff,
-        0 0 18px #00e0ff,
-        0 0 30px #00e0ff;
-}
+  .bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--cyan));transition:width .2s ease}
   .pct{margin-top:8px;color:var(--muted);font-size:14px}
   @media (max-width:720px){h1{font-size:36px}.progress{width:90vw}.panel{position:static;margin:16px}.center{transform:none;position:static;margin:80px 16px}}
 </style>
 </head>
 <body>
   <div class="bg">
-<img src="https://vladislav22231.github.io/gmod-loading/Screenshot_83.png" class="active">
-<img src="https://vladislav22231.github.io/gmod-loading/Screenshot_84.png">
-<img src="https://vladislav22231.github.io/gmod-loading/Screenshot_85.png">
-<img src="https://vladislav22231.github.io/gmod-loading/Screenshot_87.png">
+    <img src="Screenshot_83.png" class="active" alt="">
+    <img src="Screenshot_84.png" alt="">
+    <img src="Screenshot_85.png" alt="">
+    <img src="Screenshot_87.png" alt="">
 </div>
 
  <div class="links">
@@ -85,74 +75,31 @@
 </div>
 
 <script>
-const bar = document.getElementById("bar");
-const pct = document.getElementById("pct");
 // =====================
 // Слайдшоу
 // =====================
-const slides = document.querySelectorAll(".bg img");
-let currentSlide = 0;
+const slides = [...document.querySelectorAll('.bg img')];
+let i = 0;
 
-function changeSlide() {
-
-    slides[currentSlide].classList.remove("active");
-
-    currentSlide++;
-
-    if (currentSlide >= slides.length)
-        currentSlide = 0;
-
-    slides[currentSlide].classList.add("active");
-}
-
-setInterval(changeSlide, 5000);
+setInterval(() => {
+    slides[i].classList.remove('active');
+    i = (i + 1) % slides.length;
+    slides[i].classList.add('active');
+}, 6000);
 
 // =====================
 // Полоса загрузки
 // =====================
-const stages = {
-    "Sending client info": 10,
-    "Receiving server info": 20,
-    "Starting Lua": 40,
-    "Downloading": 70,
-    "Mounting Addons": 90
-};
+const bar = document.getElementById('bar');
+const pct = document.getElementById('pct');
 
-window.SetStatusChanged = function(status) {
+let p = 0;
 
-    pct.textContent = status;
-
-    for (const key in stages) {
-
-        if (status.includes(key)) {
-
-            bar.style.width = stages[key] + "%";
-            return;
-        }
-    }
-};
-
-window.DownloadingFile = function(file) {
-    pct.textContent = "📥 " + file;
-};
-
-window.GameDetails = function(servername, serverurl, mapname, maxplayers, steamid) {
-    document.getElementById("map").textContent = mapname;
-};
-
-window.SetFilesTotal = function(total) {
-    window.totalFiles = total;
-};
-
-window.SetFilesNeeded = function(needed) {
-    if (!window.totalFiles) return;
-
-    const loaded = window.totalFiles - needed;
-    const percent = Math.floor((loaded / window.totalFiles) * 100);
-
-    bar.style.width = percent + "%";
-    pct.textContent = "Загрузка файлов... " + percent + "%";
-};
+setInterval(() => {
+    p = Math.min(99, p + Math.random() * 2.2);
+    bar.style.width = p + "%";
+    pct.textContent = "Загрузка... " + Math.floor(p) + "%";
+}, 120);
 
 // =====================
 // Получение данных сервера
@@ -200,3 +147,18 @@ window.GameDetails = function(servername, serverurl, mapname, maxplayers, steami
     document.getElementById("map").textContent = mapname;
 
 }
+
+window.addEventListener("load", () => {
+
+    setTimeout(() => {
+
+        p = 100;
+
+        bar.style.width = "100%";
+
+        pct.textContent = "Готово: 100%";
+
+    }, 5000);
+
+});
+</script>
