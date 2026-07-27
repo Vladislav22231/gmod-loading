@@ -8,12 +8,12 @@
 
 <style>
 :root {
-    --bg: #0b0e14;
+    --bg: #07090e;
     --text: #e6e9ef;
     --muted: #9aa3b2;
     --accent: #e84dff;
     --cyan: #00e0ff;
-    --glass: rgba(13, 16, 24, .65);
+    --glass: rgba(13, 16, 24, .75);
 }
 
 * {
@@ -25,48 +25,25 @@
 body {
     font-family: 'Inter', Arial, Helvetica, sans-serif;
     color: var(--text);
-    background: radial-gradient(circle at center, #1a102f 0%, #080a0f 100%);
+    background: #06070a;
+    /* Яркое фиолетово-голубое свечение сзади */
+    background-image: 
+        radial-gradient(circle at 50% 45%, rgba(180, 50, 255, 0.35) 0%, rgba(100, 20, 200, 0.15) 35%, transparent 70%),
+        radial-gradient(circle at 20% 20%, rgba(232, 77, 255, 0.2) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(0, 224, 255, 0.15) 0%, transparent 40%);
     overflow: hidden;
     user-select: none;
     height: 100vh;
 }
 
-/* Фоны и Слайд-шоу */
-.background {
-    position: fixed;
-    inset: 0;
-    z-index: 1;
-}
-
-.background img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    filter: brightness(.65);
-    opacity: 0;
-    transition: opacity 1s ease-in-out;
-}
-
-.background img.active {
-    opacity: 1;
-}
-
-.overlay {
-    position: fixed;
-    inset: 0;
-    background: radial-gradient(circle, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.5) 100%);
-    z-index: 2;
-}
-
 /* Общий стиль стеклянных панелей */
 .glass-panel {
     background: var(--glass);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(232, 77, 255, .25);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(232, 77, 255, .35);
     border-radius: 14px;
+    box-shadow: 0 0 35px rgba(180, 50, 255, 0.25), inset 0 0 15px rgba(232, 77, 255, 0.05);
 }
 
 /* Кнопки слева вверху */
@@ -86,17 +63,17 @@ body {
     gap: 10px;
     color: var(--text);
     text-decoration: none;
-    padding: 10px 14px;
+    padding: 10px 16px;
     font-size: 14px;
     font-weight: 600;
-    border: 1px solid rgba(0, 224, 255, .2);
+    border: 1px solid rgba(0, 224, 255, .25);
     border-radius: 10px;
     transition: all 0.2s ease;
     cursor: pointer;
 }
 
 .btn:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15);
     border-color: var(--cyan);
 }
 
@@ -106,9 +83,9 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -55%);
-    width: 760px;
+    width: 780px;
     max-width: 95vw;
-    padding: 24px 28px;
+    padding: 26px 30px;
     text-align: center;
     z-index: 10;
 }
@@ -118,9 +95,10 @@ h1.title {
     font-weight: 800;
     letter-spacing: .5px;
     margin: 0 0 6px;
-    background: linear-gradient(90deg, var(--accent), var(--cyan));
+    background: linear-gradient(90deg, #f070ff, var(--cyan));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 30px rgba(232, 77, 255, 0.3);
 }
 
 /* Подзаголовок ровно в 1 строку */
@@ -155,7 +133,7 @@ h1.title {
 }
 
 .status-text {
-    margin-top: 8px;
+    margin-top: 10px;
     font-size: 14px;
     color: var(--muted);
     white-space: nowrap;
@@ -201,16 +179,6 @@ h1.title {
 </head>
 <body>
 
-<!-- Фоны и Слайд-шоу (Пути напрямую из корня) -->
-<div class="background">
-    <img src="1.jpg" class="active" alt="bg1">
-    <img src="2.jpg" alt="bg2">
-    <img src="3.jpg" alt="bg3">
-    <img src="4.jpg" alt="bg4">
-</div>
-
-<div class="overlay"></div>
-
 <!-- Кнопки Соцсетей -->
 <div class="social-buttons">
     <a href="https://discord.gg/UmGHaVrZ" target="_blank" class="btn glass-panel">Discord</a>
@@ -246,19 +214,6 @@ h1.title {
 </div>
 
 <script>
-/* ===== СЛАЙД-ШОУ ФОНОВ ===== */
-const slides = document.querySelectorAll(".background img");
-let currentSlide = 0;
-
-function changeSlide() {
-    if (slides.length <= 1) return;
-    slides[currentSlide].classList.remove("active");
-    currentSlide = (currentSlide + 1) % slides.length;
-    slides[currentSlide].classList.add("active");
-}
-
-setInterval(changeSlide, 5000);
-
 /* ===== ЭТАПЫ И НАСТОЯЩИЙ ПРОГРЕСС ЗАГРУЗКИ ===== */
 const bar = document.getElementById("bar");
 const statusText = document.getElementById("status");
