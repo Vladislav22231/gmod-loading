@@ -31,8 +31,18 @@
     border-radius:999px;
     overflow:hidden;
     border:1px solid rgba(255,255,255,.12);
+    box-shadow:0 0 20px rgba(232,77,255,.25);
 }
-  .bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--cyan));transition:width .2s ease}
+  .bar{
+    height:100%;
+    width:0;
+    background:linear-gradient(90deg,#e84dff,#00e0ff);
+    transition:width .2s ease;
+    box-shadow:
+        0 0 8px #e84dff,
+        0 0 18px #00e0ff,
+        0 0 30px #00e0ff;
+}
   .pct{margin-top:8px;color:var(--muted);font-size:14px}
   @media (max-width:720px){h1{font-size:36px}.progress{width:90vw}.panel{position:static;margin:16px}.center{transform:none;position:static;margin:80px 16px}}
 </style>
@@ -90,16 +100,49 @@ setInterval(() => {
 // =====================
 // Полоса загрузки
 // =====================
-const bar = document.getElementById('bar');
-const pct = document.getElementById('pct');
+const stages = {
+    "Sending client info": 10,
+    "Receiving server info": 20,
+    "Starting Lua": 40,
+    "Downloading": 70,
+    "Mounting Addons": 90
+};
 
-let p = 0;
+window.SetStatusChanged = function(status) {
 
-setInterval(() => {
-    p = Math.min(99, p + Math.random() * 2.2);
-    bar.style.width = p + "%";
-    pct.textContent = "Загрузка... " + Math.floor(p) + "%";
-}, 120);
+    pct.textContent = status;
+
+    for (const key in stages) {
+
+        if (status.includes(key)) {
+
+            bar.style.width = stages[key] + "%";
+            return;
+        }
+    }
+};
+
+window.DownloadingFile = function(file) {
+    pct.textContent = "📥 " + file;
+};
+
+window.GameDetails = function(servername, serverurl, mapname, maxplayers, steamid) {
+    document.getElementById("map").textContent = mapname;
+};
+
+window.SetFilesTotal = function(total) {
+    window.totalFiles = total;
+};
+
+window.SetFilesNeeded = function(needed) {
+    if (!window.totalFiles) return;
+
+    const loaded = window.totalFiles - needed;
+    const percent = Math.floor((loaded / window.totalFiles) * 100);
+
+    bar.style.width = percent + "%";
+    pct.textContent = "Загрузка файлов... " + percent + "%";
+};
 
 // =====================
 // Получение данных сервера
@@ -147,18 +190,3 @@ window.GameDetails = function(servername, serverurl, mapname, maxplayers, steami
     document.getElementById("map").textContent = mapname;
 
 }
-
-window.addEventListener("load", () => {
-
-    setTimeout(() => {
-
-        p = 100;
-
-        bar.style.width = "100%";
-
-        pct.textContent = "Готово: 100%";
-
-    }, 5000);
-
-});
-</script>
