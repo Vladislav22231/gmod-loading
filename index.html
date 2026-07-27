@@ -158,7 +158,7 @@ h1.title {
     text-overflow: ellipsis;
 }
 
-/* Кнопка включения/выключения звука (если автоплей заблокирован браузером) */
+/* Кнопка включения/выключения звука */
 .sound-toggle {
     position: fixed;
     bottom: 20px;
@@ -183,13 +183,12 @@ h1.title {
 </head>
 <body>
 
-<!-- Аудио элемент с фоновой музыкой (зациклен) -->
+<!-- Аудио элемент с фоновой музыкой -->
 <audio id="bg-music" loop autoplay>
-    <!-- Замените "your-music-file.mp3" на ссылку или путь к вашему аудиофайлу -->
-    <source src="your-music-file.mp3" type="audio/mpeg">
+    <source src="music.mp3" type="audio/mpeg">
 </audio>
 
-<!-- Кнопка управления звуком на случай блокировки автоплея браузером -->
+<!-- Кнопка управления звуком -->
 <button class="sound-toggle" id="sound-btn" onclick="toggleSound()">🔊 Звук: Вкл</button>
 
 <!-- Центральное меню -->
@@ -229,10 +228,8 @@ const statusText = document.getElementById("status");
 const music = document.getElementById("bg-music");
 const soundBtn = document.getElementById("sound-btn");
 
-// Установка громкости (от 0.0 до 1.0)
 music.volume = 0.5;
 
-// Автозапуск музыки при первом клике/взаимодействии, если браузер заблокировал autoplay
 document.addEventListener('click', () => {
     if (music.paused) {
         music.play().catch(() => {});
