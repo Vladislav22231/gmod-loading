@@ -22,46 +22,40 @@
     padding: 0;
 }
 
-body {
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden !important; /* Жестко убираем любые скроллы */
     font-family: 'Inter', Arial, Helvetica, sans-serif;
     color: var(--text);
-    background: var(--bg);
-    overflow: hidden;
+    background: #06070a;
     user-select: none;
-    width: 100vw;
-    height: 100vh;
     position: relative;
 }
 
-/* ОТДЕЛЬНЫЙ СЛОЙ ДЛЯ ЖИВОГО ФОНА */
-.bg-animation {
-    position: absolute;
-    top: -20%;
-    left: -20%;
-    width: 140%;
-    height: 140%;
-    z-index: 1;
-    pointer-events: none;
+/* МЯГКИЙ ЖИВОЙ ФОН БЕЗ TRANSFORM (НЕ ДВИГАЕТ ИНТЕРФЕЙС) */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background-image: 
-        radial-gradient(circle at 45% 50%, rgba(140, 30, 200, 0.22) 0%, transparent 55%),
-        radial-gradient(circle at 20% 25%, rgba(0, 224, 255, 0.15) 0%, transparent 45%),
-        radial-gradient(circle at 80% 75%, rgba(232, 77, 255, 0.15) 0%, transparent 45%);
-    animation: smoothGlow 14s ease-in-out infinite alternate;
+        radial-gradient(circle at 50% 50%, rgba(140, 30, 200, 0.25) 0%, transparent 60%),
+        radial-gradient(circle at 20% 20%, rgba(0, 224, 255, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(232, 77, 255, 0.15) 0%, transparent 40%);
+    z-index: 1;
+    /* Анимация работает ТОЛЬКО с прозрачностью */
+    animation: breathingGlow 8s ease-in-out infinite alternate;
 }
 
-@keyframes smoothGlow {
-    0% {
-        transform: translate(0, 0) scale(1);
-        opacity: 0.6;
-    }
-    50% {
-        transform: translate(-2%, 2%) scale(1.05);
-        opacity: 1;
-    }
-    100% {
-        transform: translate(2%, -2%) scale(0.95);
-        opacity: 0.7;
-    }
+@keyframes breathingGlow {
+    0% { opacity: 0.4; }
+    50% { opacity: 0.9; }
+    100% { opacity: 0.5; }
 }
 
 /* Общий стиль стеклянных панелей */
@@ -76,9 +70,9 @@ body {
 
 /* Кнопки слева вверху */
 .social-buttons {
-    position: absolute;
-    top: 32px;
-    left: 32px;
+    position: fixed;
+    top: 24px;
+    left: 24px;
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -91,7 +85,7 @@ body {
     justify-content: center;
     color: var(--text);
     text-decoration: none;
-    padding: 10px 20px;
+    padding: 10px 18px;
     font-size: 14px;
     font-weight: 600;
     border: 1px solid rgba(0, 224, 255, .3);
@@ -118,28 +112,20 @@ body {
 .btn:hover {
     background: rgba(0, 224, 255, 0.2);
     border-color: var(--cyan);
-    transform: translateY(-2px) scale(1.04);
-    box-shadow: 0 0 22px rgba(0, 224, 255, 0.6);
     color: #ffffff;
 }
 
-/* КОНТЕЙНЕР ДЛЯ СТРОГОГО ЦЕНТРИРОВАНИЯ */
-.main-wrapper {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10;
-}
-
-/* Центральный блок */
+/* ЖЕСТКОЕ ЖЕЛЕЗОБЕТОННОЕ ЦЕНТРИРОВАНИЕ */
 .center-card {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-top: -110px; /* Половина высоты блока */
+    margin-left: -390px; /* Половина ширины блока (780 / 2) */
     width: 780px;
-    max-width: 90vw;
-    padding: 30px;
+    padding: 26px 30px;
     text-align: center;
+    z-index: 10;
 }
 
 h1.title {
@@ -183,7 +169,7 @@ h1.title {
 }
 
 .status-text {
-    margin-top: 12px;
+    margin-top: 10px;
     font-size: 14px;
     color: var(--muted);
     white-space: nowrap;
@@ -193,11 +179,11 @@ h1.title {
 
 /* Инфо-блок снизу справа */
 .info-card {
-    position: absolute;
-    right: 32px;
-    bottom: 32px;
-    min-width: 340px;
-    padding: 18px 20px;
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    width: 340px;
+    padding: 16px 18px;
     font-size: 14px;
     z-index: 10;
 }
@@ -205,7 +191,7 @@ h1.title {
 .info-row {
     display: flex;
     justify-content: space-between;
-    margin: 5px 0;
+    margin: 4px 0;
     color: var(--muted);
 }
 
@@ -222,27 +208,22 @@ h1.title {
 </head>
 <body>
 
-<!-- Живой фоновый слой -->
-<div class="bg-animation"></div>
-
 <!-- Кнопки Соцсетей -->
 <div class="social-buttons">
     <a href="https://discord.gg/UmGHaVrZ" target="_blank" class="btn btn-discord glass-panel">Discord</a>
     <a href="https://t.me/PixelCanvasSandboxServer" target="_blank" class="btn btn-telegram glass-panel">Telegram</a>
 </div>
 
-<!-- Оболочка для точного центрирования главного блока -->
-<div class="main-wrapper">
-    <div class="center-card glass-panel">
-        <h1 class="title">PixelSandbox</h1>
-        <div class="subtitle">• UA Украинский Sandbox • 100+ аддонов • Безграничные возможности • Активное сообщество •</div>
+<!-- Центральное меню -->
+<div class="center-card glass-panel">
+    <h1 class="title">PixelSandbox</h1>
+    <div class="subtitle">• UA Украинский Sandbox • 100+ аддонов • Безграничные возможности • Активное сообщество •</div>
 
-        <div class="progress-container">
-            <div class="progress-bar" id="bar"></div>
-        </div>
-
-        <div class="status-text" id="status">Подключение... 0%</div>
+    <div class="progress-container">
+        <div class="progress-bar" id="bar"></div>
     </div>
+
+    <div class="status-text" id="status">Подключение... 0%</div>
 </div>
 
 <!-- Инфо-блок снизу справа -->
