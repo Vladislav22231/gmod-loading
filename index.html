@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PixelSandbox Loading Screen</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
 <style>
 :root {
@@ -106,9 +106,9 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -55%);
-    width: 560px;
-    max-width: 90vw;
-    padding: 24px 32px;
+    width: 760px; /* Увеличено для вместимости одной строки */
+    max-width: 95vw;
+    padding: 24px 28px;
     text-align: center;
     z-index: 10;
 }
@@ -123,12 +123,16 @@ h1.title {
     -webkit-text-fill-color: transparent;
 }
 
+/* Подзаголовок ровно в 1 строку */
 .subtitle {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text);
-    opacity: .9;
+    font-size: 13px;
+    font-weight: 700;
+    color: #ffffff;
+    opacity: .95;
     margin-bottom: 24px;
+    white-space: nowrap; /* Запрещает перенос строки */
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Прогресс бар */
@@ -187,8 +191,9 @@ h1.title {
     text-overflow: ellipsis;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 768px) {
     h1.title { font-size: 36px; }
+    .subtitle { font-size: 10px; }
     .center-card { transform: none; position: static; margin: 80px 16px; width: auto; }
     .info-card { position: static; margin: 16px; }
 }
@@ -253,7 +258,7 @@ function changeSlide() {
 
 setInterval(changeSlide, 5000);
 
-/* ===== ЭТАПЫ И НАСТОЯЩИЙ ПРОГРЕСС ZAГРУЗКИ ===== */
+/* ===== ЭТАПЫ И НАСТОЯЩИЙ ПРОГРЕСС ЗАГРУЗКИ ===== */
 const bar = document.getElementById("bar");
 const statusText = document.getElementById("status");
 
