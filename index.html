@@ -12,7 +12,17 @@
   }
   *{box-sizing:border-box}html,body{height:100%;margin:0}
   body{font-family:Inter,Arial,Helvetica,sans-serif;color:var(--text);background:#000;overflow:hidden}
-  .bg{position:fixed;inset:0;z-index:-1}
+ .bg{
+    position:fixed;
+    inset:0;
+    z-index:-1;
+
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+
+    transition:background-image 1s ease;
+}
   .bg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(0px) brightness(.65);opacity:0;transition:opacity 1s ease}
   .bg img.active{opacity:1}
   .center{position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);text-align:center;padding:24px 32px;background:var(--glass);border:1px solid rgba(232,77,255,.25);backdrop-filter:blur(6px);border-radius:14px}
@@ -68,18 +78,7 @@
     </div>
 </div>
 
-<script>
-// =====================
-// Слайдшоу
-// =====================
-const slides = [...document.querySelectorAll('.bg img')];
-let i = 0;
-
-setInterval(() => {
-    slides[i].classList.remove('active');
-    i = (i + 1) % slides.length;
-    slides[i].classList.add('active');
-}, 6000);
+<script>}
 
 // =====================
 // Полоса загрузки
