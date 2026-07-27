@@ -26,14 +26,39 @@ body {
     font-family: 'Inter', Arial, Helvetica, sans-serif;
     color: var(--text);
     background: #06070a;
-    /* Статичный фон ровно как на скриншоте №2 */
-    background-image: 
-        radial-gradient(circle at 50% 45%, rgba(180, 50, 255, 0.25) 0%, rgba(100, 20, 200, 0.1) 35%, transparent 70%),
-        radial-gradient(circle at 20% 20%, rgba(232, 77, 255, 0.15) 0%, transparent 40%),
-        radial-gradient(circle at 80% 80%, rgba(0, 224, 255, 0.1) 0%, transparent 40%);
     overflow: hidden;
     user-select: none;
     height: 100vh;
+    position: relative;
+}
+
+/* Движущийся/мерцающий фон (не двигает карточки) */
+body::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+        radial-gradient(circle at 50% 45%, rgba(180, 50, 255, 0.45) 0%, rgba(100, 20, 200, 0.2) 35%, transparent 70%),
+        radial-gradient(circle at 20% 20%, rgba(232, 77, 255, 0.3) 0%, transparent 45%),
+        radial-gradient(circle at 80% 80%, rgba(0, 224, 255, 0.25) 0%, transparent 45%);
+    z-index: 1;
+    animation: bgPulse 6s ease-in-out infinite alternate;
+}
+
+/* Анимация перелива и мерцания фона */
+@keyframes bgPulse {
+    0% {
+        opacity: 0.5;
+        filter: hue-rotate(0deg);
+    }
+    50% {
+        opacity: 0.85;
+        filter: hue-rotate(15deg);
+    }
+    100% {
+        opacity: 0.6;
+        filter: hue-rotate(-15deg);
+    }
 }
 
 /* Общий стиль стеклянных панелей */
@@ -70,20 +95,17 @@ body {
     border-radius: 10px;
     transition: all 0.3s ease;
     cursor: pointer;
-    /* Постоянная мягкая анимация свечения ТОЛЬКО для кнопок */
     animation: btnGlow 3s ease-in-out infinite alternate;
 }
 
-/* Настройки уникального неонового цвета для каждой кнопки */
 .btn-discord {
     animation-delay: 0s;
 }
 
 .btn-telegram {
-    animation-delay: 1.5s; /* Рассинхрон анимации, чтобы смотрелось живее */
+    animation-delay: 1.5s;
 }
 
-/* Анимация пульсации границ и свечения кнопок */
 @keyframes btnGlow {
     0% {
         box-shadow: 0 0 5px rgba(0, 224, 255, 0.2), inset 0 0 5px rgba(0, 224, 255, 0.1);
@@ -95,7 +117,6 @@ body {
     }
 }
 
-/* Эффект при наведении на кнопки */
 .btn:hover {
     background: rgba(0, 224, 255, 0.2);
     border-color: var(--cyan);
@@ -128,7 +149,6 @@ h1.title {
     text-shadow: 0 0 30px rgba(232, 77, 255, 0.3);
 }
 
-/* Подзаголовок ровно в 1 строку */
 .subtitle {
     font-size: 13px;
     font-weight: 700;
@@ -140,7 +160,6 @@ h1.title {
     text-overflow: ellipsis;
 }
 
-/* Прогресс бар */
 .progress-container {
     width: 100%;
     height: 14px;
@@ -168,7 +187,6 @@ h1.title {
     text-overflow: ellipsis;
 }
 
-/* Карточка информации внизу справа */
 .info-card {
     position: absolute;
     right: 24px;
@@ -206,7 +224,7 @@ h1.title {
 </head>
 <body>
 
-<!-- Кнопки Соцсетей с индивидуальной анимацией -->
+<!-- Кнопки Соцсетей -->
 <div class="social-buttons">
     <a href="https://discord.gg/UmGHaVrZ" target="_blank" class="btn btn-discord glass-panel">Discord</a>
     <a href="https://t.me/PixelCanvasSandboxServer" target="_blank" class="btn btn-telegram glass-panel">Telegram</a>
@@ -241,7 +259,6 @@ h1.title {
 </div>
 
 <script>
-/* ===== ЭТАПЫ И НАСТОЯЩИЙ ПРОГРЕСС ЗАГРУЗКИ ===== */
 const bar = document.getElementById("bar");
 const statusText = document.getElementById("status");
 
@@ -282,7 +299,6 @@ window.SetFilesNeeded = function(needed) {
     statusText.textContent = "Загрузка файлов... " + percent + "%";
 };
 
-/* ===== ДАННЫЕ GMOD ПРИ ВХОДЕ ===== */
 window.GameDetails = function(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
     document.getElementById("map-name").textContent = mapname || "Загрузка...";
     document.getElementById("players-count").textContent = "0 / " + (maxplayers || "20");
@@ -291,7 +307,6 @@ window.GameDetails = function(servername, serverurl, mapname, maxplayers, steami
     }
 };
 
-/* ===== ПОЛУЧЕНИЕ ДАННЫХ С ВНЕШНЕГО СЕРВЕРА ===== */
 async function updateServer() {
     try {
         const res = await fetch("http://26.214.76.58:3000/status");
