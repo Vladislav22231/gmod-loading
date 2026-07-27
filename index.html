@@ -35,7 +35,7 @@ html, body {
     position: relative;
 }
 
-/* СИНЕ-ФИОЛЕТОВО-ГОЛУБОЙ ФОН (ФИОЛЕТОВЫЙ СЛЕВА) */
+/* ПРИГЛУШЕННЫЙ, ТЁМНЫЙ СИНЕ-ФИОЛЕТОВЫЙ ФОН */
 body::before {
     content: '';
     position: fixed;
@@ -44,24 +44,24 @@ body::before {
     right: 0;
     bottom: 0;
     background-image: 
-        radial-gradient(circle at 20% 45%, rgba(180, 50, 255, 0.4) 0%, rgba(100, 20, 200, 0.15) 40%, transparent 70%),
-        radial-gradient(circle at 15% 20%, rgba(232, 77, 255, 0.3) 0%, transparent 45%),
-        radial-gradient(circle at 85% 75%, rgba(0, 224, 255, 0.25) 0%, transparent 50%),
-        radial-gradient(circle at 50% 80%, rgba(20, 50, 120, 0.3) 0%, transparent 60%);
+        radial-gradient(circle at 20% 45%, rgba(130, 30, 190, 0.22) 0%, rgba(60, 10, 120, 0.08) 45%, transparent 70%),
+        radial-gradient(circle at 15% 20%, rgba(180, 50, 210, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 85% 75%, rgba(0, 180, 220, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 50% 80%, rgba(10, 35, 80, 0.2) 0%, transparent 60%);
     z-index: 1;
-    /* Плавное мягкое дыхание без движения карточек */
-    animation: breathingGlow 7s ease-in-out infinite alternate;
+    /* Очень мягкое, не бросающееся в глаза дыхание */
+    animation: breathingGlow 8s ease-in-out infinite alternate;
 }
 
 @keyframes breathingGlow {
     0% {
-        opacity: 0.65;
+        opacity: 0.35;
     }
     50% {
-        opacity: 0.95;
+        opacity: 0.65;
     }
     100% {
-        opacity: 0.7;
+        opacity: 0.4;
     }
 }
 
