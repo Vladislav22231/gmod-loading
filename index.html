@@ -13,7 +13,7 @@
     --muted: #9aa3b2;
     --accent: #e84dff;
     --cyan: #00e0ff;
-    --glass: rgba(13, 16, 24, .55);
+    --glass: rgba(13, 16, 24, .65);
 }
 
 * {
@@ -25,7 +25,8 @@
 body {
     font-family: 'Inter', Arial, Helvetica, sans-serif;
     color: var(--text);
-    background: #0b0e14; /* Темный фон вместо чисто черного, чтобы не было промаргиваний */
+    /* Запасной яркий красивый градиент, если картинки еще не грузились */
+    background: radial-gradient(circle at center, #1a102f 0%, #080a0f 100%);
     overflow: hidden;
     user-select: none;
     height: 100vh;
@@ -36,10 +37,6 @@ body {
     position: fixed;
     inset: 0;
     z-index: 1;
-    /* Резервный фон из 1-й картинки на случай долгой загрузки */
-    background-image: url("https://vladislav22231.github.io/gmod-loading/Screenshot_83.png");
-    background-size: cover;
-    background-position: center;
 }
 
 .background img {
@@ -50,7 +47,7 @@ body {
     object-fit: cover;
     filter: brightness(.65);
     opacity: 0;
-    transition: opacity 1.2s ease-in-out;
+    transition: opacity 1s ease-in-out;
 }
 
 .background img.active {
@@ -60,7 +57,7 @@ body {
 .overlay {
     position: fixed;
     inset: 0;
-    background: radial-gradient(circle, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%);
+    background: radial-gradient(circle, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.5) 100%);
     z-index: 2;
 }
 
@@ -205,12 +202,12 @@ h1.title {
 </head>
 <body>
 
-<!-- Фоны и Слайд-шоу -->
+<!-- Фоны и Слайд-шоу (Используем локальные пути) -->
 <div class="background">
-    <img src="https://vladislav22231.github.io/gmod-loading/Screenshot_83.png" class="active" alt="bg1">
-    <img src="https://vladislav22231.github.io/gmod-loading/Screenshot_84.png" alt="bg2">
-    <img src="https://vladislav22231.github.io/gmod-loading/Screenshot_85.png" alt="bg3">
-    <img src="https://vladislav22231.github.io/gmod-loading/Screenshot_87.png" alt="bg4">
+    <img src="images/1.jpg" class="active" alt="bg1">
+    <img src="images/2.jpg" alt="bg2">
+    <img src="images/3.jpg" alt="bg3">
+    <img src="images/4.jpg" alt="bg4">
 </div>
 
 <div class="overlay"></div>
@@ -250,18 +247,12 @@ h1.title {
 </div>
 
 <script>
-/* ===== ПРЕДЗАГРУЗКА ИЗОБРАЖЕНИЙ (Предвращает чёрный экран) ===== */
-const slides = document.querySelectorAll(".background img");
-
-slides.forEach((img) => {
-    const tempImg = new Image();
-    tempImg.src = img.src;
-});
-
 /* ===== СЛАЙД-ШОУ ФОНОВ ===== */
+const slides = document.querySelectorAll(".background img");
 let currentSlide = 0;
 
 function changeSlide() {
+    if (slides.length <= 1) return;
     slides[currentSlide].classList.remove("active");
     currentSlide = (currentSlide + 1) % slides.length;
     slides[currentSlide].classList.add("active");
