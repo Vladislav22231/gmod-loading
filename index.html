@@ -4,30 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>PixelSandbox — Loading</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Orbitron:wght@900&display=swap" rel="stylesheet">
-<subtitle
-    margin-top:12px;
-    font-size:18px;
-    color:#d9d9d9;
-    line-height:1.7;
-}
-
-.ua-title{
-    font-family:'Orbitron', sans-serif;
-    font-weight:900;
-    letter-spacing:2px;
-    text-transform:uppercase;
-    color:#ffffff;
-    text-shadow:
-        0 0 8px #00bfff,
-        0 0 18px #00bfff;
-    }
-
-.divider{
-    color:#00e0ff;
-    margin:0 8px;
-    font-weight:bold;
-    }
+<link href="[fonts.googleapis.com](https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap)" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0e14;--text:#e6e9ef;--muted:#9aa3b2;
+    --accent:#e84dff;--cyan:#00e0ff;--glass:rgba(13,16,24,.55)
+  }
   *{box-sizing:border-box}html,body{height:100%;margin:0}
   body{font-family:Inter,Arial,Helvetica,sans-serif;color:var(--text);background:#000;overflow:hidden}
   .bg{position:fixed;inset:0;z-index:-1}
@@ -48,49 +30,126 @@
 </head>
 <body>
   <div class="bg">
-    <img src="img/slide1.jpg" class="active" alt="">
-    <img src="img/slide2.jpg" alt="">
-    <img src="img/slide3.jpg" alt="">
-  </div>
+    <img src="Screenshot_83.png" class="active" alt="">
+    <img src="Screenshot_84.png" alt="">
+    <img src="Screenshot_85.png" alt="">
+    <img src="Screenshot_87.png" alt="">
+</div>
 
-  <div class="links">
-    <a class="link" href="[discord.gg](https://discord.gg/yourcode)" target="_blank">Discord</a>
-    <a class="link" href="[youtube.com](https://youtube.com/@yourchannel)" target="_blank">YouTube</a>
-    <a class="link" href="[t.me](https://t.me/yourchannel)" target="_blank">Telegram</a>
-  </div>
+ <div class="links">
+    <a class="link" href="https://discord.gg/UmGHaVrZ" target="_blank">Discord</a>
+    <a class="link" href="https://t.me/PixelCanvasSandboxServer" target="_blank">Telegram</a>
+</div>
 
   <div class="center">
     <h1>PixelSandbox</h1>
-    <div class="subtitle">
-    <span class="ua-title">🇺🇦 Украинский Sandbox</span>
-    <span class="divider">•</span>
-    100+ аддонов
-    <span class="divider">•</span>
-    Безграничные возможности
-    <span class="divider">•</span>
-    Активное сообщество
-</div>
-
-  <div class="panel" id="serverInfo">
-    <div class="row"><span>Карта</span><strong id="map">gm_bigcity_improved</strong></div>
-    <div class="row"><span>Макс. игроков</span><strong>40</strong></div>
-    <div class="row"><span>Режим</span><strong>SANDBOX</strong></div>
+    <div class="subtitle">•UA Украинский Sandbox • 100+ аддонов • Безграничные возможности • Активное сообщество</div>
+    <div class="progress"><div class="bar" id="bar"></div></div>
+    <div class="pct" id="pct">Загрузка... 0%</div>
   </div>
 
-<script>
-  // Слайдшоу
-  const slides=[...document.querySelectorAll('.bg img')];let i=0;
-  setInterval(()=>{slides[i].classList.remove('active');i=(i+1)%slides.length;slides[i].classList.add('active')},6000);
+<div class="panel" id="serverInfo">
+    <div class="row">
+        <span>🗺 Карта</span>
+        <strong id="map">Загрузка...</strong>
+    </div>
 
-  // Прогресс (GMod может не слать проценты — плавная имитация + хуки если есть)
-  const bar=document.getElementById('bar'), pct=document.getElementById('pct');
-  let p=0; const timer=setInterval(()=>{p=Math.min(99,p+Math.random()*2.2);bar.style.width=p+'%';pct.textContent='Загрузка... '+Math.floor(p)+'%';},120);
-  // Если есть window.GameDetails из GMod — обновим карту
-  window.GameDetails=function(server,game,map,players,maxPlayers,bots,secure){
-    document.getElementById('map').textContent=map||'unknown';
-  }
-  // На финале:
-  window.addEventListener('load',()=>{setTimeout(()=>{p=100;bar.style.width='100%';pct.textContent='Готово: 100%'},5000)});
+    <div class="row">
+        <span>👥 Игроков</span>
+        <strong id="players">0 / 20</strong>
+    </div>
+
+    <div class="row">
+        <span>🎮 Режим</span>
+        <strong id="mode">Sandbox</strong>
+    </div>
+</div>
+
+<script>
+// =====================
+// Слайдшоу
+// =====================
+const slides = [...document.querySelectorAll('.bg img')];
+let i = 0;
+
+setInterval(() => {
+    slides[i].classList.remove('active');
+    i = (i + 1) % slides.length;
+    slides[i].classList.add('active');
+}, 6000);
+
+// =====================
+// Полоса загрузки
+// =====================
+const bar = document.getElementById('bar');
+const pct = document.getElementById('pct');
+
+let p = 0;
+
+setInterval(() => {
+    p = Math.min(99, p + Math.random() * 2.2);
+    bar.style.width = p + "%";
+    pct.textContent = "Загрузка... " + Math.floor(p) + "%";
+}, 120);
+
+// =====================
+// Получение данных сервера
+// =====================
+async function updateServer() {
+
+    try {
+
+        const res = await fetch("http://26.214.76.58:3000/status");
+        const data = await res.json();
+
+        if (data.online) {
+
+            document.getElementById("map").textContent = data.map;
+
+            document.getElementById("players").textContent =
+                data.players + " / " + data.maxplayers;
+
+            document.getElementById("mode").textContent = "Sandbox";
+
+        } else {
+
+            document.getElementById("map").textContent = "Сервер офлайн";
+            document.getElementById("players").textContent = "--";
+
+        }
+
+    } catch (err) {
+
+        console.log(err);
+
+    }
+
+}
+
+updateServer();
+
+setInterval(updateServer, 10000);
+
+// =====================
+// Данные GMod
+// =====================
+window.GameDetails = function(servername, serverurl, mapname, maxplayers, steamid) {
+
+    document.getElementById("map").textContent = mapname;
+
+}
+
+window.addEventListener("load", () => {
+
+    setTimeout(() => {
+
+        p = 100;
+
+        bar.style.width = "100%";
+
+        pct.textContent = "Готово: 100%";
+
+    }, 5000);
+
+});
 </script>
-</body>
-</html>
