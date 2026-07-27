@@ -25,7 +25,6 @@
 body {
     font-family: 'Inter', Arial, Helvetica, sans-serif;
     color: var(--text);
-    /* Запасной яркий красивый градиент, если картинки еще не грузились */
     background: radial-gradient(circle at center, #1a102f 0%, #080a0f 100%);
     overflow: hidden;
     user-select: none;
@@ -202,12 +201,12 @@ h1.title {
 </head>
 <body>
 
-<!-- Фоны и Слайд-шоу (Используем локальные пути) -->
+<!-- Фоны и Слайд-шоу (Пути напрямую из корня) -->
 <div class="background">
-    <img src="images/1.jpg" class="active" alt="1.jpg">
-    <img src="images/2.jpg" alt="2.jpg">
-    <img src="images/3.jpg" alt="3.jpg">
-    <img src="images/4.jpg" alt="4.jpg">
+    <img src="1.jpg" class="active" alt="bg1">
+    <img src="2.jpg" alt="bg2">
+    <img src="3.jpg" alt="bg3">
+    <img src="4.jpg" alt="bg4">
 </div>
 
 <div class="overlay"></div>
