@@ -2,9 +2,20 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PixelSandbox Loading Screen</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 
 <style>
+:root {
+    --bg: #0b0e14;
+    --text: #e6e9ef;
+    --muted: #9aa3b2;
+    --accent: #e84dff;
+    --cyan: #00e0ff;
+    --glass: rgba(13, 16, 24, .55);
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -12,70 +23,81 @@
 }
 
 body {
+    font-family: 'Inter', Arial, Helvetica, sans-serif;
+    color: var(--text);
+    background: #000;
     overflow: hidden;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: white;
     user-select: none;
+    height: 100vh;
 }
 
 /* Фоны и Слайд-шоу */
 .background {
     position: fixed;
-    top: 0;
-    left: 0;
+    inset: 0;
+    z-index: 1;
+}
+
+.background img {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
-    background-size: cover;
-    background-position: center;
-    transition: background-image 1s ease-in-out;
-    z-index: 1;
+    object-fit: cover;
+    filter: brightness(.65);
+    opacity: 0;
+    transition: opacity 1s ease;
+}
+
+.background img.active {
+    opacity: 1;
 }
 
 .overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     background: rgba(0, 0, 0, 0.25);
     z-index: 2;
 }
 
-/* Общий стиль стеклянных панелей (Glassmorphism) */
+/* Общий стиль стеклянных панелей */
 .glass-panel {
-    background: rgba(18, 16, 28, 0.65);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    background: var(--glass);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(232, 77, 255, .25);
+    border-radius: 14px;
 }
 
 /* Кнопки слева вверху */
 .social-buttons {
     position: absolute;
-    top: 20px;
-    left: 20px;
+    top: 24px;
+    left: 24px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
     z-index: 10;
 }
 
 .btn {
-    padding: 8px 18px;
-    font-size: 13px;
-    font-weight: 600;
-    color: #e0e0e0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text);
     text-decoration: none;
-    text-align: center;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    border: 1px solid rgba(0, 224, 255, .2);
+    border-radius: 10px;
     transition: all 0.2s ease;
     cursor: pointer;
 }
 
 .btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-    color: #ffffff;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--cyan);
 }
 
 /* Центральный блок */
@@ -83,55 +105,55 @@ body {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
-    width: 80%;
-    max-width: 650px;
-    padding: 30px 40px;
+    transform: translate(-50%, -55%);
+    width: 560px;
+    max-width: 90vw;
+    padding: 24px 32px;
     text-align: center;
     z-index: 10;
 }
 
 h1.title {
-    font-size: 42px;
+    font-size: 56px;
     font-weight: 800;
-    letter-spacing: 1px;
-    margin-bottom: 8px;
-    background: linear-gradient(90deg, #a855f7, #3b82f6);
+    letter-spacing: .5px;
+    margin: 0 0 6px;
+    background: linear-gradient(90deg, var(--accent), var(--cyan));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
 }
 
 .subtitle {
-    font-size: 13px;
-    color: #cccccc;
-    margin-bottom: 25px;
-    word-spacing: 2px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    opacity: .9;
+    margin-bottom: 24px;
 }
 
 /* Прогресс бар */
 .progress-container {
     width: 100%;
-    height: 10px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
+    height: 14px;
+    background: rgba(255, 255, 255, .08);
+    border-radius: 999px;
     overflow: hidden;
-    margin-bottom: 12px;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255, 255, 255, .12);
+    box-shadow: 0 0 20px rgba(232, 77, 255, .25);
 }
 
 .progress-bar {
     height: 100%;
     width: 0%;
-    background: linear-gradient(90deg, #8b5cf6, #3b82f6);
-    box-shadow: 0 0 10px rgba(139, 92, 246, 0.6);
+    background: linear-gradient(90deg, #e84dff, #00e0ff);
     transition: width 0.2s ease;
-    border-radius: 20px;
+    box-shadow: 0 0 8px #e84dff, 0 0 18px #00e0ff, 0 0 30px #00e0ff;
 }
 
 .status-text {
-    font-size: 12px;
-    color: #aaaaaa;
+    margin-top: 8px;
+    font-size: 14px;
+    color: var(--muted);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -140,52 +162,60 @@ h1.title {
 /* Карточка информации внизу справа */
 .info-card {
     position: absolute;
-    bottom: 25px;
-    right: 25px;
-    width: 260px;
-    padding: 12px 16px;
-    font-size: 12px;
+    right: 24px;
+    bottom: 24px;
+    min-width: 340px;
+    padding: 16px 18px;
+    font-size: 14px;
     z-index: 10;
 }
 
 .info-row {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 6px;
-    color: #aaaaaa;
-}
-
-.info-row:last-child {
-    margin-bottom: 0;
+    margin: 4px 0;
+    color: var(--muted);
 }
 
 .info-value {
-    color: #ffffff;
+    color: var(--text);
     font-weight: 600;
     text-align: right;
-    max-width: 140px;
+    max-width: 180px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
-</style>
 
+@media (max-width: 720px) {
+    h1.title { font-size: 36px; }
+    .center-card { transform: none; position: static; margin: 80px 16px; width: auto; }
+    .info-card { position: static; margin: 16px; }
+}
+</style>
 </head>
 <body>
 
-<div class="background" id="bg"></div>
+<!-- Фоны и Слайд-шоу -->
+<div class="background">
+    <img src="https://vladislav22231.github.io/gmod-loading/Screenshot_83.png" class="active" alt="bg1">
+    <img src="https://vladislav22231.github.io/gmod-loading/Screenshot_84.png" alt="bg2">
+    <img src="https://vladislav22231.github.io/gmod-loading/Screenshot_85.png" alt="bg3">
+    <img src="https://vladislav22231.github.io/gmod-loading/Screenshot_87.png" alt="bg4">
+</div>
+
 <div class="overlay"></div>
 
 <!-- Кнопки Соцсетей -->
 <div class="social-buttons">
-    <a href="#" class="btn glass-panel">Discord</a>
-    <a href="#" class="btn glass-panel">Telegram</a>
+    <a href="https://discord.gg/UmGHaVrZ" target="_blank" class="btn glass-panel">Discord</a>
+    <a href="https://t.me/PixelCanvasSandboxServer" target="_blank" class="btn glass-panel">Telegram</a>
 </div>
 
 <!-- Центральное меню -->
 <div class="center-card glass-panel">
     <h1 class="title">PixelSandbox</h1>
-    <div class="subtitle">• UA Украинский SandBox • 100+ аддонов • Безграничные возможности • Активное сообщество •</div>
+    <div class="subtitle">• UA Украинский Sandbox • 100+ аддонов • Безграничные возможности • Активное сообщество •</div>
 
     <div class="progress-container">
         <div class="progress-bar" id="bar"></div>
@@ -197,97 +227,103 @@ h1.title {
 <!-- Инфо-блок снизу справа -->
 <div class="info-card glass-panel">
     <div class="info-row">
-        <span>✈ Карта</span>
-        <span class="info-value" id="map-name">Загрузка...</span>
+        <span>🗺 Карта</span>
+        <strong class="info-value" id="map-name">Загрузка...</strong>
     </div>
     <div class="info-row">
         <span>👥 Игроков</span>
-        <span class="info-value" id="players-count">0 / 20</span>
+        <strong class="info-value" id="players-count">0 / 20</strong>
     </div>
     <div class="info-row">
         <span>🎮 Режим</span>
-        <span class="info-value" id="gamemode">Sandbox</span>
+        <strong class="info-value" id="gamemode">Sandbox</strong>
     </div>
 </div>
 
 <script>
-/* ===== ФОНЫ / СЛАЙД-ШОУ ===== */
-let images = [
-    "https://vladislav22231.github.io/gmod-loading/Screenshot_83.png",
-    "https://vladislav22231.github.io/gmod-loading/Screenshot_84.png",
-    "https://vladislav22231.github.io/gmod-loading/Screenshot_85.png",
-    "https://vladislav22231.github.io/gmod-loading/Screenshot_87.png"
-];
+/* ===== СЛАЙД-ШОУ ФОНОВ ===== */
+const slides = document.querySelectorAll(".background img");
+let currentSlide = 0;
 
-let index = 0;
-let bg = document.getElementById("bg");
-
-function changeBG() {
-    bg.style.backgroundImage = "url('" + images[index] + "')";
-    index = (index + 1) % images.length;
+function changeSlide() {
+    slides[currentSlide].classList.remove("active");
+    currentSlide = (currentSlide + 1) % slides.length;
+    slides[currentSlide].classList.add("active");
 }
 
-setInterval(changeBG, 5000);
-changeBG();
+setInterval(changeSlide, 5000);
 
-/* ===== НАСТОЯЩИЙ ПРОГРЕСС ЗАГРУЗКИ GMOD ===== */
-let totalFiles = 0;
-let filesLeft = 0;
-let currentProgress = 0;
+/* ===== ЭТАПЫ И НАСТОЯЩИЙ ПРОГРЕСС ZAГРУЗКИ ===== */
+const bar = document.getElementById("bar");
+const statusText = document.getElementById("status");
 
-let bar = document.getElementById("bar");
-let statusText = document.getElementById("status");
+const stages = {
+    "Sending client info": 10,
+    "Receiving server info": 20,
+    "Starting Lua": 40,
+    "Downloading": 70,
+    "Mounting Addons": 90
+};
 
-// Обновление шкалы
-function updateProgressBar(percentage) {
-    if (percentage > 100) percentage = 100;
-    if (percentage < currentProgress) percentage = currentProgress; // Прогресс не идет назад
-    
-    currentProgress = percentage;
-    bar.style.width = percentage.toFixed(0) + "%";
-}
+window.SetStatusChanged = function(status) {
+    statusText.textContent = status;
 
-// Вызывается GMod: Передает общее кол-во файлов
-function SetFilesNeeded(needed) {
-    totalFiles = needed;
-}
-
-// Вызывается GMod: Передает сколько файлов осталось скачать
-function SetFilesRemaining(remaining) {
-    filesLeft = remaining;
-    if (totalFiles > 0) {
-        let downloaded = totalFiles - filesLeft;
-        let percentage = (downloaded / totalFiles) * 100;
-        
-        updateProgressBar(percentage);
-        statusText.innerText = `Загрузка файлов (${downloaded}/${totalFiles})... ${Math.floor(percentage)}%`;
+    for (const key in stages) {
+        if (status.includes(key)) {
+            bar.style.width = stages[key] + "%";
+            return;
+        }
     }
-}
+};
 
-// Вызывается GMod: Имя скачиваемого файла
-function DownloadingFile(file) {
-    statusText.innerText = "Загрузка: " + file;
-}
+window.DownloadingFile = function(file) {
+    statusText.textContent = "📥 " + file;
+};
 
-// Вызывается GMod: Изменение статуса (например, "Sending client info...")
-function SetStatusChanged(status) {
-    statusText.innerText = status;
-    
-    // Популярные этапы загрузки GMod для плавной анимации
-    if (status.includes("Workshop")) updateProgressBar(20);
-    else if (status.includes("Mounting")) updateProgressBar(40);
-    else if (status.includes("Client info")) updateProgressBar(85);
-    else if (status.includes("Lua")) updateProgressBar(95);
-}
+window.SetFilesTotal = function(total) {
+    window.totalFiles = total;
+};
 
-// Вызывается GMod: Данные сервера
-function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
-    document.getElementById("map-name").innerText = mapname || "Неизвестно";
-    document.getElementById("players-count").innerText = "0 / " + (maxplayers || "20");
+window.SetFilesNeeded = function(needed) {
+    if (!window.totalFiles) return;
+
+    const loaded = window.totalFiles - needed;
+    const percent = Math.floor((loaded / window.totalFiles) * 100);
+
+    bar.style.width = percent + "%";
+    statusText.textContent = "Загрузка файлов... " + percent + "%";
+};
+
+/* ===== ДАННЫЕ GMOD ПРИ ВХОДЕ ===== */
+window.GameDetails = function(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
+    document.getElementById("map-name").textContent = mapname || "Загрузка...";
+    document.getElementById("players-count").textContent = "0 / " + (maxplayers || "20");
     if (gamemode) {
-        document.getElementById("gamemode").innerText = gamemode;
+        document.getElementById("gamemode").textContent = gamemode;
+    }
+};
+
+/* ===== ПОЛУЧЕНИЕ ДАННЫХ С ВНЕШНЕГО СЕРВЕРА ===== */
+async function updateServer() {
+    try {
+        const res = await fetch("http://26.214.76.58:3000/status");
+        const data = await res.json();
+
+        if (data.online) {
+            document.getElementById("map-name").textContent = data.map;
+            document.getElementById("players-count").textContent = data.players + " / " + data.maxplayers;
+            document.getElementById("gamemode").textContent = "Sandbox";
+        } else {
+            document.getElementById("map-name").textContent = "Сервер офлайн";
+            document.getElementById("players-count").textContent = "--";
+        }
+    } catch (err) {
+        console.log("Ошибка загрузки внешнего статуса:", err);
     }
 }
+
+updateServer();
+setInterval(updateServer, 10000);
 </script>
 
 </body>
