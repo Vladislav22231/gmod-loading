@@ -6,18 +6,10 @@
 <title>PixelSandbox — Loading</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
- :root{
-    --bg:#0b0e14;
-    --text:#e6e9ef;
-    --muted:#9aa3b2;
-    --accent:#e84dff;
-    --cyan:#00e0ff;
-    --glass:rgba(13,16,24,.55);
-}
-
-*{
-    box-sizing:border-box;
-}
+  :root{
+    --bg:#0b0e14;--text:#e6e9ef;--muted:#9aa3b2;
+    --accent:#e84dff;--cyan:#00e0ff;--glass:rgba(13,16,24,.55)
+  }
   *{box-sizing:border-box}html,body{height:100%;margin:0}
   body{font-family:Inter,Arial,Helvetica,sans-serif;color:var(--text);background:#000;overflow:hidden}
   .bg{position:fixed;inset:0;z-index:-1}
@@ -57,9 +49,12 @@
 </head>
 <body>
   <div class="bg">
-    <img id="bgimg"
-         src="https://vladislav22231.github.io/gmod-loading/Screenshot_83.png">
+<img src="https://vladislav22231.github.io/gmod-loading/Screenshot_83.png" class="active">
+<img src="https://vladislav22231.github.io/gmod-loading/Screenshot_84.png">
+<img src="https://vladislav22231.github.io/gmod-loading/Screenshot_85.png">
+<img src="https://vladislav22231.github.io/gmod-loading/Screenshot_87.png">
 </div>
+
  <div class="links">
     <a class="link" href="https://discord.gg/UmGHaVrZ" target="_blank">Discord</a>
     <a class="link" href="https://t.me/PixelCanvasSandboxServer" target="_blank">Telegram</a>
@@ -95,20 +90,24 @@ const pct = document.getElementById("pct");
 // =====================
 // Слайдшоу
 // =====================
-const images = [
-    "https://vladislav22231.github.io/gmod-loading/Screenshot_83.png",
-    "https://vladislav22231.github.io/gmod-loading/Screenshot_84.png",
-    "https://vladislav22231.github.io/gmod-loading/Screenshot_85.png",
-    "https://vladislav22231.github.io/gmod-loading/Screenshot_87.png"
-];
+const slides = document.querySelectorAll(".bg img");
+let currentSlide = 0;
 
-const bgimg = document.getElementById("bgimg");
-let current = 0;
+slides.forEach(img => {
+    img.onload = () => console.log("Загружено:", img.src);
+});
 
-setInterval(() => {
-    current = (current + 1) % images.length;
-    bgimg.src = images[current];
-}, 5000);
+function changeSlide() {
+
+    slides[currentSlide].classList.remove("active");
+
+    currentSlide = (currentSlide + 1) % slides.length;
+
+    slides[currentSlide].classList.add("active");
+}
+
+setInterval(changeSlide, 5000);
+
 // =====================
 // Полоса загрузки
 // =====================
