@@ -25,7 +25,7 @@
 body {
     font-family: 'Inter', Arial, Helvetica, sans-serif;
     color: var(--text);
-    background: #090b10;
+    background: radial-gradient(circle at center, #1a102f 0%, #080a0f 100%);
     overflow: hidden;
     user-select: none;
     height: 100vh;
@@ -36,14 +36,6 @@ body {
     position: fixed;
     inset: 0;
     z-index: 1;
-    /* Гарантированный стартовый фон вшит прямо в CSS */
-    background-color: #0d1117;
-    background-image: 
-        radial-gradient(at 0% 0%, rgba(238, 77, 255, 0.25) 0px, transparent 50%),
-        radial-gradient(at 100% 100%, rgba(0, 224, 255, 0.2) 0px, transparent 50%),
-        url('https://vladislav22231.github.io/gmod-loading/1.jpg');
-    background-size: cover;
-    background-position: center;
 }
 
 .background img {
@@ -54,7 +46,7 @@ body {
     object-fit: cover;
     filter: brightness(.65);
     opacity: 0;
-    transition: opacity 1.2s ease-in-out;
+    transition: opacity 1s ease-in-out;
 }
 
 .background img.active {
@@ -64,18 +56,17 @@ body {
 .overlay {
     position: fixed;
     inset: 0;
-    background: radial-gradient(circle, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.65) 100%);
+    background: radial-gradient(circle, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.5) 100%);
     z-index: 2;
 }
 
 /* Общий стиль стеклянных панелей */
 .glass-panel {
     background: var(--glass);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(232, 77, 255, .3);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(232, 77, 255, .25);
     border-radius: 14px;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
 /* Кнопки слева вверху */
@@ -95,17 +86,17 @@ body {
     gap: 10px;
     color: var(--text);
     text-decoration: none;
-    padding: 10px 16px;
+    padding: 10px 14px;
     font-size: 14px;
     font-weight: 600;
-    border: 1px solid rgba(0, 224, 255, .25);
+    border: 1px solid rgba(0, 224, 255, .2);
     border-radius: 10px;
     transition: all 0.2s ease;
     cursor: pointer;
 }
 
 .btn:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.1);
     border-color: var(--cyan);
 }
 
@@ -115,9 +106,9 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -55%);
-    width: 780px;
+    width: 760px;
     max-width: 95vw;
-    padding: 26px 30px;
+    padding: 24px 28px;
     text-align: center;
     z-index: 10;
 }
@@ -164,7 +155,7 @@ h1.title {
 }
 
 .status-text {
-    margin-top: 10px;
+    margin-top: 8px;
     font-size: 14px;
     color: var(--muted);
     white-space: nowrap;
@@ -210,12 +201,12 @@ h1.title {
 </head>
 <body>
 
-<!-- Фоны и Слайд-шоу -->
-<div class="background" id="bgContainer">
-    <img src="https://raw.githubusercontent.com/Vladislav22231/gmod-loading/main/1.jpg" class="active" alt="bg1" crossorigin="anonymous">
-    <img src="https://raw.githubusercontent.com/Vladislav22231/gmod-loading/main/2.jpg" alt="bg2" crossorigin="anonymous">
-    <img src="https://raw.githubusercontent.com/Vladislav22231/gmod-loading/main/3.jpg" alt="bg3" crossorigin="anonymous">
-    <img src="https://raw.githubusercontent.com/Vladislav22231/gmod-loading/main/4.jpg" alt="bg4" crossorigin="anonymous">
+<!-- Фоны и Слайд-шоу (Пути напрямую из корня) -->
+<div class="background">
+    <img src="1.jpg" class="active" alt="bg1">
+    <img src="2.jpg" alt="bg2">
+    <img src="3.jpg" alt="bg3">
+    <img src="4.jpg" alt="bg4">
 </div>
 
 <div class="overlay"></div>
@@ -255,19 +246,15 @@ h1.title {
 </div>
 
 <script>
-/* ===== ПРЕДЗАГРУЗКА И СЛАЙД-ШОУ ===== */
+/* ===== СЛАЙД-ШОУ ФОНОВ ===== */
 const slides = document.querySelectorAll(".background img");
 let currentSlide = 0;
 
 function changeSlide() {
     if (slides.length <= 1) return;
-    
-    // Проверяем, прогрузилась ли следующая картинка
-    let nextSlide = (currentSlide + 1) % slides.length;
-    
     slides[currentSlide].classList.remove("active");
-    slides[nextSlide].classList.add("active");
-    currentSlide = nextSlide;
+    currentSlide = (currentSlide + 1) % slides.length;
+    slides[currentSlide].classList.add("active");
 }
 
 setInterval(changeSlide, 5000);
