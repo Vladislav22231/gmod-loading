@@ -35,7 +35,7 @@ html, body {
     position: relative;
 }
 
-/* СИНЕ-ФИОЛЕТОВЫЙ ФОН (25%) */
+/* СИНЕ-ФИОЛЕТОВЫЙ ФОН */
 body::before {
     content: '';
     position: fixed;
@@ -76,7 +76,7 @@ body::before {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    z-index: 10;
+    z-index: 100;
 }
 
 .btn {
@@ -84,7 +84,6 @@ body::before {
     align-items: center;
     justify-content: center;
     color: var(--text);
-    text-decoration: none;
     padding: 10px 18px;
     font-size: 14px;
     font-weight: 600;
@@ -208,10 +207,10 @@ h1.title {
 </head>
 <body>
 
-<!-- Кнопки Соцсетей -->
+<!-- Кнопки Соцсетей (С исправленным обработчиком клика) -->
 <div class="social-buttons">
-    <a href="https://discord.gg/UmGHaVrZ" target="_blank" class="btn btn-discord glass-panel">Discord</a>
-    <a href="https://t.me/PixelCanvasSandboxServer" target="_blank" class="btn btn-telegram glass-panel">Telegram</a>
+    <div class="btn btn-discord glass-panel" onclick="openLink('https://discord.gg/UmGHaVrZ')">Discord</div>
+    <div class="btn btn-telegram glass-panel" onclick="openLink('https://t.me/PixelCanvasSandboxServer')">Telegram</div>
 </div>
 
 <!-- Центральное меню -->
@@ -246,6 +245,11 @@ h1.title {
 </div>
 
 <script>
+// Функция открытия ссылок в Garry's Mod / Внешнем браузере
+function openLink(url) {
+    window.open(url, '_blank');
+}
+
 const bar = document.getElementById("bar");
 const statusText = document.getElementById("status");
 
