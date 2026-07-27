@@ -157,9 +157,40 @@ h1.title {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+/* Кнопка включения/выключения звука (если автоплей заблокирован браузером) */
+.sound-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 100;
+    background: var(--glass);
+    border: 1px solid rgba(232, 77, 255, .35);
+    color: var(--text);
+    padding: 10px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+    backdrop-filter: blur(10px);
+    transition: all 0.2s ease;
+}
+.sound-toggle:hover {
+    border-color: var(--cyan);
+    box-shadow: 0 0 15px rgba(0, 224, 255, 0.3);
+}
 </style>
 </head>
 <body>
+
+<!-- Аудио элемент с фоновой музыкой (зациклен) -->
+<audio id="bg-music" loop autoplay>
+    <!-- Замените "your-music-file.mp3" на ссылку или путь к вашему аудиофайлу -->
+    <source src="your-music-file.mp3" type="audio/mpeg">
+</audio>
+
+<!-- Кнопка управления звуком на случай блокировки автоплея браузером -->
+<button class="sound-toggle" id="sound-btn" onclick="toggleSound()">🔊 Звук: Вкл</button>
 
 <!-- Центральное меню -->
 <div class="center-card glass-panel">
@@ -195,6 +226,28 @@ h1.title {
 <script>
 const bar = document.getElementById("bar");
 const statusText = document.getElementById("status");
+const music = document.getElementById("bg-music");
+const soundBtn = document.getElementById("sound-btn");
+
+// Установка громкости (от 0.0 до 1.0)
+music.volume = 0.5;
+
+// Автозапуск музыки при первом клике/взаимодействии, если браузер заблокировал autoplay
+document.addEventListener('click', () => {
+    if (music.paused) {
+        music.play().catch(() => {});
+    }
+}, { once: true });
+
+function toggleSound() {
+    if (music.muted) {
+        music.muted = false;
+        soundBtn.textContent = "🔊 Звук: Вкл";
+    } else {
+        music.muted = true;
+        soundBtn.textContent = "🔇 Звук: Выкл";
+    }
+}
 
 const stages = {
     "Sending client info": 10,
@@ -251,7 +304,7 @@ async function updateServer() {
             document.getElementById("players-count").textContent = data.players + " / " + data.maxplayers;
             document.getElementById("gamemode").textContent = "Sandbox";
         } else {
-            document.getElementById("map-name").textContent = "Сервер офлайн";
+            document.getElementById("map-name").textContent = data.map || "Сервер офлайн";
             document.getElementById("players-count").textContent = "--";
         }
     } catch (err) {
