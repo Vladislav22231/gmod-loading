@@ -38,12 +38,27 @@
 </style>
 </head>
 <body>
-  <div class="bg">
-    <img src="https://vladislav22231.github.io/gmod-loading/Screenshot_83.png" class="active" alt="">
-<img src="https://vladislav22231.github.io/gmod-loading/Screenshot_84.png" alt="">
-<img src="https://vladislav22231.github.io/gmod-loading/Screenshot_85.png" alt="">
-<img src="https://vladislav22231.github.io/gmod-loading/Screenshot_87.png" alt="">
-</div>
+  <div class="bg" id="bg"></div>
+    const images = [
+    "https://vladislav22231.github.io/gmod-loading/Screenshot_83.png",
+    "https://vladislav22231.github.io/gmod-loading/Screenshot_84.png",
+    "https://vladislav22231.github.io/gmod-loading/Screenshot_85.png",
+    "https://vladislav22231.github.io/gmod-loading/Screenshot_87.png"
+  ];
+
+const bg = document.getElementById("bg");
+let current = 0;
+
+function changeBG() {
+    bg.style.backgroundImage = `url('${images[current]}')`;
+    bg.style.backgroundSize = "cover";
+    bg.style.backgroundPosition = "center";
+
+    current = (current + 1) % images.length;
+}
+
+changeBG();
+setInterval(changeBG, 5000);
 
  <div class="links">
     <a class="link" href="https://discord.gg/UmGHaVrZ" target="_blank">Discord</a>
