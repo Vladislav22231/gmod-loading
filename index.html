@@ -22,7 +22,16 @@
   .link{display:flex;align-items:center;gap:10px;color:var(--text);text-decoration:none;padding:10px 14px;background:var(--glass);border:1px solid rgba(0,224,255,.2);border-radius:10px}
   .panel{position:absolute;right:24px;bottom:24px;min-width:340px;background:var(--glass);border:1px solid rgba(232,77,255,.25);padding:16px 18px;border-radius:12px}
   .row{display:flex;justify-content:space-between;color:var(--muted);margin:4px 0}
-  .progress{margin-top:24px;width:560px;max-width:80vw;height:14px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;border:1px solid rgba(255,255,255,.12)}
+  .progress{
+    width:560px;
+    max-width:80vw;
+    height:14px;
+    margin:24px auto 0;
+    background:rgba(255,255,255,.08);
+    border-radius:999px;
+    overflow:hidden;
+    border:1px solid rgba(255,255,255,.12);
+}
   .bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--cyan));transition:width .2s ease}
   .pct{margin-top:8px;color:var(--muted);font-size:14px}
   @media (max-width:720px){h1{font-size:36px}.progress{width:90vw}.panel{position:static;margin:16px}.center{transform:none;position:static;margin:80px 16px}}
