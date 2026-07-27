@@ -4,12 +4,30 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>PixelSandbox — Loading</title>
-<link href="[fonts.googleapis.com](https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap)" rel="stylesheet">
-<style>
-  :root{
-    --bg:#0b0e14;--text:#e6e9ef;--muted:#9aa3b2;
-    --accent:#e84dff;--cyan:#00e0ff;--glass:rgba(13,16,24,.55)
-  }
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Orbitron:wght@900&display=swap" rel="stylesheet">
+.subtitle{
+    margin-top:12px;
+    font-size:18px;
+    color:#d9d9d9;
+    line-height:1.7;
+}
+
+.ua-title{
+    font-family:'Orbitron', sans-serif;
+    font-weight:900;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:#ffffff;
+    text-shadow:
+        0 0 8px #00bfff,
+        0 0 18px #00bfff;
+}
+
+.divider{
+    color:#00e0ff;
+    margin:0 8px;
+    font-weight:bold;
+}
   *{box-sizing:border-box}html,body{height:100%;margin:0}
   body{font-family:Inter,Arial,Helvetica,sans-serif;color:var(--text);background:#000;overflow:hidden}
   .bg{position:fixed;inset:0;z-index:-1}
@@ -43,10 +61,15 @@
 
   <div class="center">
     <h1>PixelSandbox</h1>
-    <div class="subtitle">•UA Украинский Sandbox • 100+ аддонов • Безграничные возможности • Активное сообщество</div>
-    <div class="progress"><div class="bar" id="bar"></div></div>
-    <div class="pct" id="pct">Загрузка... 0%</div>
-  </div>
+    <div class="subtitle">
+    <span class="ua-title">🇺🇦 Украинский Sandbox</span>
+    <span class="divider">•</span>
+    100+ аддонов
+    <span class="divider">•</span>
+    Безграничные возможности
+    <span class="divider">•</span>
+    Активное сообщество
+</div>
 
   <div class="panel" id="serverInfo">
     <div class="row"><span>Карта</span><strong id="map">gm_bigcity_improved</strong></div>
