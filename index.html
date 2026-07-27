@@ -25,7 +25,7 @@
 body {
     font-family: 'Inter', Arial, Helvetica, sans-serif;
     color: var(--text);
-    background: #000;
+    background: #0b0e14; /* Темный фон вместо чисто черного, чтобы не было промаргиваний */
     overflow: hidden;
     user-select: none;
     height: 100vh;
@@ -36,6 +36,10 @@ body {
     position: fixed;
     inset: 0;
     z-index: 1;
+    /* Резервный фон из 1-й картинки на случай долгой загрузки */
+    background-image: url("https://vladislav22231.github.io/gmod-loading/Screenshot_83.png");
+    background-size: cover;
+    background-position: center;
 }
 
 .background img {
@@ -46,7 +50,7 @@ body {
     object-fit: cover;
     filter: brightness(.65);
     opacity: 0;
-    transition: opacity 1s ease;
+    transition: opacity 1.2s ease-in-out;
 }
 
 .background img.active {
@@ -56,15 +60,15 @@ body {
 .overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.25);
+    background: radial-gradient(circle, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%);
     z-index: 2;
 }
 
 /* Общий стиль стеклянных панелей */
 .glass-panel {
     background: var(--glass);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     border: 1px solid rgba(232, 77, 255, .25);
     border-radius: 14px;
 }
@@ -106,7 +110,7 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -55%);
-    width: 760px; /* Увеличено для вместимости одной строки */
+    width: 760px;
     max-width: 95vw;
     padding: 24px 28px;
     text-align: center;
@@ -130,7 +134,7 @@ h1.title {
     color: #ffffff;
     opacity: .95;
     margin-bottom: 24px;
-    white-space: nowrap; /* Запрещает перенос строки */
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
@@ -246,8 +250,15 @@ h1.title {
 </div>
 
 <script>
-/* ===== СЛАЙД-ШОУ ФОНОВ ===== */
+/* ===== ПРЕДЗАГРУЗКА ИЗОБРАЖЕНИЙ (Предвращает чёрный экран) ===== */
 const slides = document.querySelectorAll(".background img");
+
+slides.forEach((img) => {
+    const tempImg = new Image();
+    tempImg.src = img.src;
+});
+
+/* ===== СЛАЙД-ШОУ ФОНОВ ===== */
 let currentSlide = 0;
 
 function changeSlide() {
