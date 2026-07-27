@@ -35,7 +35,7 @@ html, body {
     position: relative;
 }
 
-/* СИНЕ-ФИОЛЕТОВЫЙ ФОН (БАЛАНС 25%) */
+/* СИНЕ-ФИОЛЕТОВЫЙ ФОН (25%) */
 body::before {
     content: '';
     position: fixed;
@@ -53,15 +53,9 @@ body::before {
 }
 
 @keyframes breathingGlow {
-    0% {
-        opacity: 0.44;
-    }
-    50% {
-        opacity: 0.76;
-    }
-    100% {
-        opacity: 0.50;
-    }
+    0% { opacity: 0.44; }
+    50% { opacity: 0.76; }
+    100% { opacity: 0.50; }
 }
 
 /* Общий стиль стеклянных панелей */
@@ -70,8 +64,8 @@ body::before {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(232, 77, 255, .35);
-    border-radius: 14px;
-    box-shadow: 0 0 35px rgba(180, 50, 255, 0.25), inset 0 0 15px rgba(232, 77, 255, 0.05);
+    border-radius: 16px;
+    box-shadow: 0 0 35px rgba(180, 50, 255, 0.2), inset 0 0 15px rgba(232, 77, 255, 0.05);
 }
 
 /* Кнопки слева вверху */
@@ -121,24 +115,27 @@ body::before {
     color: #ffffff;
 }
 
-/* Фиксированное центрирование главной карточки */
+/* Расширенная единая центральная карточка */
 .center-card {
     position: fixed;
     top: 50%;
     left: 50%;
-    margin-top: -110px;
-    margin-left: -390px;
-    width: 780px;
-    padding: 26px 30px;
-    text-align: center;
+    transform: translate(-50%, -50%);
+    width: 860px;
+    padding: 30px 36px;
     z-index: 10;
 }
 
+.card-header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
 h1.title {
-    font-size: 56px;
+    font-size: 52px;
     font-weight: 800;
     letter-spacing: .5px;
-    margin: 0 0 6px;
+    margin: 0 0 4px;
     background: linear-gradient(90deg, #f070ff, var(--cyan));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -149,11 +146,22 @@ h1.title {
     font-size: 13px;
     font-weight: 700;
     color: #ffffff;
-    opacity: .95;
-    margin-bottom: 24px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    opacity: .9;
+}
+
+/* Двухколоночный макет для загрузки и инфо */
+.card-body {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 24px;
+    align-items: center;
+}
+
+/* Левая секция: Прогресс загрузки */
+.loading-section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .progress-container {
@@ -163,7 +171,7 @@ h1.title {
     border-radius: 999px;
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, .12);
-    box-shadow: 0 0 20px rgba(232, 77, 255, .25);
+    box-shadow: 0 0 20px rgba(232, 77, 255, .2);
 }
 
 .progress-bar {
@@ -171,33 +179,33 @@ h1.title {
     width: 0%;
     background: linear-gradient(90deg, #e84dff, #00e0ff);
     transition: width 0.2s ease;
-    box-shadow: 0 0 8px #e84dff, 0 0 18px #00e0ff, 0 0 30px #00e0ff;
+    box-shadow: 0 0 8px #e84dff, 0 0 18px #00e0ff;
 }
 
 .status-text {
-    margin-top: 10px;
-    font-size: 14px;
+    margin-top: 12px;
+    font-size: 13px;
     color: var(--muted);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-/* Инфо-блок снизу справа */
-.info-card {
-    position: fixed;
-    right: 24px;
-    bottom: 24px;
-    width: 340px;
-    padding: 16px 18px;
-    font-size: 14px;
-    z-index: 10;
+/* Правая секция: Информация о сервере */
+.info-section {
+    background: rgba(0, 0, 0, 0.25);
+    border-left: 2px solid rgba(232, 77, 255, 0.4);
+    padding: 12px 16px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .info-row {
     display: flex;
     justify-content: space-between;
-    margin: 4px 0;
+    font-size: 13px;
     color: var(--muted);
 }
 
@@ -205,7 +213,7 @@ h1.title {
     color: var(--text);
     font-weight: 600;
     text-align: right;
-    max-width: 180px;
+    max-width: 150px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -220,31 +228,37 @@ h1.title {
     <a href="https://t.me/PixelCanvasSandboxServer" target="_blank" class="btn btn-telegram glass-panel">Telegram</a>
 </div>
 
-<!-- Центральное меню -->
+<!-- Центральное объединённое меню -->
 <div class="center-card glass-panel">
-    <h1 class="title">PixelSandbox</h1>
-    <div class="subtitle">• UA Украинский Sandbox • 100+ аддонов • Безграничные возможности • Активное сообщество •</div>
-
-    <div class="progress-container">
-        <div class="progress-bar" id="bar"></div>
+    <div class="card-header">
+        <h1 class="title">PixelSandbox</h1>
+        <div class="subtitle">• UA Украинский Sandbox • 100+ аддонов • Безграничные возможности •</div>
     </div>
 
-    <div class="status-text" id="status">Подключение... 0%</div>
-</div>
+    <div class="card-body">
+        <!-- Слева: Полоса загрузки -->
+        <div class="loading-section">
+            <div class="progress-container">
+                <div class="progress-bar" id="bar"></div>
+            </div>
+            <div class="status-text" id="status">Подключение... 0%</div>
+        </div>
 
-<!-- Инфо-блок снизу справа -->
-<div class="info-card glass-panel">
-    <div class="info-row">
-        <span>🗺 Карта</span>
-        <strong class="info-value" id="map-name">Загрузка...</strong>
-    </div>
-    <div class="info-row">
-        <span>👥 Игроков</span>
-        <strong class="info-value" id="players-count">0 / 20</strong>
-    </div>
-    <div class="info-row">
-        <span>🎮 Режим</span>
-        <strong class="info-value" id="gamemode">Sandbox</strong>
+        <!-- Справа: Статус сервера -->
+        <div class="info-section">
+            <div class="info-row">
+                <span>🗺 Карта</span>
+                <strong class="info-value" id="map-name">Загрузка...</strong>
+            </div>
+            <div class="info-row">
+                <span>👥 Игроков</span>
+                <strong class="info-value" id="players-count">0 / 20</strong>
+            </div>
+            <div class="info-row">
+                <span>🎮 Режим</span>
+                <strong class="info-value" id="gamemode">Sandbox</strong>
+            </div>
+        </div>
     </div>
 </div>
 
