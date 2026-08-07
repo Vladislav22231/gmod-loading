@@ -1,0 +1,423 @@
+AddCSLuaFile()
+
+-- ================================================
+-- Пути к звуковым файлам интро.
+-- Файлы должны лежать в:
+--   garrysmod/addons/<ваш_аддон>/sound/pixelintro/subswell.mp3
+--   garrysmod/addons/<ваш_аддон>/sound/pixelintro/subriser.mp3
+--   garrysmod/addons/<ваш_аддон>/sound/pixelintro/subdrop.mp3
+-- (путь указывается ОТНОСИТЕЛЬНО папки sound/)
+-- ================================================
+local SND_INTRO = "pixelintro/subswell.mp3"  -- 1. Звук в начале — Нарастающий Саб
+local SND_RISER = "pixelintro/subriser.mp3"  -- 2. Переход (1→2 кадр) — Басовый Рисер
+local SND_DROP  = "pixelintro/subdrop.mp3"   -- 3. Переход (2→3 кадр) — Саб-Дроп
+
+if SERVER then
+    -- Регистрируем звуки, чтобы они докачивались клиентам (FastDL/Workshop)
+    resource.AddFile("sound/" .. SND_INTRO)
+    resource.AddFile("sound/" .. SND_RISER)
+    resource.AddFile("sound/" .. SND_DROP)
+    return
+end
+
+local introActive = false
+
+local htmlTemplate = [==[
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>Pixel Sandbox — Intro</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@700;900&family=Rajdhani:wght@500;700&display=swap');
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  html, body {
+    width: 100vw;
+    height: 100vh;
+    background: #000;
+    color: #e0f0ff;
+    font-family: 'Rajdhani', sans-serif;
+    overflow: hidden;
+  }
+
+  .intro-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    overflow: hidden;
+    transition: opacity 1.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .scene {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .init-loader {
+    position: absolute;
+    bottom: 35px;
+    right: 45px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 15px;
+    letter-spacing: 2px;
+    color: #a0b0c0;
+    z-index: 20;
+    opacity: 0;
+    animation: initShowHide 7.5s ease forwards;
+  }
+
+  .spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-top-color: #4fd6ff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes initShowHide { 0% { opacity: 0; } 5% { opacity: 1; } 90% { opacity: 1; } 100% { opacity: 0; pointer-events: none; } }
+
+  #scene1 { animation: s1fade 4s ease forwards; }
+  @keyframes s1fade { 0% { opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; } }
+
+  .logo-title {
+    font-family: 'Poppins', sans-serif; font-weight: 900; font-size: 58px; letter-spacing: 6px; color: #4fd6ff;
+    text-shadow: 0 0 10px #4fd6ff, 0 0 25px #22aeff, 0 0 50px #0080ff, 0 0 80px #0060ff;
+    opacity: 0; animation: cleanZoomAnim 3.7s ease-out 0.3s forwards;
+  }
+  @keyframes cleanZoomAnim { 0% { opacity: 0; transform: scale(0.92); } 15% { opacity: 1; transform: scale(0.97); } 100% { opacity: 1; transform: scale(1.08); } }
+
+  .logo-sub { margin-top: 18px; font-size: 16px; letter-spacing: 8px; color: #c7d9e6; opacity: 0; animation: fadeUp 1s ease 1.4s forwards; }
+  @keyframes fadeUp { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
+
+  #scene2 { animation: s2fade 4.2s ease 4s forwards; }
+  @keyframes s2fade { 0% { opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; } }
+
+  .support-label { font-size: 15px; letter-spacing: 8px; color: #8a99a6; margin-bottom: 22px; opacity: 0; animation: slideFromRight 0.8s cubic-bezier(0.2, 0.8, 0.25, 1) 4.2s forwards; }
+  @keyframes slideFromRight { 0% { opacity: 0; transform: translateX(100px); } 100% { opacity: 1; transform: translateX(0); } }
+
+  .support-title {
+    font-family: 'Poppins', sans-serif; font-weight: 900; font-size: 42px;
+    background: linear-gradient(90deg, #3ad0ff, #1a5bff); -webkit-background-clip: text; background-clip: text; color: transparent;
+    opacity: 0; animation: slideFromLeft 0.8s cubic-bezier(0.2, 0.8, 0.25, 1) 4.5s forwards;
+  }
+  @keyframes slideFromLeft { 0% { opacity: 0; transform: translateX(-100px); } 100% { opacity: 1; transform: translateX(0); } }
+
+  #scene3 {
+    animation: s3fade 1.5s cubic-bezier(0.4, 0, 0.2, 1) 7.7s forwards;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 15% 55%, rgba(255, 0, 0, 0.16) 0%, rgba(255, 0, 0, 0.045) 45%, transparent 72%),
+      radial-gradient(circle at 85% 55%, rgba(255, 170, 0, 0.14) 0%, rgba(255, 170, 0, 0.035) 45%, transparent 72%),
+      #000;
+  }
+  @keyframes s3fade { 0% { opacity: 0; } 100% { opacity: 1; pointer-events: auto; } }
+
+  .warn-head {
+    position: absolute; top: 9%; font-family: 'Poppins', sans-serif; font-weight: 900; font-size: 30px; letter-spacing: 14px; color: #ff2424;
+    text-shadow: 0 0 6px rgba(255,255,255,0.5), 0 0 20px rgba(255,36,36,0.9); opacity: 0; z-index: 2;
+    animation: fadeUpWarn 0.8s ease 8.0s forwards, headerGlitch 4s linear 8.8s infinite;
+  }
+  @keyframes fadeUpWarn { 0% { opacity: 0; transform: translateY(15px); } 100% { opacity: 1; transform: translateY(0); } }
+  @keyframes headerGlitch {
+    0%, 90%, 100% { transform: translate(0,0); text-shadow: 0 0 6px rgba(255,255,255,0.5), 0 0 20px rgba(255,36,36,0.9); }
+    91% { transform: translate(-2px, 1px); text-shadow: 2px 0 rgba(0,255,249,0.7), -2px 0 rgba(255,0,193,0.7); }
+    92% { transform: translate(2px, -1px); text-shadow: -2px 0 rgba(0,255,249,0.7), 2px 0 rgba(255,0,193,0.7); }
+    93% { transform: translate(-1px, 1px); text-shadow: 0 0 6px rgba(255,255,255,0.5), 0 0 20px rgba(255,36,36,0.9); }
+    94%, 100% { transform: translate(0,0); }
+  }
+
+  .warn-cols { display: flex; gap: 220px; margin-top: 70px; z-index: 2; justify-content: center; }
+  .warn-col { display: flex; flex-direction: column; align-items: center; width: 640px; text-align: center; opacity: 0; }
+
+  .warn-col.left { animation: slideInLeftWarn 1.2s cubic-bezier(0.1, 0.8, 0.2, 1) 8.2s forwards; }
+  @keyframes slideInLeftWarn { 0% { opacity: 0; transform: translateX(-450px); } 100% { opacity: 1; transform: translateX(0); } }
+
+  .warn-col.right { animation: slideInRightWarn 1.2s cubic-bezier(0.1, 0.8, 0.2, 1) 8.35s forwards; }
+  @keyframes slideInRightWarn { 0% { opacity: 0; transform: translateX(450px); } 100% { opacity: 1; transform: translateX(0); } }
+
+  .badge-container {
+    width: 94px;
+    height: 94px;
+    margin-bottom: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .badge-circle {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 3px solid #ff2b2b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 900;
+    font-size: 27px;
+    color: #ff2424;
+    background: rgba(60, 9, 9, 0.60);
+    text-shadow: 0 0 6px rgba(255,36,36,0.85), 0 0 14px rgba(255,36,36,0.55);
+    box-shadow: 0 0 20px rgba(255,36,36,0.85), 0 0 40px rgba(255,36,36,0.4), inset 0 0 28px rgba(255,36,36,0.28);
+    animation: redFlicker 2.5s ease-in-out infinite;
+  }
+
+  @keyframes redFlicker {
+    0%, 100% { opacity: 1; box-shadow: 0 0 16px rgba(255,36,36,0.7), 0 0 30px rgba(255,36,36,0.3), inset 0 0 24px rgba(255,36,36,0.2); }
+    50% { opacity: 0.75; box-shadow: 0 0 8px rgba(255,36,36,0.4), 0 0 15px rgba(255,36,36,0.15), inset 0 0 12px rgba(255,36,36,0.1); }
+  }
+
+  .badge-tri {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    filter: drop-shadow(0 0 22px rgba(255,170,0,0.85));
+    animation: yellowFlicker 2.5s ease-in-out infinite;
+  }
+
+  @keyframes yellowFlicker {
+    0%, 100% { opacity: 1; filter: drop-shadow(0 0 18px rgba(255,170,0,0.8)); }
+    50% { opacity: 0.75; filter: drop-shadow(0 0 8px rgba(255,170,0,0.35)); }
+  }
+
+  .warn-title {
+    font-family: 'Poppins', sans-serif; font-weight: 900; font-size: 27px; letter-spacing: 1px;
+    color: #ff3b3b; text-shadow: 0 0 12px rgba(255,59,59,0.55);
+    margin-bottom: 34px; text-transform: uppercase;
+  }
+  .warn-text { font-size: 12.5px; line-height: 1.6; color: #a8adb1; width: 100%; font-weight: 600; letter-spacing: 0.2px; }
+  .warn-text p { margin: 0 0 16px 0; }
+
+  .play-btn {
+    position: absolute; bottom: 20%; font-family: 'Poppins', sans-serif; font-weight: 900; font-size: 32px; letter-spacing: 11px; color: #c9c9c9;
+    text-shadow: 0 0 8px rgba(255,255,255,0.5), 0 0 22px rgba(255,50,50,0.55), 0 0 42px rgba(255,20,20,0.3); cursor: pointer; z-index: 2;
+    opacity: 0;
+    animation: playFadeIn 1s ease 14s forwards;
+    transition: transform 0.2s ease, text-shadow 0.2s ease, color 0.2s ease;
+  }
+  .play-btn:hover { transform: scale(1.05); color: #ff3b3b; text-shadow: 0 0 18px rgba(255, 40, 40, 0.9), 0 0 34px rgba(255, 40, 40, 0.5); }
+  @keyframes playFadeIn { 0% { opacity: 0; transform: translateY(15px); } 100% { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<div class="intro-inner" id="stageContainer">
+  <div style="display:none;" id="cache_id">%s</div>
+
+  <div class="init-loader">
+    <div class="spinner"></div>
+    <span>ИНИЦИАЛИЗАЦИЯ ИГРЫ ...</span>
+  </div>
+
+  <div class="scene" id="scene1">
+    <div class="logo-title">PIXEL SANDBOX</div>
+    <div class="logo-sub">ПРЕДСТАВЛЯЕТ</div>
+  </div>
+
+  <div class="scene" id="scene2">
+    <div class="support-label">( ПРИ ПОДДЕРЖКЕ )</div>
+    <div class="support-title">PXL Community Discord</div>
+  </div>
+
+  <div class="scene" id="scene3">
+    <div class="warn-head">ПРЕДУПРЕЖДЕНИЕ</div>
+    <div class="warn-cols">
+      <div class="warn-col left">
+        <div class="badge-container">
+          <div class="badge-circle">18+</div>
+        </div>
+        <div class="warn-title">НЕЖЕЛАТЕЛЬНЫЙ КОНТЕНТ 18+</div>
+        <div class="warn-text">
+          <p>Данный сервер содержит материалы, не предназначенные для лиц младше 18 лет.</p>
+          <p>Возможны сцены жестокости, насилия и шокирующий визуальный контент. Мы не несем ответственности за вашу психику.</p>
+        </div>
+      </div>
+      <div class="warn-col right">
+        <div class="badge-container">
+          <svg class="badge-tri" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="50,8 96,88 4,88" fill="#ffaa00" stroke="#ffaa00" stroke-width="3" stroke-linejoin="round"/>
+            <rect x="44" y="34" width="12" height="28" rx="3" fill="#000000"/>
+            <circle cx="50" cy="74" r="6.5" fill="#000000"/>
+          </svg>
+        </div>
+        <div class="warn-title">ТОКСИЧНОСТЬ И БУЛЛИНГ</div>
+        <div class="warn-text">
+          <p>Внутриигровое голосовое и текстовое общение практически не модерируется.</p>
+          <p>Присутствует ненормативная лексика, жесткий черный юмор и возможный буллинг. Входите на свой страх и риск.</p>
+        </div>
+      </div>
+    </div>
+    <div class="play-btn" onclick="closeIntroFromHTML()">ИГРАТЬ</div>
+  </div>
+</div>
+
+<script>
+(function() {
+  function initSafe(){
+    try {
+      if (document.documentElement) {
+        document.documentElement.style.width = "100%";
+        document.documentElement.style.height = "100%";
+      }
+      if (document.body) {
+        document.body.style.width = "100%";
+        document.body.style.height = "100%";
+        document.body.style.margin = "0";
+        document.body.style.padding = "0";
+        document.body.style.boxSizing = "border-box";
+      }
+    } catch(e){}
+  }
+
+  if (document.readyState === "complete" || document.readyState === "interactive") {
+    initSafe();
+  } else {
+    document.addEventListener("DOMContentLoaded", initSafe, false);
+    setTimeout(function(){ if (document.body) initSafe(); }, 600);
+  }
+
+  window.closeIntroFromHTML = function() {
+    try {
+      var stage = document.getElementById("stageContainer");
+      if (!stage || stage.dataset.closing === "1") return;
+      stage.dataset.closing = "1";
+      stage.style.pointerEvents = "none";
+      stage.style.opacity = "0"; // Плавное затухание HTML элементов
+      
+      // Сигнализируем в GMod о начале закрытия
+      try { document.title = "CLOSE_GMOD_INTRO"; } catch(e){}
+    } catch(e) {}
+  };
+})();
+</script>
+</body>
+</html>
+]==]
+
+local function OpenPixelIntro()
+    if introActive then return end
+
+    local sw, sh = ScrW(), ScrH()
+    if sw <= 1 or sh <= 1 then
+        timer.Simple(0.1, OpenPixelIntro)
+        return
+    end
+
+    introActive = true
+
+    local container = vgui.Create("DPanel")
+    container:SetSize(sw, sh)
+    container:SetPos(0, 0)
+    container:MakePopup()
+    container:SetKeyboardInputEnabled(true)
+    container:SetMouseInputEnabled(true)
+    gui.EnableScreenClicker(true)
+    container:SetAlpha(255)
+
+    if container.ParentToHUD then container:ParentToHUD() end
+    if container.SetZPos then container:SetZPos(9999) end
+
+    container.Paint = function(self, w, h)
+        surface.SetDrawColor(0, 0, 0, 255)
+        surface.DrawRect(0, 0, w, h)
+    end
+
+    local uniqueID = tostring(math.random(1, 999999))
+    local formattedHTML = string.gsub(htmlTemplate, "%%s", uniqueID)
+
+    local html = vgui.Create("DHTML", container)
+    html:Dock(FILL)
+    html:SetSize(sw, sh)
+    html:SetPos(0, 0)
+    html:SetHTML(formattedHTML)
+
+    timer.Simple(0.05, function() if IsValid(html) then html:SetSize(ScrW(), ScrH()) end end)
+    timer.Simple(0.25, function() if IsValid(html) then html:SetSize(ScrW(), ScrH()) end end)
+    timer.Simple(0.6, function() if IsValid(html) then html:SetSize(ScrW(), ScrH()) end end)
+
+    -- ================================================
+    -- Воспроизведение звуков синхронно с анимацией:
+    -- 1. Нарастающий Саб  — начало (0.1с)
+    -- 2. Басовый Рисер    — переход к сцене 2 (3.7с)
+    -- 3. Саб-Дроп         — переход к сцене 3 (7.7с)
+    -- ================================================
+    local function playIntroSound(path)
+        if not IsValid(container) then return end
+        surface.PlaySound(path)
+    end
+
+    timer.Simple(0.1, function() playIntroSound(SND_INTRO) end)
+    timer.Simple(3.7, function() playIntroSound(SND_RISER) end)
+    timer.Simple(7.7, function() playIntroSound(SND_DROP) end)
+
+    local function ResizeIntro()
+        if not IsValid(container) then
+            hook.Remove("OnScreenSizeChanged", "PixelIntro_ResizeHook")
+            return
+        end
+        local W, H = ScrW(), ScrH()
+        container:SetSize(W, H)
+        if IsValid(html) then
+            html:SetSize(W, H)
+            local js = string.format([[
+                try {
+                    document.documentElement.style.width = "%dpx";
+                    document.documentElement.style.height = "%dpx";
+                    document.body.style.width = "%dpx";
+                    document.body.style.height = "%dpx";
+                    document.body.style.margin = "0";
+                } catch(e) {}
+            ]], W, H, W, H)
+            html:RunJavascript(js)
+        end
+    end
+    hook.Add("OnScreenSizeChanged", "PixelIntro_ResizeHook", ResizeIntro)
+
+    function html:OnChangeTitle(title)
+        if title == "CLOSE_GMOD_INTRO" then
+            if container.isClosing then return end
+            container.isClosing = true
+
+            -- Отключаем клики мыши по интро сразу после нажатия кнопки «Играть»
+            container:SetMouseInputEnabled(false)
+            container:SetKeyboardInputEnabled(false)
+
+            -- Плавно снижаем прозрачность всей панели (вместе с фоном и HTML) за 1.8 секунды
+            container:AlphaTo(0, 1.8, 0, function()
+                if IsValid(container) then container:Remove() end
+                gui.EnableScreenClicker(false) -- Снимает курсор мыши, возвращая полный контроль над камерой игроку
+                if vgui.GetWorldPanel then vgui.GetWorldPanel():RequestFocus() end
+                introActive = false
+                hook.Remove("OnScreenSizeChanged", "PixelIntro_ResizeHook")
+            end)
+        end
+    end
+end
+
+hook.Add("InitPostEntity", "PixelIntroStart", function()
+    timer.Simple(1, OpenPixelIntro)
+end)
+
+concommand.Add("intro", function()
+    introActive = false
+    OpenPixelIntro()
+end)
