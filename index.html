@@ -52,6 +52,28 @@
     100%{ transform:translateY(-120px) translateX(20px); opacity:0;}
   }
 
+  /* Emblem */
+  .emblem{
+    position:relative; z-index:2;
+    width:54px; height:54px;
+    margin:0 auto -6px;
+    filter:drop-shadow(0 0 10px rgba(160,80,255,0.55));
+    animation:emblempulse 4s ease-in-out infinite;
+  }
+  .emblem svg{width:100%; height:100%;}
+  @keyframes emblempulse{
+    0%,100%{ transform:translateY(0) scale(1); filter:drop-shadow(0 0 10px rgba(160,80,255,0.55));}
+    50%{ transform:translateY(-3px) scale(1.03); filter:drop-shadow(0 0 18px rgba(160,80,255,0.8));}
+  }
+
+  .tip-icon{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:14px; height:14px; margin-right:7px;
+    vertical-align:-2px;
+  }
+  .tip-icon svg{width:100%; height:100%; stroke:var(--purple-bright); fill:none; stroke-width:2;
+    filter:drop-shadow(0 0 4px rgba(160,80,255,0.6));}
+
   /* Title */
   .title-wrap{
     position:relative; z-index:2;
@@ -63,20 +85,32 @@
     letter-spacing:0.04em;
     line-height:1;
     background:linear-gradient(180deg,
-        var(--purple-bright) 0%, var(--purple-bright) 38%,
-        var(--white) 42%, var(--white) 58%,
-        var(--purple-deep) 62%, var(--purple-deep) 100%);
+        #c9a3f5 0%, #c9a3f5 42%,
+        #ffffff 45%, #ffffff 54%,
+        #8b4fd6 57%, #8b4fd6 100%);
     -webkit-background-clip:text;
     background-clip:text;
     color:transparent;
-    filter:drop-shadow(0 0 14px rgba(160,70,255,0.65)) drop-shadow(0 0 40px rgba(140,50,240,0.35));
+    -webkit-text-fill-color:transparent;
+    text-shadow:
+      0 0 14px rgba(160,70,255,0.65),
+      0 0 40px rgba(140,50,240,0.35),
+      0 0 80px rgba(140,50,240,0.20);
     animation:flicker 5s ease-in-out infinite;
     white-space:nowrap;
   }
   @keyframes flicker{
-    0%,92%,100%{filter:drop-shadow(0 0 14px rgba(160,70,255,0.65)) drop-shadow(0 0 40px rgba(140,50,240,0.35));}
-    94%{filter:drop-shadow(0 0 5px rgba(160,70,255,0.3)) drop-shadow(0 0 10px rgba(140,50,240,0.15));}
-    95%{filter:drop-shadow(0 0 18px rgba(160,70,255,0.8)) drop-shadow(0 0 50px rgba(140,50,240,0.45));}
+    0%,92%,100%{ text-shadow:
+      0 0 14px rgba(160,70,255,0.65),
+      0 0 40px rgba(140,50,240,0.35),
+      0 0 80px rgba(140,50,240,0.20);}
+    94%{ text-shadow:
+      0 0 5px rgba(160,70,255,0.3),
+      0 0 10px rgba(140,50,240,0.15);}
+    95%{ text-shadow:
+      0 0 18px rgba(160,70,255,0.8),
+      0 0 50px rgba(140,50,240,0.45),
+      0 0 90px rgba(140,50,240,0.25);}
   }
 
   .divider{
@@ -183,6 +217,22 @@
 
   <div class="particles" id="particles"></div>
 
+  <div class="emblem">
+    <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="32,4 58,18 58,46 32,60 6,46 6,18" fill="none" stroke="url(#emgrad)" stroke-width="2.4"/>
+      <polygon points="32,4 58,18 32,32 6,18" fill="url(#emgrad)" opacity="0.28"/>
+      <line x1="32" y1="32" x2="32" y2="60" stroke="url(#emgrad)" stroke-width="1.4" opacity="0.6"/>
+      <line x1="32" y1="32" x2="6" y2="18" stroke="url(#emgrad)" stroke-width="1.4" opacity="0.35"/>
+      <line x1="32" y1="32" x2="58" y2="18" stroke="url(#emgrad)" stroke-width="1.4" opacity="0.35"/>
+      <defs>
+        <linearGradient id="emgrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#d6b6ff"/>
+          <stop offset="100%" stop-color="#7a35c9"/>
+        </linearGradient>
+      </defs>
+    </svg>
+  </div>
+
   <div class="title-wrap">
     <div class="logo">PIXELSANDBOX</div>
   </div>
@@ -190,10 +240,10 @@
   <div class="divider"></div>
 
   <div class="welcome">Добро пожаловать на <b>PixelSandbox</b></div>
-  <div class="mapline"><span class="dot"></span>SANDBOX EVOLVED &nbsp;•&nbsp; SEASON 3</div>
+  <div class="mapline"><span class="dot"></span>ДРУЖЕЛЮБНЫЙ SANDBOX-СЕРВЕР</div>
 
   <div class="tip-box">
-    <div class="tip-eyebrow">// Совет новичкам</div>
+    <div class="tip-eyebrow"><span class="tip-icon" id="tipIcon"></span>Совет новичкам</div>
     <div class="tip-text" id="tipText"></div>
   </div>
 
@@ -230,23 +280,41 @@
   const tips = [
     "Зажми Q, чтобы открыть меню спавна пропов и инструментов.",
     "Physgun поднимает и двигает объекты — зажми ЛКМ на пропе, чтобы схватить его.",
-    "Toolgun (инструмент) позволяет крепить, красить и настраивать физику пропов.",
-    "Команда !rtd не работает на PvP-картах — уточняй правила в /rules.",
-    "Строй базу в отведённой зоне — вне зоны билды удаляются автоочисткой.",
-    "Используй !tp <ник>, чтобы телепортироваться к другу, если он разрешил телепорт.",
-    "Нажми Tab, чтобы увидеть список онлайн-игроков и их роли.",
-    "Донат-привилегии открывают доп. слоты пропов и приватные зоны — подробнее на pixelsandbox.ua",
-    "Если завис в текстуре — набери !stuck в чат, чтобы телепортироваться в безопасное место.",
+    "Toolgun позволяет крепить, красить и настраивать физику пропов.",
+    "Используй Weld, чтобы жёстко соединить два пропа между собой.",
     "Сохраняй свои постройки через дупликатор (Duplicator), чтобы не строить заново после рестарта.",
+    "Зажми R для быстрого доступа к последнему использованному инструменту.",
     "Не спавни слишком много пропов сразу — есть лимит, чтобы не лагал сервер.",
+    "Нажми Tab, чтобы увидеть список онлайн-игроков на сервере.",
+    "Используй Thruster и Wheel из Wiremod, чтобы построить свою первую машину.",
+    "Если завис в текстуре — набери !stuck в чат, чтобы телепортироваться в безопасное место.",
+    "Donator-привилегии открывают доп. слоты пропов и приватные зоны — подробнее на pixelsandbox.ua",
     "Дискорд сервера обязателен для апелляций и репортов — ссылка в /discord.",
+  ];
+  // простые line-иконки под каждый совет (в том же порядке, что и tips)
+  const tipIcons = [
+    '<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 4v16M4 9h16"/></svg>', // спавн-меню
+    '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 3"/></svg>', // physgun
+    '<svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 0 5.4-5.4l-2.1 2.1-2-2z"/></svg>', // toolgun/wrench
+    '<svg viewBox="0 0 24 24"><path d="M8 12h8M8 8h8M8 16h8"/><rect x="3" y="4" width="18" height="16" rx="2"/></svg>', // weld/link
+    '<svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M7 3v6h8V3"/></svg>', // save/duplicator
+    '<svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M8 12h.01M12 12h.01M16 12h.01"/></svg>', // клавиша R
+    '<svg viewBox="0 0 24 24"><path d="M12 2 2 20h20L12 2Z"/><path d="M12 9v5M12 17h.01"/></svg>', // лимит/предупреждение
+    '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6"/><circle cx="18" cy="9" r="2.4"/></svg>', // список игроков
+    '<svg viewBox="0 0 24 24"><path d="M4 16v-3a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v3"/><circle cx="7" cy="17" r="1.6"/><circle cx="17" cy="17" r="1.6"/></svg>', // машина/wiremod
+    '<svg viewBox="0 0 24 24"><path d="M4 4v16h16"/><path d="M9 15l3-3 3 3 5-5"/></svg>', // stuck/телепорт
+    '<svg viewBox="0 0 24 24"><path d="m12 2 2.7 6.6L22 9l-5.4 4.8L18 21l-6-3.6L6 21l1.4-7.2L2 9l7.3-.4L12 2Z"/></svg>', // донат/звезда
+    '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 13c1 1.3 2.4 2 4 2s3-.7 4-2M9 9h.01M15 9h.01"/></svg>', // дискорд
   ];
   let ti = 0;
   const tipEl = document.getElementById('tipText');
+  const tipIconEl = document.getElementById('tipIcon');
   function showTip(){
     tipEl.style.animation='none';
     void tipEl.offsetWidth;
-    tipEl.textContent = tips[ti % tips.length];
+    const idx = ti % tips.length;
+    tipEl.textContent = tips[idx];
+    tipIconEl.innerHTML = tipIcons[idx % tipIcons.length];
     tipEl.style.animation='tipfade 6s ease-in-out infinite';
     ti++;
   }
