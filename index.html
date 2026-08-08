@@ -57,14 +57,9 @@
     position:relative; z-index:2;
     width:54px; height:54px;
     margin:0 auto -6px;
-    filter:drop-shadow(0 0 4px rgba(160,80,255,0.6));
-    animation:emblempulse 4s ease-in-out infinite;
+    filter:drop-shadow(0 0 5px rgba(160,80,255,0.65));
   }
   .emblem svg{width:100%; height:100%;}
-  @keyframes emblempulse{
-    0%,100%{ transform:translateY(0) scale(1); filter:drop-shadow(0 0 4px rgba(160,80,255,0.6));}
-    50%{ transform:translateY(-3px) scale(1.03); filter:drop-shadow(0 0 7px rgba(160,80,255,0.85));}
-  }
 
   .tip-icon{
     display:inline-flex; align-items:center; justify-content:center;
@@ -321,49 +316,96 @@
   showTip();
   setInterval(showTip, 6000);
 
-  // реалистичная симуляция загрузки: список файлов/аддонов, каждый грузится до 100%,
-  // общий прогресс = позиция в очереди + прогресс текущего файла
-  const queue = [
-    "maps/rp_pixelcity_v3.bsp",
-    "addon_sandbox_tools.gma",
-    "materials/props_pixel/pack_02.vtf",
-    "models/weapons/w_pixelpistol.mdl",
-    "addon_advanced_duplicator2.gma",
-    "sound/pixelsandbox/ambient_pack.mp3",
-    "lua/autorun/sb_pixel_core.lua",
-    "addon_wiremod.gma",
-    "particles/pixel_fx.pcf",
-    "addon_simfphys_vehicles.gma",
-    "resource/fonts/pixel_ui.ttf",
-    "синхронизация с сервером...",
-  ];
+  // ==== РЕАЛЬНАЯ загрузка: движок GMod сам вызывает эти функции на window ====
+  // во время настоящего коннекта к серверу. Никакого рандома — только то,
+  // что реально сообщает игра.
   const stageLabel = document.getElementById('stageLabel');
   const pctLabel = document.getElementById('pctLabel');
   const barfillEl = document.querySelector('.barfill');
   const handleDot = document.querySelector('.handle-dot');
-  barfillEl.style.animation = 'none';
-  handleDot.style.animation = 'none';
 
-  let fileIndex = 0;
-  let fileProgress = 0;
+  let totalFiles = 0;
+  let neededFiles = 0;
+  let realDataReceived = false;
 
-  function stepLoad(){
-    // случайный прирост, имитирующий неравномерную реальную загрузку
-    fileProgress += Math.random()*14 + 3;
-    if(fileProgress >= 100){
-      fileProgress = 0;
-      fileIndex = (fileIndex + 1) % queue.length;
-    }
-    const overall = Math.min(100, Math.round(((fileIndex + fileProgress/100) / queue.length) * 100));
-    stageLabel.textContent = queue[fileIndex];
-    pctLabel.textContent = overall + '%';
-    barfillEl.style.width = overall + '%';
-    handleDot.style.left = overall + '%';
-
-    const delay = 120 + Math.random()*260;
-    setTimeout(stepLoad, delay);
+  function setProgress(pct){
+    pct = Math.max(0, Math.min(100, Math.round(pct)));
+    pctLabel.textContent = pct + '%';
+    barfillEl.style.width = pct + '%';
+    handleDot.style.left = pct + '%';
   }
-  stepLoad();
+
+  function updateFileProgress(){
+    if(totalFiles <= 0){ setProgress(0); return; }
+    const downloaded = totalFiles - neededFiles;
+    setProgress((downloaded / totalFiles) * 100);
+  }
+
+  // Вызывается один раз — сколько всего файлов нужно скачать
+  window.SetFilesTotal = function(total){
+    realDataReceived = true;
+    totalFiles = total;
+    neededFiles = total;
+    updateFileProgress();
+  };
+
+  // Вызывается при изменении числа оставшихся файлов
+  window.SetFilesNeeded = function(needed){
+    realDataReceived = true;
+    neededFiles = needed;
+    updateFileProgress();
+  };
+
+  // Вызывается когда стартует скачивание конкретного файла — показываем его имя
+  window.DownloadingFile = function(fileName){
+    realDataReceived = true;
+    stageLabel.textContent = fileName;
+  };
+
+  // Вызывается при смене общего статуса подключения (например "Retrieving server info")
+  window.SetStatusChanged = function(status){
+    realDataReceived = true;
+    stageLabel.textContent = status;
+  };
+
+  // Вызывается один раз в начале — реальные данные о сервере/карте
+  window.GameDetails = function(servername, serverurl, mapname, maxplayers, maxplayers_visible, steamid, gamemode){
+    realDataReceived = true;
+    if(mapname){
+      const mapEl = document.querySelector('.mapline');
+      if(mapEl) mapEl.innerHTML = '<span class="dot"></span>' + mapname.toUpperCase();
+    }
+  };
+
+  // ==== Демо-режим ====
+  // Если открыть этот файл просто в браузере (не через реальный коннект к
+  // серверу GMod), вызовы выше никогда не произойдут — тогда через секунду
+  // включаем условную демонстрацию, чтобы страница не стояла на 0%.
+  // Внутри игры realDataReceived станет true почти сразу, и демо не запустится.
+  setTimeout(function(){
+    if(realDataReceived) return;
+    const demoQueue = [
+      "maps/rp_pixelcity_v3.bsp",
+      "addon_sandbox_tools.gma",
+      "materials/props_pixel/pack_02.vtf",
+      "models/weapons/w_pixelpistol.mdl",
+      "addon_advanced_duplicator2.gma",
+      "lua/autorun/sb_pixel_core.lua",
+      "addon_wiremod.gma",
+      "синхронизация с сервером...",
+    ];
+    let i = 0, prog = 0;
+    stageLabel.textContent = 'ПРЕДПРОСМОТР (нет данных от сервера)';
+    function demoStep(){
+      prog += Math.random()*12 + 3;
+      if(prog >= 100){ prog = 0; i = (i+1) % demoQueue.length; }
+      stageLabel.textContent = demoQueue[i];
+      setProgress(((i + prog/100) / demoQueue.length) * 100);
+      setTimeout(demoStep, 150 + Math.random()*250);
+    }
+    demoStep();
+  }, 1200);
+
 
 </script>
 </body>
