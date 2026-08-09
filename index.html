@@ -204,14 +204,6 @@
     z-index:2;
   }
 
-  .soundtoggle{
-    position:absolute; right:24px; bottom:16px;
-    font-size:11px; letter-spacing:1px; color:var(--dim);
-    z-index:3; cursor:pointer; user-select:none;
-    display:flex; align-items:center; gap:6px;
-  }
-  .soundtoggle:hover{ color:var(--lilac); }
-  .soundtoggle svg{width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:2;}
 
 </style>
 </head>
@@ -264,11 +256,6 @@
   </div>
 
   <div class="siteurl">PIXELSANDBOX.UA</div>
-
-  <div class="soundtoggle" id="soundToggle">
-    <svg id="soundIcon" viewBox="0 0 24 24"><path d="M4 9v6h4l5 5V4L8 9H4Z"/><path d="M16 8a5 5 0 0 1 0 8"/></svg>
-    <span id="soundLabel">ЗВУК ВКЛ</span>
-  </div>
 
 </div>
 
@@ -331,33 +318,17 @@
   showTip();
   setInterval(showTip, 6000);
 
-  // ==== Фоновая музыка: средняя громкость, зациклена ====
+  // ==== Фоновая музыка: средняя громкость, зациклена, всегда включена ====
   const bgMusic = document.getElementById('bgMusic');
-  const soundToggle = document.getElementById('soundToggle');
-  const soundLabel = document.getElementById('soundLabel');
-  bgMusic.volume = 0.5;
+  bgMusic.volume = 0.35;
+  bgMusic.play().catch(function(){});
 
-  function startMusic(){
-    bgMusic.play().catch(function(){
-      // Автовоспроизведение со звуком заблокировано браузером/CEF —
-      // запустится по первому клику/движению мыши.
-      document.addEventListener('pointerdown', function once(){
-        bgMusic.play();
-        document.removeEventListener('pointerdown', once);
-      });
-    });
+  // Если автозапуск со звуком заблокирован браузером/CEF — доиграет по первому клику/движению.
+  function unlockOnce(){
+    if(bgMusic.paused){ bgMusic.play().catch(function(){}); }
+    document.removeEventListener('pointerdown', unlockOnce);
   }
-  startMusic();
-
-  soundToggle.addEventListener('click', function(){
-    if(bgMusic.paused){
-      bgMusic.play();
-      soundLabel.textContent = 'ЗВУК ВКЛ';
-    } else {
-      bgMusic.pause();
-      soundLabel.textContent = 'ЗВУК ВЫКЛ';
-    }
-  });
+  document.addEventListener('pointerdown', unlockOnce);
 
   // ==== РЕАЛЬНАЯ загрузка: движок GMod сам вызывает эти функции на window ====
   // во время настоящего коннекта к серверу. Никакого рандома — только то,
