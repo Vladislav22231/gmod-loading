@@ -58,13 +58,20 @@
     100%{ opacity:1; transform:translateY(0);}
   }
 
-  /* Emblem — появляется чуть раньше логотипа, с лёгким разворотом */
+  /* Emblem — появляется чуть раньше логотипа, с лёгким разворотом.
+     Скрыт по умолчанию; анимация запускаетсяJS-ом через класс .intro-play
+     на body, а не по animation-delay от момента парсинга страницы —
+     иначе если GMod отрисует страницу заранее, к показу анимация уже
+     успеет доиграть и будет казаться, что её вообще не было. */
   .emblem{
     position:relative; z-index:2;
     width:54px; height:54px;
     margin:0 auto -6px;
-    filter:drop-shadow(0 0 5px rgba(160,80,255,0.65));
     opacity:0;
+    transform:scale(0.7) rotate(-25deg);
+    filter:drop-shadow(0 0 0 rgba(160,80,255,0));
+  }
+  body.intro-play .emblem{
     animation: emblemIntro 0.9s cubic-bezier(0.16,1,0.3,1) 0.15s forwards;
   }
   @keyframes emblemIntro{
@@ -110,6 +117,9 @@
       0 0 40px rgba(140,50,240,0.35),
       0 0 80px rgba(140,50,240,0.20);
 
+    animation: none;
+  }
+  body.intro-play .logo{
     animation:
       logoFocusIn 1.15s cubic-bezier(0.16, 1, 0.3, 1) 0.05s forwards,
       flicker 5s ease-in-out 1.3s infinite;
@@ -155,15 +165,17 @@
     box-shadow:0 0 8px var(--purple-bright);
     position:relative; z-index:2;
     opacity:0;
-    animation: fadeInUp 0.7s ease-out 0.95s forwards;
+    transform:translateY(10px);
   }
+  body.intro-play .divider{ animation: fadeInUp 0.7s ease-out 0.95s forwards; }
 
   .welcome{
     font-size:15px; color:var(--dim); z-index:2; position:relative;
     letter-spacing:0.3px;
     opacity:0;
-    animation: fadeInUp 0.7s ease-out 1.05s forwards;
+    transform:translateY(10px);
   }
+  body.intro-play .welcome{ animation: fadeInUp 0.7s ease-out 1.05s forwards; }
   .welcome b{color:var(--lilac); font-weight:700;}
 
   .mapline{
@@ -171,8 +183,9 @@
     color:var(--purple-bright); z-index:2; position:relative;
     display:flex; align-items:center; justify-content:center; gap:8px;
     opacity:0;
-    animation: fadeInUp 0.7s ease-out 1.15s forwards;
+    transform:translateY(10px);
   }
+  body.intro-play .mapline{ animation: fadeInUp 0.7s ease-out 1.15s forwards; }
   .mapline .dot{
     width:6px; height:6px; border-radius:50%;
     background:var(--purple-bright);
@@ -187,8 +200,9 @@
     z-index:2; position:relative;
     min-height:70px;
     opacity:0;
-    animation: fadeInUp 0.7s ease-out 1.3s forwards;
+    transform:translateY(10px);
   }
+  body.intro-play .tip-box{ animation: fadeInUp 0.7s ease-out 1.3s forwards; }
   .tip-eyebrow{
     font-size:11px; letter-spacing:4px; color:var(--purple);
     text-transform:uppercase; margin-bottom:8px;
@@ -211,8 +225,9 @@
     max-width:900px;
     z-index:2; position:relative;
     opacity:0;
-    animation: fadeInUp 0.7s ease-out 1.5s forwards;
+    transform:translateY(10px);
   }
+  body.intro-play .loadbar{ animation: fadeInUp 0.7s ease-out 1.5s forwards; }
   .bartrack{
     width:100%; height:2px; background:rgba(255,255,255,0.10);
     border-radius:2px; position:relative; overflow:hidden;
@@ -256,8 +271,9 @@
     font-size:11px; letter-spacing:1px; color:var(--dim);
     z-index:2;
     opacity:0;
-    animation: fadeInUp 0.7s ease-out 1.6s forwards;
+    transform:translateY(10px);
   }
+  body.intro-play .siteurl{ animation: fadeInUp 0.7s ease-out 1.6s forwards; }
 
 
 </style>
@@ -315,6 +331,19 @@
 </div>
 
 <script>
+  // ==== Запуск анимаций входа ====
+  // Не полагаемся на animation-delay от момента парсинга HTML — если GMod
+  // подготовит/отрисует страницу заранее (до того как игрок её реально видит),
+  // все anim-delay успеют истечь в фоне, и анимация покажется пропущенной.
+  // Вместо этого добавляем класс через двойной requestAnimationFrame —
+  // это гарантирует, что браузер уже отрисовал скрытое (opacity:0) состояние
+  // хотя бы один кадр, и только после этого стартуют переходы.
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      document.body.classList.add('intro-play');
+    });
+  });
+
   // particles
   const pc = document.getElementById('particles');
   for(let i=0;i<40;i++){
@@ -372,6 +401,7 @@
   }
   showTip();
   setInterval(showTip, 6000);
+  requestAnimationFrame(function(){ requestAnimationFrame(showTip); });
 
   // ==== Фоновая музыка: средняя громкость, зациклена, всегда включена ====
   const bgMusic = document.getElementById('bgMusic');
