@@ -282,6 +282,19 @@
   }
   @keyframes shineBar{ to{ transform: translateX(330%) skewX(-18deg); } }
 
+  /* Неопределённый прогресс: файлы качаются (события DownloadingFile идут), но
+     SetFilesTotal не пришёл (бывает с workshop-контентом) — полоса «дышит»
+     scaleX, а не стоит мёртвой 0%. Как только придёт реальный счётчик —
+     класс снимается, полоса снова показывает честный процент. */
+  .bar-fill.indet{
+    width:100% !important;
+    animation: indetPulse 1.3s ease-in-out infinite;
+  }
+  @keyframes indetPulse{
+    0%,100%{ opacity:.35; transform:scaleX(.3); transform-origin:left; }
+    50%{ opacity:1; transform:scaleX(1); transform-origin:left; }
+  }
+
   .loadtext{
     font-size:18px; letter-spacing:3px; color:#e8e5ee; font-weight:800;
     text-shadow:0 0 10px rgba(220,110,50,.55);
@@ -439,7 +452,8 @@
   let filesLeft  = 0;
   let statusText = 'ПОДКЛЮЧЕНИЕ...';
   let engineActive = false;              // true — страницу открыл движок GMod
-  let lastPct = -1, lastStatus = null;   // для дешёвой перерисовки (см. render)
+  let lastPct = -1, lastStatus = null, lastIndet = false;   // для дешёвой перерисовки (см. render)
+  let sawDownload = false;   // было ли хоть одно событие DownloadingFile (для неопределённого прогресса)
 
   // Тяжёлые фазы загрузки, когда движок занят и CEF недополучает CPU:
   //  - скачивание аддонов (filesLeft > 0);
@@ -462,13 +476,19 @@
     }
     pct = Math.max(0, Math.min(100, pct));
 
+    // Неопределённый прогресс: файлы качаются (DownloadingFile/SetFilesNeeded идут),
+    // но SetFilesTotal не пришёл (бывает с workshop-контентом) — полоса «дышит»,
+    // чтобы экран не выглядел мёртвым.
+    const indet = (filesTotal === 0 && (sawDownload || filesLeft > 0));
+    barfill.classList.toggle('indet', indet);
+
     // Пишем в DOM только при реальном изменении значения. Во время скачивания
     // аддонов движок шлёт сотни событий в секунду — каждое переписывание
     // width/textContent заставляло CEF делать layout и давало лаги.
-    if (pct !== lastPct || statusText !== lastStatus){
-      lastPct = pct; lastStatus = statusText;
+    if (pct !== lastPct || statusText !== lastStatus || indet !== lastIndet){
+      lastPct = pct; lastStatus = statusText; lastIndet = indet;
       barfill.style.width = pct + '%';
-      pctEl.textContent = pct + '%';
+      pctEl.textContent = indet ? '···' : pct + '%';
       loadtext.firstChild.textContent = statusText + '\u00A0\u00A0';
     }
 
@@ -520,13 +540,21 @@
     srvData.mode = gamemode || 'Sandbox';
     srvData.max  = maxplayers || 20;
     // Статус «КАРТА: ...» не матчится с BUSY_STATUS — не перебиваем им тяжёлую фазу
-    // («Sending client info» движок ставит ДО GameDetails, и busy не должен спадать).
+    // (докачку или финальный «Sending client info»), иначе busy бы спадал зря.
     if (!BUSY_STATUS.test(statusText)) statusText = ('КАРТА: ' + (mapname || '—')).toUpperCase();
     render(); updateServerBar();
   };
 
   window.SetStatusChanged = function(status){
     statusText = status;
+    // Канонический паттерн GMod (вики + скелет load-seed): «Sending client info...»
+    // приходит ПОСЛЕ докачки — это финал, добиваем полосу до 100%. Гарды:
+    // filesTotal > 0 — не срабатывать до начала загрузки файлов;
+    // filesLeft < filesTotal — только если докачка реально шла (иначе ранний
+    // статус выставил бы 100% и заблокировал дальнейшие декременты).
+    if (filesTotal > 0 && filesLeft < filesTotal && status.indexOf('Sending client info') === 0){
+      filesLeft = 0;
+    }
     render();
   };
 
@@ -542,6 +570,12 @@
   };
 
   window.DownloadingFile = function(fileName){
+    // Канонический паттерн GMod (вики + скелет load-seed): событие приходит на
+    // КАЖДЫЙ скачиваемый файл, поэтому счётчик уменьшаем сами. SetFilesNeeded
+    // может не вызываться (часто так с workshop-контентом) — без этого полоса
+    // загрузки стояла бы на 0%, пока файлы качаются.
+    sawDownload = true;
+    if (filesTotal > 0 && filesLeft > 0) filesLeft--;
     statusText = 'ЗАГРУЗКА: ' + fileName;
     render();
   };
