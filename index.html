@@ -30,13 +30,9 @@
     width:100%; height:100vh;
     display:flex; flex-direction:column;
     align-items:center; justify-content:center;
-    animation: stageFlicker 6s infinite, stageShake 7s ease-in-out infinite;
+    animation: stageShake 7s ease-in-out infinite;
   }
-  @keyframes stageFlicker{
-    0%,96%,100%{ filter:brightness(1); }
-    97%{ filter:brightness(1.18); }
-    98%{ filter:brightness(.9); }
-  }
+  /* stageFlicker (filter:brightness на весь экран) убран — сильно грузит CEF */
   @keyframes stageShake{
     0%,94%,100%{ transform:translate(0,0); }
     94.5%{ transform:translate(1.5px,-1px); }
@@ -46,28 +42,23 @@
   }
 
   .noise{
-    position:absolute; inset:0; pointer-events:none; opacity:.05; mix-blend-mode:overlay;
+    position:absolute; inset:0; pointer-events:none; opacity:.05;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
   .scanlines{
     position:absolute; inset:0; pointer-events:none;
     background: repeating-linear-gradient(0deg, rgba(255,255,255,.03) 0px, rgba(255,255,255,.03) 1px, transparent 2px, transparent 4px);
-    mix-blend-mode:overlay;
   }
   .vignette{
     position:absolute; inset:0; pointer-events:none;
     box-shadow: inset 0 0 200px 100px rgba(0,0,0,.96);
-    animation: vigPulse 3.2s ease-in-out infinite;
   }
-  @keyframes vigPulse{
-    0%,100%{ box-shadow: inset 0 0 200px 100px rgba(0,0,0,.96); }
-    50%{ box-shadow: inset 0 0 225px 115px rgba(220,80,20,.09), inset 0 0 200px 100px rgba(0,0,0,.92); }
-  }
+  /* vigPulse (анимация box-shadow) убрана — box-shadow анимировать дорого */
 
   .glowring{
-    position:absolute; width:900px; height:900px;
-    background: conic-gradient(from 0deg, transparent 0%, rgba(220,100,25,.1) 8%, transparent 16%, transparent 50%, rgba(200,50,25,.1) 58%, transparent 66%, transparent 100%);
-    filter: blur(38px);
+    position:absolute; left:50%; top:50%; width:900px; height:900px;
+    margin-left:-450px; margin-top:-450px;
+    background: radial-gradient(circle at 62% 45%, rgba(230,120,50,.14) 0%, rgba(200,60,25,.05) 32%, transparent 60%);
     animation: spin 11s linear infinite;
   }
   @keyframes spin{ to{ transform:rotate(360deg); } }
@@ -105,23 +96,16 @@
   }
   @keyframes crossSpin{ to{ transform:rotate(360deg); } }
 
-  .mark{
-    position:absolute; width:14px; height:14px;
-    background:var(--ember-1);
-    box-shadow:0 0 12px var(--ember-1), 0 0 20px var(--ember-3);
-    animation: markPulse 2s ease-in-out infinite;
+  /* Тонкие декоративные уголки-скобки по краям экрана (статические, не грузят) */
+  .bracket{
+    position:absolute; width:36px; height:36px; opacity:.55; pointer-events:none;
+    border:1px solid rgba(229,109,23,.6);
+    filter: drop-shadow(0 0 6px rgba(220,100,25,.35));
   }
-  .mark.tl{ top:6%; left:6%; animation-delay:.1s; }
-  .mark.tr{ top:6%; right:6%; animation-delay:.5s; }
-  .mark.bl{ bottom:8%; left:7%; animation-delay:.9s; }
-  .mark.br{ bottom:8%; right:7%; animation-delay:1.3s; }
-  @keyframes markPulse{
-    0%,100%{ opacity:.3; transform:scale(1) rotate(0deg); }
-    50%{ opacity:.9; transform:scale(1.6) rotate(45deg); }
-  }
-
-  /* corner bracket decals framing the wordmark */
-  .bracket{ display:none; }
+  .bracket.tl{ top:18px; left:18px; border-right:none; border-bottom:none; }
+  .bracket.tr{ top:18px; right:18px; border-left:none; border-bottom:none; }
+  .bracket.bl{ bottom:18px; left:18px; border-right:none; border-top:none; }
+  .bracket.br{ bottom:18px; right:18px; border-left:none; border-top:none; }
 
   .embers{ position:absolute; inset:0; }
   .ember{
@@ -138,19 +122,7 @@
     90%{ opacity:.7; }
     100%{ opacity:0; transform:translateY(-108vh) translateX(var(--drift,20px)) scale(.4); }
   }
-  .streak{
-    position:absolute; height:2px; width:140px;
-    background:linear-gradient(90deg, transparent, var(--ember-4), transparent);
-    opacity:0;
-    animation-name: streakGo; animation-timing-function: ease-out; animation-iteration-count: infinite;
-    filter: drop-shadow(0 0 6px var(--ember-2));
-  }
-  @keyframes streakGo{
-    0%{ opacity:0; transform: translateX(-220px); }
-    8%{ opacity:1; }
-    25%{ opacity:0; transform: translateX(280px); }
-    100%{ opacity:0; transform: translateX(280px); }
-  }
+  /* (ветряные полосы .streak удалены по просьбе) */
 
   /* burst rings removed */
   .burst{ display:none; }
@@ -169,52 +141,99 @@
     background: linear-gradient(180deg,
         #f2e2c4 0%, var(--ember-4) 14%, var(--ember-2) 32%,
         var(--ember-1) 50%, #4c1e05 66%, var(--ember-1) 80%, var(--ember-4) 100%);
-    background-size: 100% 300%;
     -webkit-background-clip:text;
     background-clip:text;
     color:transparent;
     filter: drop-shadow(0 0 15px rgba(220,100,25,.42)) drop-shadow(0 3px 0 rgba(0,0,0,.88)) drop-shadow(0 0 30px rgba(220,60,25,.18));
-    animation: metalShift 3.2s ease-in-out infinite, textPulse 2.2s ease-in-out infinite;
+    opacity:0;
+    animation: wordmarkIn 1.1s cubic-bezier(.16,1,.3,1) .25s forwards;
   }
-  @keyframes metalShift{ 0%,100%{ background-position: 0% 0%; } 50%{ background-position: 0% 100%; } }
-  @keyframes textPulse{
-    0%,100%{ filter: drop-shadow(0 0 15px rgba(220,100,25,.42)) drop-shadow(0 3px 0 rgba(0,0,0,.88)) drop-shadow(0 0 30px rgba(220,60,25,.18)); }
-    50%{ filter: drop-shadow(0 0 25px rgba(230,130,50,.6)) drop-shadow(0 3px 0 rgba(0,0,0,.88)) drop-shadow(0 0 44px rgba(220,80,25,.3)); }
+  @keyframes wordmarkIn{
+    0%{ opacity:0; transform:scale(.88) translateY(16px); }
+    100%{ opacity:1; transform:none; }
   }
+  /* metalShift (background-position) и textPulse (filter) убраны — грузили рендер.
+     Глитч-дубли текста (g1/g2) и ::after-свечение удалены — из-за них справа
+     появлялся фантомный «PIXEL SANDBOX». */
 
-  .wordmark .glitch{
+  /* ==== Вращающийся эмблемный логотип над заголовком ==== */
+  .logo-emblem{
+    position:relative;
+    width:128px; height:128px;
+    margin-bottom:28px;
+    opacity:0; animation: fadeUp 1s .1s ease-out forwards;
+  }
+  /* мягкое пульсирующее гало позади */
+  .logo-halo{
+    position:absolute; inset:-20px;
+    border-radius:50%;
+    background: radial-gradient(circle, rgba(229,109,23,.28) 0%, rgba(229,109,23,.08) 45%, transparent 70%);
+    animation: haloPulse 3s ease-in-out infinite;
+  }
+  @keyframes haloPulse{ 0%,100%{opacity:.55;} 50%{opacity:1;} }
+  /* внешнее пунктирное кольцо */
+  .logo-ring{
     position:absolute; inset:0;
-    font-family:'Anton', sans-serif; font-size:clamp(60px, 12vw, 156px);
-    letter-spacing:2px; text-transform:uppercase; color:transparent;
-    -webkit-background-clip:text; background-clip:text;
+    border-radius:50%;
+    border:2px dashed rgba(229,109,23,.6);
+    box-shadow:0 0 18px rgba(220,100,25,.25), inset 0 0 14px rgba(220,100,25,.10);
+    animation: emblemSpin 16s linear infinite;
   }
-  .g1{ background:var(--ember-3); opacity:0; animation: glitch1 4s infinite; }
-  .g2{ background:#f0dcb8; opacity:0; animation: glitch2 4s infinite; }
-  @keyframes glitch1{
-    0%,92%,100%{ opacity:0; transform:translate(0,0); }
-    93%{ opacity:.7; transform:translate(4px,-2px); } 94%{ opacity:0; }
-    95%{ opacity:.6; transform:translate(-5px,1px); } 96%{ opacity:0; }
+  /* среднее кольцо с орбитальными искрами */
+  .logo-orbit{
+    position:absolute; inset:7px;
+    border-radius:50%;
+    border:1px solid rgba(229,109,23,.22);
+    animation: emblemSpinRev 9s linear infinite;
   }
-  @keyframes glitch2{
-    0%,92%,100%{ opacity:0; transform:translate(0,0); }
-    93.5%{ opacity:.6; transform:translate(-4px,2px); } 94.5%{ opacity:0; }
-    95.5%{ opacity:.5; transform:translate(5px,-1px); } 96.5%{ opacity:0; }
+  .logo-orbit i{
+    position:absolute; top:50%; left:50%;
+    width:5px; height:5px; margin:-2.5px 0 0 -2.5px;
+    border-radius:50%;
+    background:var(--ember-2);
+    box-shadow:0 0 8px var(--ember-1), 0 0 16px rgba(229,109,23,.6);
   }
-
-  .wordmark::after{
-    content:"PIXEL SANDBOX";
-    position:absolute; inset:0;
-    background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.9) 48%, rgba(255,255,255,.9) 52%, transparent 70%);
-    background-size: 300% 100%;
+  .logo-orbit i:nth-child(1){ transform: rotate(0deg)   translateY(-59px); }
+  .logo-orbit i:nth-child(2){ transform: rotate(120deg) translateY(-59px); }
+  .logo-orbit i:nth-child(3){ transform: rotate(240deg) translateY(-59px); }
+  /* внутреннее тонкое кольцо */
+  .logo-ring2{
+    position:absolute; inset:16px;
+    border-radius:50%;
+    border:1px solid rgba(229,109,23,.4);
+    animation: emblemSpinRev 22s linear infinite;
+  }
+  /* сердцевина с тёмной подложкой и металлической монограммой */
+  .logo-core{
+    position:absolute; inset:24px;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:
+      radial-gradient(circle at 35% 30%, rgba(245,213,160,.16), transparent 55%),
+      radial-gradient(circle, #3a1a08 0%, #20100a 55%, #120a06 100%);
+    border:1px solid rgba(229,109,23,.55);
+    box-shadow:0 0 16px rgba(220,100,25,.3), inset 0 0 14px rgba(0,0,0,.75);
+  }
+  .logo-core::before{
+    content:''; position:absolute; inset:0; border-radius:50%; z-index:0;
+    background: radial-gradient(circle, rgba(240,140,60,.22), transparent 65%);
+    animation: coreGlow 3s ease-in-out infinite;
+  }
+  .logo-core::after{
+    content:''; position:absolute; inset:4px; border-radius:50%; z-index:0; pointer-events:none;
+    border-top:1px solid rgba(245,213,160,.3);
+  }
+  @keyframes coreGlow{ 0%,100%{opacity:.4;} 50%{opacity:1;} }
+  .logo-core .core-text{
+    position:relative; z-index:1;
+    font-family:'Anton', sans-serif;
+    font-size:26px; letter-spacing:1px; line-height:1;
+    background: linear-gradient(180deg, #f5d5a0 0%, #f0a041 40%, #e56d17 72%, #6e2705 100%);
     -webkit-background-clip:text; background-clip:text; color:transparent;
-    mix-blend-mode: overlay;
-    animation: sweep 2.1s ease-in-out infinite;
-    animation-delay: .3s;
+    filter: drop-shadow(0 0 8px rgba(229,109,23,.55)) drop-shadow(0 2px 0 rgba(0,0,0,.7));
   }
-  @keyframes sweep{
-    0%{ background-position: 200% 0; opacity:0; } 8%{ opacity:1; }
-    40%{ background-position: -60% 0; opacity:0; } 100%{ background-position: -60% 0; opacity:0; }
-  }
+  @keyframes emblemSpin{ to{ transform:rotate(360deg); } }
+  @keyframes emblemSpinRev{ to{ transform:rotate(-360deg); } }
 
   .bracket-wrap{ position:relative; display:inline-block; }
 
@@ -222,7 +241,7 @@
     width:0; height:5px; margin:26px 0 16px;
     background: linear-gradient(90deg, transparent, var(--ember-1), var(--ember-4), var(--ember-1), transparent);
     box-shadow:0 0 14px var(--ember-1), 0 0 26px var(--ember-3);
-    animation: growRule 1.1s .2s ease-out forwards, ruleGlow 1.3s 1.3s ease-in-out infinite;
+    animation: growRule 1.1s .9s ease-out forwards, ruleGlow 1.3s 2.1s ease-in-out infinite;
   }
   @keyframes growRule{ to{ width:min(76vw, 600px); } }
   @keyframes ruleGlow{ 0%,100%{opacity:.75; transform:scaleY(1);} 50%{opacity:1; transform:scaleY(1.7);} }
@@ -231,15 +250,41 @@
     font-size:16px; letter-spacing:1px; color:#c9c3d0;
     font-weight:600;
     opacity:0; text-shadow:0 0 10px rgba(220,110,50,.3);
-    animation: fadeUp 1s .7s ease-out forwards;
+    animation: fadeUp 1s 1.25s ease-out forwards;
   }
   .tag b{ color:var(--ember-2); text-shadow:0 0 10px rgba(220,110,50,.5); }
   .tag .subtag{ display:inline-block; margin-top:8px; opacity:1; animation:none; }
   @keyframes fadeUp{ from{ opacity:0; transform:translateY(8px);} to{ opacity:1; transform:translateY(0);} }
 
+  /* ==== Статус-бар сервера: Карта / Игроки / Режим (часть фона — едва заметный) ==== */
+  .server-bar{
+    margin-top:18px;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(229,109,23,.045);
+    border:1px solid rgba(229,109,23,.10);
+    border-radius:14px;
+    padding:8px 4px;
+    opacity:0; animation: fadeUp 1s 1.4s ease-out forwards;
+  }
+  .server-group{
+    display:flex; align-items:center; gap:8px;
+    padding:0 22px;
+    min-width:190px; justify-content:center;
+  }
+  .server-group + .server-group{ border-left:1px solid rgba(229,109,23,.16); }
+  .server-group svg{ width:16px; height:16px; flex:none; opacity:.75; }
+  .server-label{
+    font-size:12px; letter-spacing:1.2px; color:#9a93a0;
+    text-transform:uppercase; font-weight:600;
+  }
+  .server-val{
+    font-size:14px; letter-spacing:.4px; color:#c9c3d0; font-weight:600;
+    max-width:240px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+
   .loadwrap{
     margin-top:42px; display:flex; flex-direction:column; align-items:center; gap:14px;
-    opacity:0; animation: fadeUp 1s 1s ease-out forwards;
+    opacity:0; animation: fadeUp 1s 1.55s ease-out forwards;
   }
   .bar{
     width:380px; height:18px;
@@ -270,10 +315,9 @@
   .loadtext b{ color:var(--ember-2); font-size:21px; }
 
   .corner-mark{
-    position:absolute; top:14px; left:16px;
-    font-size:8px; letter-spacing:2px; font-weight:600;
-    color:rgba(220,170,130,.55);
-    text-shadow:0 0 6px rgba(220,110,50,.35);
+    position:absolute; bottom:8px; left:10px;
+    font-size:8px; letter-spacing:1.5px; font-weight:500;
+    color:rgba(220,170,130,.22);
     text-transform:uppercase;
     z-index:5;
   }
@@ -286,10 +330,11 @@
     margin-bottom:6px;
   }
   .subtag::before{ content:"● "; color:var(--ember-1); }
+  .subtag::after{ content:" ●"; color:var(--ember-1); }
 
   .tip-wrap{
     margin-top:34px; text-align:center; max-width:640px;
-    opacity:0; animation: fadeUp 1s 1.15s ease-out forwards;
+    opacity:0; animation: fadeUp 1s 1.7s ease-out forwards;
   }
   .tip-label{
     font-size:13px; letter-spacing:4px; color:var(--ember-2);
@@ -307,6 +352,10 @@
   <audio id="bgMusic" src="https://cdn.jsdelivr.net/gh/Vladislav22231/gmod-loading@main/music.mp3" loop preload="auto"></audio>
   <div class="stage">
     <div class="corner-mark">PIXELSANDBOX.UA</div>
+    <div class="bracket tl"></div>
+    <div class="bracket tr"></div>
+    <div class="bracket bl"></div>
+    <div class="bracket br"></div>
     <div class="noise"></div>
     <div class="scanlines"></div>
     <div class="vignette"></div>
@@ -316,26 +365,59 @@
       <div class="ring2"></div>
     </div>
 
-    <div class="mark tl"></div>
-    <div class="mark tr"></div>
-    <div class="mark bl"></div>
-    <div class="mark br"></div>
-
     <div class="embers" id="embers"></div>
-    <div class="embers" id="streaks"></div>
+
+    <div class="logo-emblem">
+      <div class="logo-halo"></div>
+      <div class="logo-ring"></div>
+      <div class="logo-orbit"><i></i><i></i><i></i></div>
+      <div class="logo-ring2"></div>
+      <div class="logo-core"><span class="core-text">PXLS</span></div>
+    </div>
 
     <div class="bracket-wrap">
       <div class="wordwrap">
         <div class="wordmark">
           PIXEL SANDBOX
-          <span class="glitch g1">PIXEL SANDBOX</span>
-          <span class="glitch g2">PIXEL SANDBOX</span>
         </div>
       </div>
     </div>
 
     <div class="rule"></div>
     <div class="tag">Добро пожаловать на <b>PixelSandbox</b><br><span class="subtag">Дружелюбный Sandbox-сервер</span></div>
+
+    <div class="server-bar">
+      <div class="server-group">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#f0a041" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="2" y1="12" x2="22" y2="12"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+        <span class="server-label">Карта:</span>
+        <span class="server-val" id="srvMap">Загрузка...</span>
+      </div>
+      <div class="server-group">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#f0a041" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        <span class="server-label">Игроки:</span>
+        <span class="server-val" id="srvPlayers">— / —</span>
+      </div>
+      <div class="server-group">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#f0a041" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="7" width="20" height="10" rx="5"/>
+          <line x1="8" y1="10.5" x2="8" y2="13.5"/>
+          <line x1="6.5" y1="12" x2="9.5" y2="12"/>
+          <circle cx="15.5" cy="11" r=".7" fill="#f0a041" stroke="none"/>
+          <circle cx="17.5" cy="13" r=".7" fill="#f0a041" stroke="none"/>
+        </svg>
+        <span class="server-label">Режим:</span>
+        <span class="server-val" id="srvMode">Sandbox</span>
+      </div>
+    </div>
 
     <div class="loadwrap">
       <div class="bar"><div class="bar-fill" id="barfill"></div></div>
@@ -377,9 +459,46 @@
     loadtext.firstChild.textContent = statusText + '\u00A0\u00A0';
   }
 
+  /* ==== Статус-бар сервера: Карта / Игроки / Режим ==== */
+  const srvMap     = document.getElementById('srvMap');
+  const srvPlayers = document.getElementById('srvPlayers');
+  const srvMode    = document.getElementById('srvMode');
+
+  // Реальный онлайн берём из твоего ретранслятора (см. player_count.php),
+  // он должен отдавать JSON: { "players": 3, "maxplayers": 20 }.
+  // Оставь '' чтобы отключить запрос (тогда онлайн покажет «—»).
+  const PLAYERS_API = 'player_count.php';
+
+  const srvData = { map: 'Загрузка...', mode: 'Sandbox', online: null, max: 20 };
+
+  function updateServerBar(){
+    srvMap.textContent     = (srvData.map || '—').toUpperCase();
+    srvMode.textContent    = srvData.mode ? srvData.mode.charAt(0).toUpperCase() + srvData.mode.slice(1) : '—';
+    srvPlayers.textContent = (srvData.online === null ? '—' : srvData.online) + ' / ' + (srvData.max || '—');
+  }
+
+  function fetchPlayers(){
+    if (!PLAYERS_API) return;
+    fetch(PLAYERS_API, { cache: 'no-store' })
+      .then(r => r.json())
+      .then(d => {
+        if (typeof d.players === 'number')    srvData.online = d.players;
+        if (typeof d.maxplayers === 'number') srvData.max = d.maxplayers;
+        updateServerBar();
+      })
+      .catch(function(){});
+  }
+
+  updateServerBar();
+  fetchPlayers();
+  setInterval(fetchPlayers, 15000); // обновление онлайна каждые 15 сек
+
   window.GameDetails = function(servername, serverurl, mapname, maxplayers, steamid, gamemode, volume, language){
+    srvData.map  = mapname  || 'Загрузка...';
+    srvData.mode = gamemode || 'Sandbox';
+    srvData.max  = maxplayers || 20;
     statusText = ('КАРТА: ' + (mapname || '—')).toUpperCase();
-    render();
+    render(); updateServerBar();
   };
 
   window.SetStatusChanged = function(status){
@@ -412,6 +531,12 @@
 
   setTimeout(() => {
     if (engineActive) return;
+    // Демо-данные для предпросмотра в браузере (в игре заменятся реальными)
+    srvData.map = 'gm_construct';
+    srvData.mode = 'sandbox';
+    srvData.max = 20;
+    srvData.online = 0;
+    updateServerBar();
     const steps = [
       'ОТПРАВКА CLIENT INFO...',
       'ЗАПРОС SERVER INFO...',
@@ -461,17 +586,6 @@
     e.style.animationDuration = (3.2 + Math.random()*4.5)+'s';
     e.style.animationDelay = (Math.random()*6)+'s';
     field.appendChild(e);
-  }
-
-  const sfield = document.getElementById('streaks');
-  for (let i = 0; i < 8; i++) {
-    const s = document.createElement('div');
-    s.className = 'streak';
-    s.style.top = (8 + Math.random()*84) + '%';
-    s.style.left = '0%';
-    s.style.animationDuration = (1.2 + Math.random()*1.6) + 's';
-    s.style.animationDelay = (Math.random()*5) + 's';
-    sfield.appendChild(s);
   }
 
   // ==== Ротация советов новичкам ====
