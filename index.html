@@ -322,6 +322,23 @@
     font-size:14px; letter-spacing:.3px; color:#c9c3d0;
     line-height:1.6;
   }
+
+  /* ==== Режим загрузки аддонов (экономия CPU для старого CEF) ====
+     Пока движок реально качает файлы, JS вешает на <body> класс .busy.
+     В этот момент:
+       - все бесконечные анимации ставятся на паузу (каждый кадр вращения/
+         подъёма требует композитинга в CEF, а CPU и так занят распаковкой);
+       - у полосы прогресса отключается transition: при сотнях событий
+         DownloadingFile в секунду transition по width перезапускался на
+         каждом обновлении, вызывая постоянный layout.
+     Как только файлы докачались — класс снимается, всё снова крутится. */
+  body.busy .crosshair,
+  body.busy .logo-ring,
+  body.busy .ember,
+  body.busy .bar-fill::after{
+    animation-play-state: paused !important;
+  }
+  body.busy .bar-fill{ transition: none !important; }
 </style>
 </head>
 <body>
@@ -422,6 +439,8 @@
   let filesTotal = 0;
   let filesLeft  = 0;
   let statusText = 'ПОДКЛЮЧЕНИЕ...';
+  let engineActive = false;              // true — страницу открыл движок GMod
+  let lastPct = -1, lastStatus = null;   // для дешёвой перерисовки (см. render)
 
   function render(){
     let pct = 0;
@@ -429,9 +448,21 @@
       pct = Math.round(((filesTotal - filesLeft) / filesTotal) * 100);
     }
     pct = Math.max(0, Math.min(100, pct));
-    barfill.style.width = pct + '%';
-    pctEl.textContent = pct + '%';
-    loadtext.firstChild.textContent = statusText + '\u00A0\u00A0';
+
+    // Пишем в DOM только при реальном изменении значения. Во время скачивания
+    // аддонов движок шлёт сотни событий в секунду — каждое переписывание
+    // width/textContent заставляло CEF делать layout и давало лаги.
+    if (pct !== lastPct || statusText !== lastStatus){
+      lastPct = pct; lastStatus = statusText;
+      barfill.style.width = pct + '%';
+      pctEl.textContent = pct + '%';
+      loadtext.firstChild.textContent = statusText + '\u00A0\u00A0';
+    }
+
+    // Энергосбережение: пока файлы реально качаются в движке — вешаем body.busy,
+    // CSS ставит все бесконечные анимации на паузу и убирает transition у бара.
+    // В демо-режиме браузера класс не вешаем (там нет нагрузки, пусть крутится).
+    document.body.classList.toggle('busy', engineActive && filesTotal > 0 && filesLeft > 0);
   }
 
   /* ==== Статус-бар сервера: Карта / Игроки / Режим ==== */
@@ -500,7 +531,6 @@
   // ---- Демо-режим только для предпросмотра в браузере ----
   // Если движок GMod не позвал GameDetails за секунду — значит,
   // страница открыта не в игре, показываем имитацию для превью.
-  let engineActive = false;
   const origGameDetails = window.GameDetails;
   window.GameDetails = function(...args){ engineActive = true; origGameDetails(...args); };
 
