@@ -69,9 +69,8 @@
     width:520px; height:520px;
     margin-left:-260px; margin-top:-260px;
     opacity:.3;
-    /* вращение крутит JS-движок (см. внизу): время-зависимое, плавно
-       замедляется при нехватке CPU вместо рывков и заморозки */
-    will-change: transform;   /* слой выносится на композит, без перерисовки фона */
+    will-change: transform;   /* вращение на композитном слое, без перерисовки фона */
+    animation: crossSpin 16s linear infinite;
   }
   .crosshair::before, .crosshair::after{
     content:"";
@@ -97,6 +96,7 @@
     border:1px dashed rgba(230,120,60,.22);
     border-radius:50%;
   }
+  @keyframes crossSpin{ to{ transform:rotate(360deg); } }
   /* Тонкие декоративные уголки-скобки по краям экрана (статические, не грузят) */
   .bracket{
     position:absolute; width:36px; height:36px; opacity:.55; pointer-events:none;
@@ -113,8 +113,14 @@
     width:3px; height:3px; border-radius:50%;
     background:var(--ember-2);
     opacity:0;
-    /* подъём крутит JS-движок: позиция/прозрачность считаются от времени */
-    will-change: transform;   /* слой выносится на композит, дешевле для CEF */
+    will-change: transform;   /* подъём на композитном слое, дешевле для CEF */
+    animation-name: rise; animation-timing-function: ease-in; animation-iteration-count: infinite;
+  }
+  @keyframes rise{
+    0%{ opacity:0; transform:translateY(0) translateX(0) scale(1); }
+    10%{ opacity:.85; }
+    90%{ opacity:.7; }
+    100%{ opacity:0; transform:translateY(-108vh) translateX(var(--drift,20px)) scale(.4); }
   }
   /* (ветряные полосы .streak удалены по просьбе) */
 
@@ -168,8 +174,8 @@
     position:absolute; top:0; left:0; width:128px; height:128px;
     border-radius:50%;
     border:2px dashed rgba(229,109,23,.6);
-    /* вращение крутит JS-движок (см. внизу), время-зависимое */
     will-change: transform;   /* вращение на композитном слое */
+    animation: emblemSpin 16s linear infinite;
   }
   /* внутреннее тонкое кольцо — статичное */
   .logo-ring2{
@@ -198,6 +204,7 @@
     color:#f5d5a0;
     text-shadow: 0 0 10px rgba(229,109,23,.55), 0 2px 0 rgba(0,0,0,.7);
   }
+  @keyframes emblemSpin{ to{ transform:rotate(360deg); } }
   .bracket-wrap{ position:relative; display:inline-block; }
 
   .rule{
@@ -270,9 +277,10 @@
     position:absolute; top:0; left:0; width:70%; height:100%;
     background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.7) 50%, transparent 70%);
     transform: translateX(-130%) skewX(-18deg);
-    /* проход блика крутит JS-движок (см. внизу) */
     will-change: transform;   /* блик на композитном слое */
+    animation: shineBar 1.1s linear infinite;
   }
+  @keyframes shineBar{ to{ transform: translateX(330%) skewX(-18deg); } }
 
   .loadtext{
     font-size:18px; letter-spacing:3px; color:#e8e5ee; font-weight:800;
@@ -313,15 +321,22 @@
     line-height:1.6;
   }
 
-  /* ==== Режим энергосбережения для старого CEF ====
+  /* ==== Максимальный режим энергосбережения для старого CEF ====
      JS вешает на <body> класс .busy, пока движок занят тяжёлой фазой:
      скачивание аддонов, «Sending client info» или инициализация мира.
-     В этот момент анимации НЕ останавливаются — их крутит один
-     время-зависимый JS-движок, который при .busy ограничивает частоту
-     до ~20fps и плавно замедляет движение вместо рывков и заморозки.
-     Здесь же у полосы прогресса отключается transition: при сотнях
-     событий DownloadingFile в секунду transition по width перезапускался
-     на каждом обновлении, вызывая постоянный layout. */
+     Анимации работают на CSS — только так они гарантированно крутятся
+     в CEF загрузочного экрана GMod (JS requestAnimationFrame там
+     не вызывается, страница считается «скрытой»).
+     В тяжёлой фазе экран ступенчато упрощается:
+       - эмберы и блик полосы (11 слоёв) полностью снимаются с отрисовки
+         (display:none — никакого композитинга и перерисовки);
+       - остаются только прицел и кольцо эмблемы (2 лёгких слоя);
+       - у полосы прогресса отключается transition: при сотнях событий
+         DownloadingFile в секунду transition по width перезапускался
+         на каждом обновлении, вызывая постоянный layout.
+     Как только тяжёлая фаза заканчивается — декор возвращается. */
+  body.busy .ember,
+  body.busy .bar-fill .shine{ display:none; }
   body.busy .bar-fill{ transition: none !important; }
 </style>
 </head>
@@ -396,7 +411,7 @@
     </div>
 
     <div class="loadwrap">
-      <div class="bar"><div class="bar-fill" id="barfill"><div class="shine" id="barShine"></div></div></div>
+      <div class="bar"><div class="bar-fill" id="barfill"><div class="shine"></div></div></div>
       <div class="loadtext" id="loadtext">ПОДКЛЮЧЕНИЕ...&nbsp; <b id="pct">0%</b></div>
     </div>
 
@@ -459,8 +474,8 @@
 
     // Энергосбережение: пока движок занят тяжёлой фазой (скачивание аддонов,
     // «Sending client info», инициализация мира) — вешаем body.busy:
-    // анимационный движок в этой фазе крутится реже (~20fps) и плавно
-    // замедляется, а у полосы прогресса отключается transition.
+    // CSS прячет эмберы и блик полосы (остаются прицел и кольцо), а у полосы
+    // прогресса отключается transition (без layout-троттлинга).
     // В демо-режиме браузера класс не вешаем (там нет нагрузки, пусть крутится).
     document.body.classList.toggle('busy', isBusyPhase());
   }
@@ -485,6 +500,7 @@
 
   function fetchPlayers(){
     if (!PLAYERS_API) return;
+    if (isBusyPhase()) return;   // в тяжёлой фазе не дёргаем сеть — обновится после
     fetch(PLAYERS_API, { cache: 'no-store' })
       .then(r => r.json())
       .then(d => {
@@ -581,76 +597,24 @@
   }
   document.addEventListener('pointerdown', unlockOnce);
 
-  // ============ Единый анимационный движок (время-зависимый, адаптивный) ============
-  // Все бесконечные анимации (вращение прицела и кольца, эмберы, блик полосы)
-  // крутит ОДИН rAF-цикл. Позиции считаются от реального времени, поэтому при
-  // нехватке CPU (скачивание аддонов, инициализация мира) движение плавно
-  // замедляется, а не «замерзает» и не дёргается, как CSS-анимации в старом CEF.
-  // В тяжёлой фазе (body.busy) цикл ограничивает себя ~20fps вместо 60 —
-  // CPU почти не тратится, а экран продолжает жить.
-  const emberField  = document.getElementById('embers');
-  const crosshairEl = document.querySelector('.crosshair');
-  const logoRingEl  = document.querySelector('.logo-ring');
-  const barShine    = document.getElementById('barShine');
-  // Страховка: если по какой-то причине элемент не найден (например, HTML
-  // разъехался при правках) — движок не запускаем, чтобы не падать на каждом кадре.
-
-  const EMBERS = [];
-  const N_EMBERS = 10;   // 22 эмбера в CSS грузили CEF — снижено
-  for (let i = 0; i < N_EMBERS; i++){
+  // ==== Фоновые эмберы ====
+  // Подъём крутит CSS-анимация rise (через переменную --drift).
+  // CSS-анимации — единственный способ, который гарантированно работает
+  // в CEF загрузочного экрана GMod: JS requestAnimationFrame там не вызывается
+  // (страница считается «скрытой»), поэтому JS-движок анимаций не используем.
+  const emberField = document.getElementById('embers');
+  const N = 10;   // 22 эмбера с бесконечными анимациями грузили CEF — снижено
+  for (let i = 0; i < N; i++) {
     const e = document.createElement('div');
     e.className = 'ember';
     e.style.left = (Math.random()*100) + '%';
     const size = 2 + Math.random()*4;
     e.style.width = size+'px'; e.style.height = size+'px';
+    e.style.setProperty('--drift', (Math.random()*110-55)+'px');
+    e.style.animationDuration = (3.2 + Math.random()*4.5)+'s';
+    e.style.animationDelay = (Math.random()*6)+'s';
     emberField.appendChild(e);
-    EMBERS.push({
-      el: e,
-      dur:   3.2 + Math.random()*4.5,   // длительность подъёма
-      delay: Math.random()*6,           // сдвиг фазы
-      drift: Math.random()*110 - 55     // боковое смещение, px
-    });
   }
-
-  // Прозрачность эмбера по прогрессу подъёма p (0..1): как было в keyframes
-  function emberOpacity(p){
-    if (p < 0.1) return p * 8.5;                // 0 → 0.85
-    if (p > 0.9) return (1 - p) * 7;            // 0.7 → 0
-    return 0.85 - 0.15 * ((p - 0.1) / 0.8);     // 0.85 → 0.7
-  }
-
-  const ANIM_START = performance.now();
-  let lastAnimFrame = 0;
-
-  function animLoop(ts){
-    const busy = isBusyPhase();
-    // В тяжёлой фазе крутим реже: меньше нагрузка на CEF, движение всё равно идёт.
-    if (ts - lastAnimFrame >= (busy ? 50 : 0)){
-      lastAnimFrame = ts;
-      const t = (ts - ANIM_START) / 1000;   // секунды от старта страницы
-
-      // прицел: 360° за 16с
-      crosshairEl.style.transform = 'rotate(' + ((t * 360 / 16) % 360).toFixed(2) + 'deg)';
-      // кольцо эмблемы: 360° за 16с, как в оригинале (по часовой)
-      logoRingEl.style.transform = 'rotate(' + ((t * 360 / 16) % 360).toFixed(2) + 'deg)';
-      // блик на полосе прогресса: проход слева направо за 1.1с
-      const sp = (t / 1.1) % 1;
-      barShine.style.transform = 'translateX(' + (-130 + 460 * sp).toFixed(1) + '%) skewX(-18deg)';
-      // эмберы: подъём снизу вверх за своё время
-      for (const em of EMBERS){
-        const p = ((t + em.delay) % em.dur) / em.dur;
-        em.el.style.transform =
-          'translateY(' + (-108 * p).toFixed(1) + 'vh)' +
-          ' translateX(' + (em.drift * p).toFixed(1) + 'px)' +
-          ' scale(' + (1 - 0.6 * p).toFixed(3) + ')';
-        em.el.style.opacity = emberOpacity(p).toFixed(3);
-      }
-    }
-    requestAnimationFrame(animLoop);
-  }
-  // Страховка: цикл запускаем только если все элементы найдены (см. выше),
-  // иначе не начинать, чтобы не падать на каждом кадре.
-  if (emberField && crosshairEl && logoRingEl && barShine) requestAnimationFrame(animLoop);
 
   // ==== Ротация советов новичкам ====
   // Просто добавляй/убирай/меняй строки в массиве — больше ничего трогать не нужно.
@@ -685,6 +649,7 @@
 
     if (TIPS.length > 1){
       setInterval(() => {
+        if (isBusyPhase()) return;   // в тяжёлой фазе не переключаем советы — меньше работы
         tipIndex = (tipIndex + 1) % TIPS.length;
         tipTextEl.style.transition = 'opacity .35s ease';
         tipTextEl.style.opacity = '0';
