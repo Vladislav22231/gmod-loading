@@ -323,15 +323,16 @@
     line-height:1.6;
   }
 
-  /* ==== Режим загрузки аддонов (экономия CPU для старого CEF) ====
-     Пока движок реально качает файлы, JS вешает на <body> класс .busy.
+  /* ==== Режим энергосбережения для старого CEF ====
+     JS вешает на <body> класс .busy, пока движок занят тяжёлой фазой:
+     скачивание аддонов, «Sending client info» или инициализация мира.
      В этот момент:
        - все бесконечные анимации ставятся на паузу (каждый кадр вращения/
          подъёма требует композитинга в CEF, а CPU и так занят распаковкой);
        - у полосы прогресса отключается transition: при сотнях событий
          DownloadingFile в секунду transition по width перезапускался на
          каждом обновлении, вызывая постоянный layout.
-     Как только файлы докачались — класс снимается, всё снова крутится. */
+     Как только тяжёлая фаза закончилась — класс снимается, всё снова крутится. */
   body.busy .crosshair,
   body.busy .logo-ring,
   body.busy .ember,
@@ -442,6 +443,20 @@
   let engineActive = false;              // true — страницу открыл движок GMod
   let lastPct = -1, lastStatus = null;   // для дешёвой перерисовки (см. render)
 
+  // Тяжёлые фазы загрузки, когда движок занят и CEF недополучает CPU:
+  //  - скачивание аддонов (filesLeft > 0);
+  //  - «Sending client info» в начале коннекта;
+  //  - загрузка и инициализация мира после докачки.
+  // Статусы приходят и от движка (англ.), и наши локализованные — ловим оба.
+  // «Loaded»/«ГОТОВО» не входят — это финал, экран уже почти закрыт.
+  const BUSY_STATUS = /SENDING|CLIENT INFO|DOWNLOAD|LOADING|PREPAR|INITIAL|SYNCHRON|CONNECT|ОТПРАВКА|ЗАПРОС|ЗАГРУЗК|ПРОВЕРК|СИНХРОНИЗАЦ|ИНИЦИАЛИЗАЦ|ПОДКЛЮЧЕН/i;
+
+  function isBusyPhase(){
+    if (!engineActive) return false;                  // демо-превью — не трогаем
+    if (filesTotal > 0 && filesLeft > 0) return true; // идёт скачивание аддонов
+    return BUSY_STATUS.test(statusText);              // «Sending client info», загрузка мира и т.п.
+  }
+
   function render(){
     let pct = 0;
     if (filesTotal > 0){
@@ -459,10 +474,11 @@
       loadtext.firstChild.textContent = statusText + '\u00A0\u00A0';
     }
 
-    // Энергосбережение: пока файлы реально качаются в движке — вешаем body.busy,
+    // Энергосбережение: пока движок занят тяжёлой фазой (скачивание аддонов,
+    // «Sending client info», инициализация мира) — вешаем body.busy,
     // CSS ставит все бесконечные анимации на паузу и убирает transition у бара.
     // В демо-режиме браузера класс не вешаем (там нет нагрузки, пусть крутится).
-    document.body.classList.toggle('busy', engineActive && filesTotal > 0 && filesLeft > 0);
+    document.body.classList.toggle('busy', isBusyPhase());
   }
 
   /* ==== Статус-бар сервера: Карта / Игроки / Режим ==== */
@@ -503,7 +519,9 @@
     srvData.map  = mapname  || 'Загрузка...';
     srvData.mode = gamemode || 'Sandbox';
     srvData.max  = maxplayers || 20;
-    statusText = ('КАРТА: ' + (mapname || '—')).toUpperCase();
+    // Статус «КАРТА: ...» не матчится с BUSY_STATUS — не перебиваем им тяжёлую фазу
+    // («Sending client info» движок ставит ДО GameDetails, и busy не должен спадать).
+    if (!BUSY_STATUS.test(statusText)) statusText = ('КАРТА: ' + (mapname || '—')).toUpperCase();
     render(); updateServerBar();
   };
 
