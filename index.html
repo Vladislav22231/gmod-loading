@@ -2,406 +2,440 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>PIXELSANDBOX — Загрузка</title>
+<title>Pixel Sandbox — Loading</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@400;600;800&display=swap');
+
   :root{
-    --bg:#0a0410;
-    --bg2:#120818;
-    --purple-deep:#5b1f9e;
-    --purple:#9b3ff2;
-    --purple-bright:#b978ff;
-    --lilac:#e9d8ff;
-    --white:#f5eeff;
-    --dim:#8a7a9e;
+    --bg-0:#050408;
+    --bg-1:#150e10;
+    --ember-1:#e56d17;
+    --ember-2:#f0a041;
+    --ember-3:#e0361a;
+    --ember-4:#f5d5a0;
+    --muted:#847f8a;
   }
-  *{margin:0;padding:0;box-sizing:border-box;}
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+
   html,body{
-    width:100%;height:100%;
-    background:var(--bg);
+    width:100%; height:100%;
+    background: radial-gradient(ellipse at 50% 45%, var(--bg-1) 0%, var(--bg-0) 70%);
     overflow:hidden;
-    font-family:'Segoe UI', Arial, sans-serif;
+    font-family:'JetBrains Mono', monospace;
   }
-  .screen{
+
+  .stage{
     position:relative;
-    width:100%;height:100vh;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    background:
-      radial-gradient(ellipse at 50% 40%, rgba(120,40,200,0.20), transparent 60%),
-      radial-gradient(ellipse at 20% 80%, rgba(90,20,160,0.15), transparent 55%),
-      radial-gradient(ellipse at 85% 15%, rgba(150,60,255,0.12), transparent 50%),
-      linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+    width:100%; height:100vh;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    animation: stageFlicker 6s infinite, stageShake 7s ease-in-out infinite;
+  }
+  @keyframes stageFlicker{
+    0%,96%,100%{ filter:brightness(1); }
+    97%{ filter:brightness(1.18); }
+    98%{ filter:brightness(.9); }
+  }
+  @keyframes stageShake{
+    0%,94%,100%{ transform:translate(0,0); }
+    94.5%{ transform:translate(1.5px,-1px); }
+    95%{ transform:translate(-2px,1px); }
+    95.5%{ transform:translate(1px,1.5px); }
+    96%{ transform:translate(0,0); }
   }
 
-
-  /* Drifting particles */
-  .particles{position:absolute; inset:0; overflow:hidden; pointer-events:none;}
-  .p{
-    position:absolute; width:3px; height:3px; border-radius:50%;
-    background:var(--purple-bright);
-    box-shadow:0 0 6px 1px var(--purple-bright);
-    opacity:0.5;
-    animation:drift linear infinite;
+  .noise{
+    position:absolute; inset:0; pointer-events:none; opacity:.05; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
-  @keyframes drift{
-    0%{ transform:translateY(0) translateX(0); opacity:0;}
-    10%{opacity:0.6;}
-    90%{opacity:0.6;}
-    100%{ transform:translateY(-120px) translateX(20px); opacity:0;}
+  .scanlines{
+    position:absolute; inset:0; pointer-events:none;
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,.03) 0px, rgba(255,255,255,.03) 1px, transparent 2px, transparent 4px);
+    mix-blend-mode:overlay;
   }
-
-  /* ===== Плавное появление всего экрана при первой отрисовке ===== */
-  @keyframes fadeInUp{
-    0%{ opacity:0; transform:translateY(10px);}
-    100%{ opacity:1; transform:translateY(0);}
+  .vignette{
+    position:absolute; inset:0; pointer-events:none;
+    box-shadow: inset 0 0 200px 100px rgba(0,0,0,.96);
+    animation: vigPulse 3.2s ease-in-out infinite;
+  }
+  @keyframes vigPulse{
+    0%,100%{ box-shadow: inset 0 0 200px 100px rgba(0,0,0,.96); }
+    50%{ box-shadow: inset 0 0 225px 115px rgba(220,80,20,.09), inset 0 0 200px 100px rgba(0,0,0,.92); }
   }
 
-  /* Emblem — появляется чуть раньше логотипа, с лёгким разворотом.
-     Скрыт по умолчанию; анимация запускаетсяJS-ом через класс .intro-play
-     на body, а не по animation-delay от момента парсинга страницы —
-     иначе если GMod отрисует страницу заранее, к показу анимация уже
-     успеет доиграть и будет казаться, что её вообще не было. */
-  .emblem{
-    position:relative; z-index:2;
-    width:54px; height:54px;
-    margin:0 auto -6px;
+  .glowring{
+    position:absolute; width:900px; height:900px;
+    background: conic-gradient(from 0deg, transparent 0%, rgba(220,100,25,.1) 8%, transparent 16%, transparent 50%, rgba(200,50,25,.1) 58%, transparent 66%, transparent 100%);
+    filter: blur(38px);
+    animation: spin 11s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  /* rotating crosshair backdrop */
+  .crosshair{
+    position:absolute;
+    width:520px; height:520px;
+    opacity:.28;
+    animation: crossSpin 16s linear infinite;
+  }
+  .crosshair::before, .crosshair::after{
+    content:"";
+    position:absolute; top:50%; left:50%;
+    background: linear-gradient(90deg, transparent, var(--ember-1), transparent);
+  }
+  .crosshair::before{
+    width:100%; height:1px;
+    transform: translate(-50%,-50%);
+  }
+  .crosshair::after{
+    width:1px; height:100%;
+    transform: translate(-50%,-50%);
+    background: linear-gradient(180deg, transparent, var(--ember-1), transparent);
+  }
+  .crosshair .ring{
+    position:absolute; inset:70px;
+    border:1px solid rgba(230,120,60,.32);
+    border-radius:50%;
+  }
+  .crosshair .ring2{
+    position:absolute; inset:140px;
+    border:1px dashed rgba(230,120,60,.2);
+    border-radius:50%;
+  }
+  @keyframes crossSpin{ to{ transform:rotate(360deg); } }
+
+  .mark{
+    position:absolute; width:14px; height:14px;
+    background:var(--ember-1);
+    box-shadow:0 0 12px var(--ember-1), 0 0 20px var(--ember-3);
+    animation: markPulse 2s ease-in-out infinite;
+  }
+  .mark.tl{ top:6%; left:6%; animation-delay:.1s; }
+  .mark.tr{ top:6%; right:6%; animation-delay:.5s; }
+  .mark.bl{ bottom:8%; left:7%; animation-delay:.9s; }
+  .mark.br{ bottom:8%; right:7%; animation-delay:1.3s; }
+  @keyframes markPulse{
+    0%,100%{ opacity:.3; transform:scale(1) rotate(0deg); }
+    50%{ opacity:.9; transform:scale(1.6) rotate(45deg); }
+  }
+
+  /* corner bracket decals framing the wordmark */
+  .bracket{ display:none; }
+
+  .embers{ position:absolute; inset:0; }
+  .ember{
+    position:absolute; bottom:-10px;
+    width:3px; height:3px; border-radius:50%;
+    background:var(--ember-2);
+    box-shadow:0 0 8px 2px var(--ember-1);
     opacity:0;
-    transform:scale(0.7) rotate(-25deg);
-    filter:drop-shadow(0 0 0 rgba(160,80,255,0));
+    animation-name: rise; animation-timing-function: ease-in; animation-iteration-count: infinite;
   }
-  body.intro-play .emblem{
-    animation: emblemIntro 0.9s cubic-bezier(0.16,1,0.3,1) 0.15s forwards;
+  @keyframes rise{
+    0%{ opacity:0; transform:translateY(0) translateX(0) scale(1); }
+    10%{ opacity:.85; }
+    90%{ opacity:.7; }
+    100%{ opacity:0; transform:translateY(-108vh) translateX(var(--drift,20px)) scale(.4); }
   }
-  @keyframes emblemIntro{
-    0%{ opacity:0; transform:scale(0.7) rotate(-25deg); filter:drop-shadow(0 0 0 rgba(160,80,255,0));}
-    100%{ opacity:1; transform:scale(1) rotate(0deg); filter:drop-shadow(0 0 5px rgba(160,80,255,0.65));}
+  .streak{
+    position:absolute; height:2px; width:140px;
+    background:linear-gradient(90deg, transparent, var(--ember-4), transparent);
+    opacity:0;
+    animation-name: streakGo; animation-timing-function: ease-out; animation-iteration-count: infinite;
+    filter: drop-shadow(0 0 6px var(--ember-2));
   }
-  .emblem svg{width:100%; height:100%;}
+  @keyframes streakGo{
+    0%{ opacity:0; transform: translateX(-220px); }
+    8%{ opacity:1; }
+    25%{ opacity:0; transform: translateX(280px); }
+    100%{ opacity:0; transform: translateX(280px); }
+  }
 
-  .tip-icon{
-    display:inline-flex; align-items:center; justify-content:center;
-    width:14px; height:14px; margin-right:7px;
-    vertical-align:-2px;
-  }
-  .tip-icon svg{width:100%; height:100%; stroke:var(--purple-bright); fill:none; stroke-width:2;
-    filter:drop-shadow(0 0 4px rgba(160,80,255,0.6));}
+  /* burst rings removed */
+  .burst{ display:none; }
 
-  /* Title */
-  .title-wrap{
-    position:relative; z-index:2;
+  .wordwrap{ position:relative; text-align:center; padding:0 90px; }
+
+  .wordmark{
+    position:relative;
+    font-family:'Anton', sans-serif;
+    font-size:clamp(60px, 12vw, 156px);
+    letter-spacing:2px;
+    text-transform:uppercase;
+    line-height:.95;
     text-align:center;
-  }
-  .logo{
-    font-size:9.5vw;
-    font-weight:900;
-    letter-spacing:0.04em;
-    line-height:1;
-    background:linear-gradient(180deg,
-        #c9a3f5 0%, #c9a3f5 42%,
-        #ffffff 45%, #ffffff 54%,
-        #8b4fd6 57%, #8b4fd6 100%);
+    -webkit-text-stroke: 2px rgba(0,0,0,.55);
+    background: linear-gradient(180deg,
+        #f2e2c4 0%, var(--ember-4) 14%, var(--ember-2) 32%,
+        var(--ember-1) 50%, #4c1e05 66%, var(--ember-1) 80%, var(--ember-4) 100%);
+    background-size: 100% 300%;
     -webkit-background-clip:text;
     background-clip:text;
     color:transparent;
-    -webkit-text-fill-color:transparent;
-    white-space:nowrap;
-
-    /* стартовое состояние перед "наводкой на резкость" */
-    opacity:0;
-    filter: blur(18px) brightness(0.4);
-    transform: scale(1.05);
-    text-shadow:
-      0 0 14px rgba(160,70,255,0.65),
-      0 0 40px rgba(140,50,240,0.35),
-      0 0 80px rgba(140,50,240,0.20);
-
-    animation: none;
+    filter: drop-shadow(0 0 15px rgba(220,100,25,.42)) drop-shadow(0 3px 0 rgba(0,0,0,.88)) drop-shadow(0 0 30px rgba(220,60,25,.18));
+    animation: metalShift 3.2s ease-in-out infinite, textPulse 2.2s ease-in-out infinite;
   }
-  body.intro-play .logo{
-    animation:
-      logoFocusIn 1.15s cubic-bezier(0.16, 1, 0.3, 1) 0.05s forwards,
-      flicker 5s ease-in-out 1.3s infinite;
-  }
-  /* эффект "наводки на резкость" — как в видео-референсе: логотип входит
-     размытым и тусклым, затем плавно фокусируется и разгорается */
-  @keyframes logoFocusIn{
-    0%{
-      opacity:0;
-      filter: blur(18px) brightness(0.4);
-      transform: scale(1.05);
-    }
-    55%{
-      opacity:1;
-      filter: blur(2px) brightness(1.35);
-      transform: scale(1.01);
-    }
-    100%{
-      opacity:1;
-      filter: blur(0px) brightness(1);
-      transform: scale(1);
-    }
-  }
-  @keyframes flicker{
-    0%,92%,100%{ text-shadow:
-      0 0 14px rgba(160,70,255,0.65),
-      0 0 40px rgba(140,50,240,0.35),
-      0 0 80px rgba(140,50,240,0.20);}
-    94%{ text-shadow:
-      0 0 5px rgba(160,70,255,0.3),
-      0 0 10px rgba(140,50,240,0.15);}
-    95%{ text-shadow:
-      0 0 18px rgba(160,70,255,0.8),
-      0 0 50px rgba(140,50,240,0.45),
-      0 0 90px rgba(140,50,240,0.25);}
+  @keyframes metalShift{ 0%,100%{ background-position: 0% 0%; } 50%{ background-position: 0% 100%; } }
+  @keyframes textPulse{
+    0%,100%{ filter: drop-shadow(0 0 15px rgba(220,100,25,.42)) drop-shadow(0 3px 0 rgba(0,0,0,.88)) drop-shadow(0 0 30px rgba(220,60,25,.18)); }
+    50%{ filter: drop-shadow(0 0 25px rgba(230,130,50,.6)) drop-shadow(0 3px 0 rgba(0,0,0,.88)) drop-shadow(0 0 44px rgba(220,80,25,.3)); }
   }
 
-
-
-  .divider{
-    width:280px; height:1px; margin:22px auto 20px;
-    background:linear-gradient(90deg, transparent, var(--purple-bright), transparent);
-    box-shadow:0 0 8px var(--purple-bright);
-    position:relative; z-index:2;
-    opacity:0;
-    transform:translateY(10px);
+  .wordmark .glitch{
+    position:absolute; inset:0;
+    font-family:'Anton', sans-serif; font-size:clamp(60px, 12vw, 156px);
+    letter-spacing:2px; text-transform:uppercase; color:transparent;
+    -webkit-background-clip:text; background-clip:text;
   }
-  body.intro-play .divider{ animation: fadeInUp 0.7s ease-out 0.95s forwards; }
-
-  .welcome{
-    font-size:15px; color:var(--dim); z-index:2; position:relative;
-    letter-spacing:0.3px;
-    opacity:0;
-    transform:translateY(10px);
+  .g1{ background:var(--ember-3); opacity:0; animation: glitch1 4s infinite; }
+  .g2{ background:#f0dcb8; opacity:0; animation: glitch2 4s infinite; }
+  @keyframes glitch1{
+    0%,92%,100%{ opacity:0; transform:translate(0,0); }
+    93%{ opacity:.7; transform:translate(4px,-2px); } 94%{ opacity:0; }
+    95%{ opacity:.6; transform:translate(-5px,1px); } 96%{ opacity:0; }
   }
-  body.intro-play .welcome{ animation: fadeInUp 0.7s ease-out 1.05s forwards; }
-  .welcome b{color:var(--lilac); font-weight:700;}
-
-  .mapline{
-    margin-top:10px; font-size:13px; letter-spacing:2px;
-    color:var(--purple-bright); z-index:2; position:relative;
-    display:flex; align-items:center; justify-content:center; gap:8px;
-    opacity:0;
-    transform:translateY(10px);
-  }
-  body.intro-play .mapline{ animation: fadeInUp 0.7s ease-out 1.15s forwards; }
-  .mapline .dot{
-    width:6px; height:6px; border-radius:50%;
-    background:var(--purple-bright);
-    box-shadow:0 0 8px var(--purple-bright);
+  @keyframes glitch2{
+    0%,92%,100%{ opacity:0; transform:translate(0,0); }
+    93.5%{ opacity:.6; transform:translate(-4px,2px); } 94.5%{ opacity:0; }
+    95.5%{ opacity:.5; transform:translate(5px,-1px); } 96.5%{ opacity:0; }
   }
 
-  /* Tip box */
-  .tip-box{
-    margin-top:42px;
-    max-width:640px;
-    text-align:center;
-    z-index:2; position:relative;
-    min-height:70px;
-    opacity:0;
-    transform:translateY(10px);
+  .wordmark::after{
+    content:"PIXEL SANDBOX";
+    position:absolute; inset:0;
+    background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.9) 48%, rgba(255,255,255,.9) 52%, transparent 70%);
+    background-size: 300% 100%;
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    mix-blend-mode: overlay;
+    animation: sweep 2.1s ease-in-out infinite;
+    animation-delay: .3s;
   }
-  body.intro-play .tip-box{ animation: fadeInUp 0.7s ease-out 1.3s forwards; }
-  .tip-eyebrow{
-    font-size:11px; letter-spacing:4px; color:var(--purple);
-    text-transform:uppercase; margin-bottom:8px;
+  @keyframes sweep{
+    0%{ background-position: 200% 0; opacity:0; } 8%{ opacity:1; }
+    40%{ background-position: -60% 0; opacity:0; } 100%{ background-position: -60% 0; opacity:0; }
+  }
+
+  .bracket-wrap{ position:relative; display:inline-block; }
+
+  .rule{
+    width:0; height:5px; margin:26px 0 16px;
+    background: linear-gradient(90deg, transparent, var(--ember-1), var(--ember-4), var(--ember-1), transparent);
+    box-shadow:0 0 14px var(--ember-1), 0 0 26px var(--ember-3);
+    animation: growRule 1.1s .2s ease-out forwards, ruleGlow 1.3s 1.3s ease-in-out infinite;
+  }
+  @keyframes growRule{ to{ width:min(76vw, 600px); } }
+  @keyframes ruleGlow{ 0%,100%{opacity:.75; transform:scaleY(1);} 50%{opacity:1; transform:scaleY(1.7);} }
+
+  .tag{
+    font-size:16px; letter-spacing:1px; color:#c9c3d0;
+    font-weight:600;
+    opacity:0; text-shadow:0 0 10px rgba(220,110,50,.3);
+    animation: fadeUp 1s .7s ease-out forwards;
+  }
+  .tag b{ color:var(--ember-2); text-shadow:0 0 10px rgba(220,110,50,.5); }
+  .tag .subtag{ display:inline-block; margin-top:8px; opacity:1; animation:none; }
+  @keyframes fadeUp{ from{ opacity:0; transform:translateY(8px);} to{ opacity:1; transform:translateY(0);} }
+
+  .loadwrap{
+    margin-top:42px; display:flex; flex-direction:column; align-items:center; gap:14px;
+    opacity:0; animation: fadeUp 1s 1s ease-out forwards;
+  }
+  .bar{
+    width:380px; height:18px;
+    background:rgba(255,255,255,.05);
+    border:2px solid rgba(220,120,50,.45);
+    border-radius:9px; overflow:hidden; position:relative;
+    box-shadow:0 0 20px rgba(210,90,25,.32), inset 0 0 10px rgba(0,0,0,.75);
+  }
+  .bar-fill{
+    position:absolute; top:0; left:0; height:100%; width:0%;
+    border-radius:9px;
+    background:linear-gradient(90deg, var(--ember-3), var(--ember-1), var(--ember-4));
+    box-shadow:0 0 16px var(--ember-1), 0 0 28px var(--ember-3);
+    transition: width .25s ease-out;
+  }
+  .bar-fill::after{
+    content:""; position:absolute; inset:0;
+    background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.7) 50%, transparent 70%);
+    background-size: 220% 100%;
+    animation: shineBar 1.1s linear infinite;
+  }
+  @keyframes shineBar{ 0%{ background-position: 200% 0; } 100%{ background-position: -60% 0; } }
+
+  .loadtext{
+    font-size:18px; letter-spacing:3px; color:#e8e5ee; font-weight:800;
+    text-shadow:0 0 10px rgba(220,110,50,.55);
+  }
+  .loadtext b{ color:var(--ember-2); font-size:21px; }
+
+  .corner-mark{
+    position:absolute; top:14px; left:16px;
+    font-size:8px; letter-spacing:2px; font-weight:600;
+    color:rgba(220,170,130,.55);
+    text-shadow:0 0 6px rgba(220,110,50,.35);
+    text-transform:uppercase;
+    z-index:5;
+  }
+
+  .subtag{
+    position:relative; text-align:center;
+    font-size:13px; letter-spacing:4px; color:var(--muted);
+    text-transform:uppercase; font-weight:700;
+    opacity:0; animation: fadeUp 1s .55s ease-out forwards;
+    margin-bottom:6px;
+  }
+  .subtag::before{ content:"● "; color:var(--ember-1); }
+
+  .tip-wrap{
+    margin-top:34px; text-align:center; max-width:640px;
+    opacity:0; animation: fadeUp 1s 1.15s ease-out forwards;
+  }
+  .tip-label{
+    font-size:13px; letter-spacing:4px; color:var(--ember-2);
+    text-transform:uppercase; font-weight:800;
+    text-shadow:0 0 10px rgba(220,110,50,.45);
+    margin-bottom:10px;
   }
   .tip-text{
-    font-size:15px; color:#cbb9ea; line-height:1.5;
-    animation:tipfade 6s ease-in-out infinite;
+    font-size:14px; letter-spacing:.3px; color:#c9c3d0;
+    line-height:1.6;
   }
-  @keyframes tipfade{
-    0%{opacity:0; transform:translateY(4px);}
-    8%{opacity:1; transform:translateY(0);}
-    88%{opacity:1;}
-    100%{opacity:0;}
-  }
-
-  /* Load bar — placed under tips, wide like screenshot */
-  .loadbar{
-    margin:38px auto 0;
-    width:78%;
-    max-width:900px;
-    z-index:2; position:relative;
-    opacity:0;
-    transform:translateY(10px);
-  }
-  body.intro-play .loadbar{ animation: fadeInUp 0.7s ease-out 1.5s forwards; }
-  .bartrack{
-    width:100%; height:2px; background:rgba(255,255,255,0.10);
-    border-radius:2px; position:relative; overflow:hidden;
-  }
-  .barfill{
-    height:100%; width:0%;
-    background:linear-gradient(90deg, var(--purple-deep), var(--purple-bright));
-    box-shadow:0 0 8px var(--purple-bright);
-    border-radius:2px;
-    transition: width 0.45s cubic-bezier(0.16,1,0.3,1);
-  }
-  .barfill::after{
-    content:'';
-    position:absolute; right:0; top:0; bottom:0; width:14px;
-    background:var(--white); filter:blur(4px); opacity:0.7;
-  }
-  .handle{
-    position:relative; width:100%; height:0;
-  }
-  .handle-dot{
-    position:absolute; top:-1px; width:8px; height:8px; border-radius:50%;
-    background:var(--white);
-    box-shadow:0 0 8px var(--purple-bright);
-    transform:translate(-50%,-50%);
-    transition: left 0.45s cubic-bezier(0.16,1,0.3,1);
-  }
-  .barrow{
-    display:flex; align-items:center; justify-content:space-between;
-    margin-top:9px;
-  }
-  .barlabel{
-    font-size:11px; letter-spacing:1.5px; color:var(--dim);
-    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    text-transform:uppercase;
-  }
-  .barpct{
-    font-size:12px; color:var(--purple-bright); font-weight:700;
-  }
-  .siteurl{
-    position:absolute; left:24px; bottom:16px;
-    font-size:11px; letter-spacing:1px; color:var(--dim);
-    z-index:2;
-    opacity:0;
-    transform:translateY(10px);
-  }
-  body.intro-play .siteurl{ animation: fadeInUp 0.7s ease-out 1.6s forwards; }
-
-
 </style>
 </head>
 <body>
-<div class="screen">
-
   <audio id="bgMusic" src="https://cdn.jsdelivr.net/gh/Vladislav22231/gmod-loading@main/music.mp3" loop preload="auto"></audio>
-
-  <div class="particles" id="particles"></div>
-
-  <div class="emblem">
-    <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-      <polygon points="32,4 58,18 58,46 32,60 6,46 6,18" fill="none" stroke="url(#emgrad)" stroke-width="3"/>
-      <polygon points="32,4 58,18 32,32 6,18" fill="url(#emgrad)" opacity="0.4"/>
-      <line x1="32" y1="32" x2="32" y2="60" stroke="url(#emgrad)" stroke-width="1.4" opacity="0.6"/>
-      <line x1="32" y1="32" x2="6" y2="18" stroke="url(#emgrad)" stroke-width="1.4" opacity="0.35"/>
-      <line x1="32" y1="32" x2="58" y2="18" stroke="url(#emgrad)" stroke-width="1.4" opacity="0.35"/>
-      <defs>
-        <linearGradient id="emgrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#d6b6ff"/>
-          <stop offset="100%" stop-color="#7a35c9"/>
-        </linearGradient>
-      </defs>
-    </svg>
-  </div>
-
-  <div class="title-wrap">
-    <div class="logo">PIXELSANDBOX</div>
-  </div>
-
-  <div class="divider"></div>
-
-  <div class="welcome">Добро пожаловать на <b>PixelSandbox</b></div>
-  <div class="mapline"><span class="dot"></span>ДРУЖЕЛЮБНЫЙ SANDBOX-СЕРВЕР</div>
-
-  <div class="tip-box">
-    <div class="tip-eyebrow"><span class="tip-icon" id="tipIcon"></span>Совет новичкам</div>
-    <div class="tip-text" id="tipText"></div>
-  </div>
-
-  <div class="loadbar">
-    <div class="bartrack">
-      <div class="barfill"></div>
-      <div class="handle"><div class="handle-dot"></div></div>
+  <div class="stage">
+    <div class="corner-mark">PIXELSANDBOX.UA</div>
+    <div class="noise"></div>
+    <div class="scanlines"></div>
+    <div class="vignette"></div>
+    <div class="glowring"></div>
+    <div class="crosshair">
+      <div class="ring"></div>
+      <div class="ring2"></div>
     </div>
-    <div class="barrow">
-      <div class="barlabel" id="stageLabel">ЗАГРУЗКА АДДОНОВ ВОРКШОПА</div>
-      <div class="barpct" id="pctLabel">2%</div>
+
+    <div class="mark tl"></div>
+    <div class="mark tr"></div>
+    <div class="mark bl"></div>
+    <div class="mark br"></div>
+
+    <div class="embers" id="embers"></div>
+    <div class="embers" id="streaks"></div>
+
+    <div class="bracket-wrap">
+      <div class="wordwrap">
+        <div class="wordmark">
+          PIXEL SANDBOX
+          <span class="glitch g1">PIXEL SANDBOX</span>
+          <span class="glitch g2">PIXEL SANDBOX</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rule"></div>
+    <div class="tag">Добро пожаловать на <b>PixelSandbox</b><br><span class="subtag">Дружелюбный Sandbox-сервер</span></div>
+
+    <div class="loadwrap">
+      <div class="bar"><div class="bar-fill" id="barfill"></div></div>
+      <div class="loadtext" id="loadtext">ПОДКЛЮЧЕНИЕ...&nbsp; <b id="pct">0%</b></div>
+    </div>
+
+    <div class="tip-wrap">
+      <div class="tip-label">🗒 Совет новичкам</div>
+      <div class="tip-text" id="tipText">Сохраняй свои постройки через Advanced Duplicator 2 (ADV2), чтобы не строить заново после рестарта.</div>
     </div>
   </div>
-
-  <div class="siteurl">PIXELSANDBOX.UA</div>
-
-</div>
 
 <script>
-  // ==== Запуск анимаций входа ====
-  // Не полагаемся на animation-delay от момента парсинга HTML — если GMod
-  // подготовит/отрисует страницу заранее (до того как игрок её реально видит),
-  // все anim-delay успеют истечь в фоне, и анимация покажется пропущенной.
-  // Вместо этого добавляем класс через двойной requestAnimationFrame —
-  // это гарантирует, что браузер уже отрисовал скрытое (opacity:0) состояние
-  // хотя бы один кадр, и только после этого стартуют переходы.
-  requestAnimationFrame(function(){
-    requestAnimationFrame(function(){
-      document.body.classList.add('intro-play');
-    });
-  });
+  /* ==========================================================
+     РЕАЛЬНАЯ ЗАГРУЗКА GMOD
+     Использует функции, которые движок вызывает по-настоящему:
+     GameDetails, SetStatusChanged, SetFilesTotal, SetFilesNeeded,
+     DownloadingFile — wiki.facepunch.com/gmod/Loading_URL
 
-  // particles
-  const pc = document.getElementById('particles');
-  for(let i=0;i<40;i++){
-    const p=document.createElement('div');
-    p.className='p';
-    p.style.left = Math.random()*100+'%';
-    p.style.top = (60+Math.random()*40)+'%';
-    p.style.animationDuration = (6+Math.random()*8)+'s';
-    p.style.animationDelay = (Math.random()*8)+'s';
-    p.style.opacity = 0.3+Math.random()*0.5;
-    pc.appendChild(p);
+     sv_loadingurl "https://ваш-домен/index.html?steamid=%s&mapname=%m"
+     ========================================================== */
+
+  const barfill  = document.getElementById('barfill');
+  const loadtext = document.getElementById('loadtext');
+  const pctEl    = document.getElementById('pct');
+
+  let filesTotal = 0;
+  let filesLeft  = 0;
+  let statusText = 'ПОДКЛЮЧЕНИЕ...';
+
+  function render(){
+    let pct = 0;
+    if (filesTotal > 0){
+      pct = Math.round(((filesTotal - filesLeft) / filesTotal) * 100);
+    }
+    pct = Math.max(0, Math.min(100, pct));
+    barfill.style.width = pct + '%';
+    pctEl.textContent = pct + '%';
+    loadtext.firstChild.textContent = statusText + '\u00A0\u00A0';
   }
 
-  // tips rotation — новичкам про типичный sandbox-сервер (S&box/GMod-style)
-  const tips = [
-    "Зажми Q, чтобы открыть меню спавна пропов и инструментов.",
-    "Physgun поднимает и двигает объекты — зажми ЛКМ на пропе, чтобы схватить его.",
-    "Toolgun позволяет крепить, красить и настраивать физику пропов.",
-    "Используй Weld, чтобы жёстко соединить два пропа между собой.",
-    "Сохраняй свои постройки через Advanced Duplicator 2 (ADV2), чтобы не строить заново после рестарта.",
-    "Зажми R для быстрого доступа к последнему использованному инструменту.",
-    "Не спавни слишком много пропов сразу — есть лимит, чтобы не лагал сервер.",
-    "Нажми Tab, чтобы увидеть список онлайн-игроков на сервере.",
-    "Используй Thruster и Wheel из Wiremod, чтобы построить свою первую машину.",
-    "Если завис в текстуре — набери !stuck в чат, чтобы телепортироваться в безопасное место.",
-    "Donator-привилегии открывают доп. слоты пропов и приватные зоны — подробнее на pixelsandbox.ua",
-    "Дискорд сервера обязателен для апелляций и репортов — ссылка в /discord.",
-  ];
-  // простые line-иконки под каждый совет (в том же порядке, что и tips)
-  const tipIcons = [
-    '<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 4v16M4 9h16"/></svg>', // спавн-меню
-    '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 3"/></svg>', // physgun
-    '<svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 0 5.4-5.4l-2.1 2.1-2-2z"/></svg>', // toolgun/wrench
-    '<svg viewBox="0 0 24 24"><path d="M8 12h8M8 8h8M8 16h8"/><rect x="3" y="4" width="18" height="16" rx="2"/></svg>', // weld/link
-    '<svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M7 3v6h8V3"/></svg>', // save/duplicator
-    '<svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M8 12h.01M12 12h.01M16 12h.01"/></svg>', // клавиша R
-    '<svg viewBox="0 0 24 24"><path d="M12 2 2 20h20L12 2Z"/><path d="M12 9v5M12 17h.01"/></svg>', // лимит/предупреждение
-    '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M2 20c0-3.3 3.1-6 7-6s7 2.7 7 6"/><circle cx="18" cy="9" r="2.4"/></svg>', // список игроков
-    '<svg viewBox="0 0 24 24"><path d="M4 16v-3a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v3"/><circle cx="7" cy="17" r="1.6"/><circle cx="17" cy="17" r="1.6"/></svg>', // машина/wiremod
-    '<svg viewBox="0 0 24 24"><path d="M4 4v16h16"/><path d="M9 15l3-3 3 3 5-5"/></svg>', // stuck/телепорт
-    '<svg viewBox="0 0 24 24"><path d="m12 2 2.7 6.6L22 9l-5.4 4.8L18 21l-6-3.6L6 21l1.4-7.2L2 9l7.3-.4L12 2Z"/></svg>', // донат/звезда
-    '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 13c1 1.3 2.4 2 4 2s3-.7 4-2M9 9h.01M15 9h.01"/></svg>', // дискорд
-  ];
-  let ti = 0;
-  const tipEl = document.getElementById('tipText');
-  const tipIconEl = document.getElementById('tipIcon');
-  function showTip(){
-    tipEl.style.animation='none';
-    void tipEl.offsetWidth;
-    const idx = ti % tips.length;
-    tipEl.textContent = tips[idx];
-    tipIconEl.innerHTML = tipIcons[idx % tipIcons.length];
-    tipEl.style.animation='tipfade 6s ease-in-out infinite';
-    ti++;
-  }
-  showTip();
-  setInterval(showTip, 6000);
-  requestAnimationFrame(function(){ requestAnimationFrame(showTip); });
+  window.GameDetails = function(servername, serverurl, mapname, maxplayers, steamid, gamemode, volume, language){
+    statusText = ('КАРТА: ' + (mapname || '—')).toUpperCase();
+    render();
+  };
+
+  window.SetStatusChanged = function(status){
+    statusText = status;
+    render();
+  };
+
+  window.SetFilesTotal = function(total){
+    filesTotal = total || 0;
+    filesLeft = filesTotal;
+    render();
+  };
+
+  window.SetFilesNeeded = function(needed){
+    filesLeft = needed || 0;
+    render();
+  };
+
+  window.DownloadingFile = function(fileName){
+    statusText = 'ЗАГРУЗКА: ' + fileName;
+    render();
+  };
+
+  // ---- Демо-режим только для предпросмотра в браузере ----
+  // Если движок GMod не позвал GameDetails за секунду — значит,
+  // страница открыта не в игре, показываем имитацию для превью.
+  let engineActive = false;
+  const origGameDetails = window.GameDetails;
+  window.GameDetails = function(...args){ engineActive = true; origGameDetails(...args); };
+
+  setTimeout(() => {
+    if (engineActive) return;
+    const steps = [
+      'ОТПРАВКА CLIENT INFO...',
+      'ЗАПРОС SERVER INFO...',
+      'СИНХРОНИЗАЦИЯ LUA...',
+      'ПРОВЕРКА АДДОНОВ...',
+      'ЗАГРУЗКА ФАЙЛОВ КАРТЫ...',
+      'ИНИЦИАЛИЗАЦИЯ МИРА...'
+    ];
+    let i = 0;
+    let simTotal = 40, simLeft = 40;
+    const iv = setInterval(() => {
+      if (i < steps.length){ statusText = steps[i]; i++; }
+      simLeft = Math.max(0, simLeft - (2 + Math.floor(Math.random()*4)));
+      filesTotal = simTotal; filesLeft = simLeft;
+      render();
+      if (simLeft <= 0){
+        statusText = 'ГОТОВО';
+        render();
+        clearInterval(iv);
+      }
+    }, 500);
+  }, 1000);
+
+  render();
 
   // ==== Фоновая музыка: средняя громкость, зациклена, всегда включена ====
   const bgMusic = document.getElementById('bgMusic');
@@ -410,102 +444,73 @@
 
   // Если автозапуск со звуком заблокирован браузером/CEF — доиграет по первому клику/движению.
   function unlockOnce(){
-    if(bgMusic.paused){ bgMusic.play().catch(function(){}); }
+    if (bgMusic.paused){ bgMusic.play().catch(function(){}); }
     document.removeEventListener('pointerdown', unlockOnce);
   }
   document.addEventListener('pointerdown', unlockOnce);
 
-  // ==== РЕАЛЬНАЯ загрузка: движок GMod сам вызывает эти функции на window ====
-  // во время настоящего коннекта к серверу. Никакого рандома — только то,
-  // что реально сообщает игра.
-  const stageLabel = document.getElementById('stageLabel');
-  const pctLabel = document.getElementById('pctLabel');
-  const barfillEl = document.querySelector('.barfill');
-  const handleDot = document.querySelector('.handle-dot');
-
-  let totalFiles = 0;
-  let neededFiles = 0;
-  let realDataReceived = false;
-
-  function setProgress(pct){
-    pct = Math.max(0, Math.min(100, Math.round(pct)));
-    pctLabel.textContent = pct + '%';
-    barfillEl.style.width = pct + '%';
-    handleDot.style.left = pct + '%';
+  const field = document.getElementById('embers');
+  const N = 54;
+  for (let i = 0; i < N; i++) {
+    const e = document.createElement('div');
+    e.className = 'ember';
+    e.style.left = (Math.random()*100) + '%';
+    const size = 2 + Math.random()*4;
+    e.style.width = size+'px'; e.style.height = size+'px';
+    e.style.setProperty('--drift', (Math.random()*110-55)+'px');
+    e.style.animationDuration = (3.2 + Math.random()*4.5)+'s';
+    e.style.animationDelay = (Math.random()*6)+'s';
+    field.appendChild(e);
   }
 
-  function updateFileProgress(){
-    if(totalFiles <= 0){ setProgress(0); return; }
-    const downloaded = totalFiles - neededFiles;
-    setProgress((downloaded / totalFiles) * 100);
+  const sfield = document.getElementById('streaks');
+  for (let i = 0; i < 8; i++) {
+    const s = document.createElement('div');
+    s.className = 'streak';
+    s.style.top = (8 + Math.random()*84) + '%';
+    s.style.left = '0%';
+    s.style.animationDuration = (1.2 + Math.random()*1.6) + 's';
+    s.style.animationDelay = (Math.random()*5) + 's';
+    sfield.appendChild(s);
   }
 
-  // Вызывается один раз — сколько всего файлов нужно скачать
-  window.SetFilesTotal = function(total){
-    realDataReceived = true;
-    totalFiles = total;
-    neededFiles = total;
-    updateFileProgress();
-  };
+  // ==== Ротация советов новичкам ====
+  // Просто добавляй/убирай/меняй строки в массиве — больше ничего трогать не нужно.
+  const TIPS = [
+    'Сохраняй свои постройки через Advanced Duplicator 2 (ADV2), чтобы не строить заново после рестарта.',
+    'Используй Physgun (Физпушку) для аккуратного перемещения крупных объектов — зажми R для заморозки.',
+    'Прежде чем строить, включи Prop Protection — так твои пропы не сможет забрать другой игрок.',
+    'Команда !motd откроет это окно с советами и правилами сервера в любой момент.',
+    'Комбинируй Thruster и Wheel из Wire Mod, чтобы собрать простую машину без единого скрипта.',
+    'Заходи в наш Discord — там раздаём донат-бонусы и сообщаем о вайпах заранее.',
+    'Используй Toolgun (F1) для быстрой сварки, покраски и настройки материалов пропов.',
+    'Команда !rtd (roll the dice) может дать случайный бонус — но будь осторожен, есть и штрафы.',
+    'Сохраняй важные схемы Wire Mod через E2/Expression 2, чтобы не пересобирать логику заново.',
+    'Команда !tp позволит быстро телепортироваться к друзьям или на точки интереса на карте.',
+    'Не строй слишком близко к спавну — используй !home, чтобы задать себе точку возврата.',
+    'Загляни в магазин через !shop — там можно докупить слоты пропов и полезные привилегии.',
+    'Работай в команде: совместные постройки прокачивают базу быстрее и надёжнее.',
+    'Используй Camera Tool, чтобы делать красивые скриншоты своих построек для соцсетей.'
+  ];
 
-  // Вызывается при изменении числа оставшихся файлов
-  window.SetFilesNeeded = function(needed){
-    realDataReceived = true;
-    neededFiles = needed;
-    updateFileProgress();
-  };
+  const tipTextEl = document.getElementById('tipText');
+  let tipIndex = 0;
 
-  // Вызывается когда стартует скачивание конкретного файла — показываем его имя
-  window.DownloadingFile = function(fileName){
-    realDataReceived = true;
-    stageLabel.textContent = fileName;
-  };
+  if (tipTextEl && TIPS.length){
+    tipTextEl.textContent = TIPS[0];
 
-  // Вызывается при смене общего статуса подключения (например "Retrieving server info")
-  window.SetStatusChanged = function(status){
-    realDataReceived = true;
-    stageLabel.textContent = status;
-  };
-
-  // Вызывается один раз в начале — реальные данные о сервере/карте
-  window.GameDetails = function(servername, serverurl, mapname, maxplayers, maxplayers_visible, steamid, gamemode){
-    realDataReceived = true;
-    if(mapname){
-      const mapEl = document.querySelector('.mapline');
-      if(mapEl) mapEl.innerHTML = '<span class="dot"></span>' + mapname.toUpperCase();
+    if (TIPS.length > 1){
+      setInterval(() => {
+        tipIndex = (tipIndex + 1) % TIPS.length;
+        tipTextEl.style.transition = 'opacity .35s ease';
+        tipTextEl.style.opacity = '0';
+        setTimeout(() => {
+          tipTextEl.textContent = TIPS[tipIndex];
+          tipTextEl.style.opacity = '1';
+        }, 370);
+      }, 4000);
     }
-  };
-
-  // ==== Демо-режим ====
-  // Если открыть этот файл просто в браузере (не через реальный коннект к
-  // серверу GMod), вызовы выше никогда не произойдут — тогда через секунду
-  // включаем условную демонстрацию, чтобы страница не стояла на 0%.
-  // Внутри игры realDataReceived станет true почти сразу, и демо не запустится.
-  setTimeout(function(){
-    if(realDataReceived) return;
-    const demoQueue = [
-      "maps/rp_pixelcity_v3.bsp",
-      "addon_sandbox_tools.gma",
-      "materials/props_pixel/pack_02.vtf",
-      "models/weapons/w_pixelpistol.mdl",
-      "addon_advanced_duplicator2.gma",
-      "lua/autorun/sb_pixel_core.lua",
-      "addon_wiremod.gma",
-      "синхронизация с сервером...",
-    ];
-    let i = 0, prog = 0;
-    stageLabel.textContent = 'ПРЕДПРОСМОТР (нет данных от сервера)';
-    function demoStep(){
-      prog += Math.random()*12 + 3;
-      if(prog >= 100){ prog = 0; i = (i+1) % demoQueue.length; }
-      stageLabel.textContent = demoQueue[i];
-      setProgress(((i + prog/100) / demoQueue.length) * 100);
-      setTimeout(demoStep, 150 + Math.random()*250);
-    }
-    demoStep();
-  }, 1200);
-
-
+  }
 </script>
 </body>
 </html>
