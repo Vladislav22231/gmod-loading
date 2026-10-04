@@ -1,79 +1,56 @@
 <?php
-/**
- * player_count.php — ретранслятор A2S_INFO для загрузочного экрана GMod.
- *
- * Возвращает JSON: { "players": 3, "maxplayers": 20 }
- *
- * Как подключить:
- *   1. Залей этот файл на свой веб-хостинг В ТУ ЖЕ ПАПКУ, где лежит loading.html
- *   2. Пропиши ниже IP и порт своего игрового сервера
- *   3. В loading.html запрос уже настроен (PLAYERS_API = 'player_count.php')
- *
- * Требования хостинга: PHP 5+ (обычный PHP-хостинг подходит).
- * Скрипт не требует API-ключей, кэширует ответ 5 секунд — не грузит сервер.
- */
+// Реальный онлайн GMod-сервера через Source Query (A2S_INFO).
+// Положи рядом с HTML и впиши IP и порт СВОЕГО игрового сервера.
+const SERVER_IP   = '127.0.0.1';
+const SERVER_PORT = 27015;
+const CACHE_SEC   = 5;
 
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
+header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
+header('Access-Control-Allow-Origin: *');
 
-/* ================= НАСТРОЙКИ ================= */
-$SERVER_IP   = '178.150.168.248';   // ← IP твоего игрового сервера
-$SERVER_PORT = 27015;         // ← порт твоего сервера (обычно 27015)
-/* ============================================= */
-
-$ip   = isset($_GET['ip'])   ? preg_replace('/[^0-9a-fA-F.:]/', '', $_GET['ip']) : $SERVER_IP;
-$port = isset($_GET['port']) ? (int)$_GET['port'] : $SERVER_PORT;
-if ($port < 1 || $port > 65535) $port = $SERVER_PORT;
-// IPv6 нужно оборачивать в квадратные скобки
-if (strpos($ip, ':') !== false && $ip[0] !== '[') $ip = '[' . $ip . ']';
-
-$out = array('players' => null, 'maxplayers' => null);
-
-/* Короткий кэш (5 сек) — чтобы много игроков не долбили сервер запросами */
-$cacheFile = sys_get_temp_dir() . '/player_count_' . md5($ip . ':' . $port) . '.json';
-if (is_file($cacheFile)){
-    $mtime = @filemtime($cacheFile);
-    if ($mtime !== false && time() - $mtime < 5){
-        $cached = @file_get_contents($cacheFile);
-        if ($cached !== false){ echo $cached; exit; }
-    }
-}
-
-$sock = @fsockopen('udp://' . $ip, $port, $errno, $errstr, 3);
-if (!$sock){
-    echo json_encode($out);
+$cache = sys_get_temp_dir() . '/ps_player_count.json';
+if (is_file($cache) && time() - filemtime($cache) < CACHE_SEC) {
+    readfile($cache);
     exit;
 }
-stream_set_timeout($sock, 3);
 
-$ping = "\xFF\xFF\xFF\xFF\x54Source Engine Query\x00";
-fwrite($sock, $ping);
-$resp = fread($sock, 4096);
-
-// Если сервер просит challenge (отвечает 0x41 'A') — отправляем ещё раз с кодом
-if (strlen($resp) >= 6 && ord($resp[4]) === 0x41){
-    $challenge = substr($resp, 5, 4);
-    fwrite($sock, $ping . $challenge);
-    $resp = fread($sock, 4096);
+function readStr($d, &$o) {
+    $e = strpos($d, "\0", $o);
+    if ($e === false) return '';
+    $s = substr($d, $o, $e - $o);
+    $o = $e + 1;
+    return $s;
 }
 
-// Парсим A2S_INFO: заголовок FF FF FF FF + 0x49 'I'
-if (strlen($resp) >= 9 && ord($resp[4]) === 0x49){
-    $p = 5;                 // пропускаем заголовок и байт типа
-    $p += 1;                // protocol
-    for ($i = 0; $i < 4; $i++){        // name, map, folder, game — 4 строки
-        while ($p < strlen($resp) && $resp[$p] !== "\x00") $p++;
-        $p++;
+function a2s($ip, $port) {
+    $s = @stream_socket_client("udp://$ip:$port", $en, $es, 1);
+    if (!$s) return null;
+    stream_set_timeout($s, 1);
+    $req = "\xFF\xFF\xFF\xFFTSource Engine Query\0";
+    fwrite($s, $req);
+    $r = fread($s, 1400);
+    // сервер может попросить challenge
+    if ($r !== false && strlen($r) >= 9 && $r[4] === 'A') {
+        fwrite($s, $req . substr($r, 5, 4));
+        $r = fread($s, 1400);
     }
-    $p += 2;                // appid (short LE)
-    if ($p + 1 < strlen($resp)){
-        $out['players']    = ord($resp[$p]);
-        $out['maxplayers'] = ord($resp[$p + 1]);
-    }
+    fclose($s);
+    if (!$r || strlen($r) < 6 || $r[4] !== 'I') return null;
+    $o = 6;               // после заголовка и protocol
+    readStr($r, $o);      // name
+    readStr($r, $o);      // map
+    readStr($r, $o);      // folder
+    readStr($r, $o);      // game
+    $o += 2;              // app id
+    if (strlen($r) < $o + 3) return null;
+    $players = ord($r[$o]);
+    $max     = ord($r[$o + 1]);
+    $bots    = ord($r[$o + 2]);
+    return ['players' => max(0, $players - $bots), 'max' => $max];
 }
-fclose($sock);
 
-$json = json_encode($out);
-@file_put_contents($cacheFile, $json, LOCK_EX);
-echo $json;
+$info = a2s(SERVER_IP, SERVER_PORT);
+$out  = json_encode($info ?: ['players' => null]);
+if ($info) @file_put_contents($cache, $out);
+echo $out;
