@@ -22,7 +22,7 @@ function progress(){
 }
 function GameDetails(servername,serverurl,mapname,maxplayers,steamid,gamemode,volume,language){
  S.map=mapname||"Unknown"; S.mode=gamemode||"Sandbox";
- set("server",servername||"PixelSandbox"); set("map",S.map); set("mode",S.mode);
+ set("map",S.map); set("mode",S.mode);
  if($("maxplayers"))set("maxplayers",maxplayers??"—");
 }
 function SetStatusChanged(status){S.status=status||"Loading";set("status",S.status)}
