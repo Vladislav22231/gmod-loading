@@ -26,44 +26,45 @@ body{
   height:330px;
   border-radius:50%;
   background:#000;
-  box-shadow:0 0 0 1px #7656ff44,0 0 100px #5d3dff22;
+  /* Сделали тени диска плотнее и ярче, чтобы они не блекли при сетевой загрузке */
+  box-shadow:0 0 0 1px rgba(118, 86, 255, 0.4), 0 0 100px rgba(93, 61, 255, 0.3);
   will-change: transform;
 }
 
+/* Первое кольцо: увеличили базовую видимость границ */
 .void:before{
   content:"";
   position:absolute;
   inset:-58px;
-  border:1px solid #8a75ff24;
+  border:1px solid rgba(138, 117, 255, 0.25);
   border-radius:50%;
-  box-shadow:0 0 70px #765dff18;
+  box-shadow:0 0 70px rgba(118, 93, 255, 0.2);
   will-change: transform;
   animation:voidHalo 7s linear infinite
 }
 
+/* Второе кольцо: сделали неоновую тень существенно ярче */
 .void:after{
   content:"";
   position:absolute;
   inset:-40px;
-  border:1px solid #6f5cff33;
+  border:1px solid rgba(111, 92, 255, 0.35);
   border-radius:50%;
-  box-shadow:0 0 60px #765dff33;
+  box-shadow:0 0 75px rgba(118, 93, 255, 0.45);
   will-change: transform;
   animation:p 4s ease-in-out infinite
 }
 
+/* Фикс анимации для GitHub: убрали скачки opacity, оставили только scale */
 @keyframes p{
   0% {
     transform: rotate(0deg) scale(1.0);
-    opacity: 1;
   }
   50%{
     transform: rotate(180deg) scale(1.08);
-    opacity: .5;
   }
   100% {
     transform: rotate(360deg) scale(1.0);
-    opacity: 1;
   }
 }
 
@@ -165,32 +166,32 @@ body{
   height: 20px;
 }
 
+/* Фикс фонового свечения: сделали подложку плотнее, чтобы компенсировать сжатие цвета в GMod */
 body:after{
   content:"";
   position:fixed;
   inset:0;
   pointer-events:none;
-  background:radial-gradient(circle at 50% 42%,#8a75ff0a,transparent 42%);
+  background:radial-gradient(circle at 50% 42%, rgba(138, 117, 255, 0.08), transparent 45%);
   animation:deepVoid 4s ease-in-out infinite alternate
 }
 
 @keyframes deepVoid{
   to{
-    opacity:.7;
+    opacity:.9;
     transform:scale(1.08)
   }
 }
 
-/* Настройки водяного знака: оригинальный жирный шрифт, капс, маленький размер и сильная прозрачность */
 .watermark{
   position:fixed;
   left:22px;
   bottom:18px;
   z-index:30;
-  color:rgba(160,145,210,.18); /* Полупрозрачный цвет, чтобы не выделялся */
-  font-size:11px; /* Компактный размер */
-  font-weight:800; /* Жирный шрифт как у основного логотипа */
-  text-transform: uppercase; /* Все буквы заглавные */
+  color:rgba(160,145,210,.18);
+  font-size:11px;
+  font-weight:800;
+  text-transform: uppercase;
   letter-spacing:1px;
   text-shadow:0 0 12px rgba(118,93,255,.04);
   pointer-events:none;
