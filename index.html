@@ -17,7 +17,6 @@ body{
   font:14px Arial
 }
 
-/* Оптимизированный центральный круг с поддержкой GPU-ускорения */
 .void{
   position:absolute;
   left:50%;
@@ -27,11 +26,10 @@ body{
   height:330px;
   border-radius:50%;
   background:#000;
-  box-shadow:0 0 0 1px #7656ff44, 0 0 100px #5d3dff22;
+  box-shadow:0 0 0 1px #7656ff44,0 0 100px #5d3dff22;
   will-change: transform;
 }
 
-/* Первое анимированное внешнее кольцо */
 .void:before{
   content:"";
   position:absolute;
@@ -40,10 +38,9 @@ body{
   border-radius:50%;
   box-shadow:0 0 70px #765dff18;
   will-change: transform;
-  animation: voidHalo 12s linear infinite;
+  animation:voidHalo 7s linear infinite
 }
 
-/* Второе анимированное кольцо (пульсирующее и вращающееся) */
 .void:after{
   content:"";
   position:absolute;
@@ -52,22 +49,21 @@ body{
   border-radius:50%;
   box-shadow:0 0 60px #765dff33;
   will-change: transform;
-  animation: p 6s ease-in-out infinite;
+  animation:p 4s ease-in-out infinite
 }
 
-/* Исправленные плавные анимации через трансформации без использования тяжелого inset */
 @keyframes p{
   0% {
     transform: rotate(0deg) scale(1.0);
-    opacity: .4;
+    opacity: 1;
   }
   50%{
-    transform: rotate(180deg) scale(1.06);
-    opacity: .7;
+    transform: rotate(180deg) scale(1.08);
+    opacity: .5;
   }
   100% {
     transform: rotate(360deg) scale(1.0);
-    opacity: .4;
+    opacity: 1;
   }
 }
 
@@ -76,9 +72,9 @@ body{
     transform: rotate(0deg) scale(1.0);
   }
   50% {
-    transform: rotate(180deg) scale(1.03);
+    transform: rotate(180deg) scale(1.04);
   }
-  to{
+  to {
     transform: rotate(360deg) scale(1.0);
   }
 }
@@ -102,6 +98,7 @@ body{
   font-size:52px;
   font-weight:800;
   margin:9px;
+  color: #fff;
   animation:voidText 4s ease-in-out infinite
 }
 
@@ -130,7 +127,8 @@ body{
 
 .stats b{
   display:block;
-  margin-top:6px
+  margin-top:6px;
+  color: #fff;
 }
 
 .head{
@@ -179,20 +177,22 @@ body:after{
 @keyframes deepVoid{
   to{
     opacity:.7;
-    transform:scale(1.04)
+    transform:scale(1.08)
   }
 }
 
+/* Настройки водяного знака: оригинальный жирный шрифт, капс, маленький размер и сильная прозрачность */
 .watermark{
   position:fixed;
   left:22px;
   bottom:18px;
   z-index:30;
-  color:rgba(160,145,210,.28);
-  font-size:11px;
-  font-weight:700;
-  letter-spacing:2.5px;
-  text-shadow:0 0 12px rgba(118,93,255,.08);
+  color:rgba(160,145,210,.18); /* Полупрозрачный цвет, чтобы не выделялся */
+  font-size:11px; /* Компактный размер */
+  font-weight:800; /* Жирный шрифт как у основного логотипа */
+  text-transform: uppercase; /* Все буквы заглавные */
+  letter-spacing:1px;
+  text-shadow:0 0 12px rgba(118,93,255,.04);
   pointer-events:none;
   user-select:none
 }
@@ -202,11 +202,10 @@ body:after{
 <body>
 
 <div class="void"></div>
-<div class="watermark">PixelSandbox</div>
+<div class="watermark">pixelsandbox.ua</div>
 
 <main class="panel">
   <div class="tag"></div>
-  <!-- Название изначально зафиксировано -->
   <div class="title" id="server">PIXELSANDBOX</div>
   <div class="sub">A new world is forming.</div>
 
@@ -283,7 +282,6 @@ function GameDetails(
   S.map=mapname||"Unknown";
   S.mode=gamemode||"Sandbox";
 
-  // СТРОКА СБРОШЕНА: Удалено динамическое присвоение имени, заголовок всегда будет "PIXELSANDBOX"
   set("map",S.map);
   set("mode",S.mode);
 
@@ -339,7 +337,6 @@ setTimeout(()=>{
 </script>
 
 <script>
-// Скрипт фоновых частиц (Canvas эффект мелкого космического мусора)
 (()=> {
   const c=document.createElement("canvas");
   c.style.cssText="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:19;opacity:.8";
@@ -384,7 +381,6 @@ setTimeout(()=>{
 </script>
 
 <script>
-// Скрипт автоматической ротации полезных советов для игроков
 (()=> {
   const tips=[
     "💡 Advanced Duplicator позволяет сохранять и загружать большие постройки.",
