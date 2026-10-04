@@ -26,42 +26,41 @@ body{
   height:330px;
   border-radius:50%;
   background:#000;
-  /* Сделали тени диска плотнее и ярче, чтобы они не блекли при сетевой загрузке */
-  box-shadow:0 0 0 1px rgba(118, 86, 255, 0.4), 0 0 100px rgba(93, 61, 255, 0.3);
+  /* Мощное, мягкое внешнее неоновое свечение, которое не темнеет в GMod */
+  box-shadow: 0 0 40px #5d3dff, 0 0 140px #765dff;
   will-change: transform;
 }
 
-/* Первое кольцо: увеличили базовую видимость границ */
+/* Первое кольцо: сделали линию светлой и добавили ей объемный неоновый бэкграунд */
 .void:before{
   content:"";
   position:absolute;
   inset:-58px;
-  border:1px solid rgba(138, 117, 255, 0.25);
+  border:2px solid #8a75ff; 
   border-radius:50%;
-  box-shadow:0 0 70px rgba(118, 93, 255, 0.2);
+  box-shadow: 0 0 30px #765dff, inset 0 0 20px #5d3dff;
   will-change: transform;
   animation:voidHalo 7s linear infinite
 }
 
-/* Второе кольцо: сделали неоновую тень существенно ярче */
+/* Второе кольцо: увеличили толщину и яркость свечения */
 .void:after{
   content:"";
   position:absolute;
   inset:-40px;
-  border:1px solid rgba(111, 92, 255, 0.35);
+  border:3px solid #765dff;
   border-radius:50%;
-  box-shadow:0 0 75px rgba(118, 93, 255, 0.45);
+  box-shadow: 0 0 40px #765dff, inset 0 0 30px #5d3dff;
   will-change: transform;
   animation:p 4s ease-in-out infinite
 }
 
-/* Фикс анимации для GitHub: убрали скачки opacity, оставили только scale */
 @keyframes p{
   0% {
     transform: rotate(0deg) scale(1.0);
   }
   50%{
-    transform: rotate(180deg) scale(1.08);
+    transform: rotate(180deg) scale(1.06);
   }
   100% {
     transform: rotate(360deg) scale(1.0);
@@ -73,7 +72,7 @@ body{
     transform: rotate(0deg) scale(1.0);
   }
   50% {
-    transform: rotate(180deg) scale(1.04);
+    transform: rotate(180deg) scale(1.03);
   }
   to {
     transform: rotate(360deg) scale(1.0);
@@ -166,20 +165,25 @@ body{
   height: 20px;
 }
 
-/* Фикс фонового свечения: сделали подложку плотнее, чтобы компенсировать сжатие цвета в GMod */
+/* Усилили яркость фонового сине-фиолетового градиента */
 body:after{
   content:"";
   position:fixed;
   inset:0;
   pointer-events:none;
-  background:radial-gradient(circle at 50% 42%, rgba(138, 117, 255, 0.08), transparent 45%);
+  background:radial-gradient(circle at 50% 42%, #5d3dff 0%, #765dff 15%, transparent 50%);
+  mix-blend-mode: screen;
   animation:deepVoid 4s ease-in-out infinite alternate
 }
 
 @keyframes deepVoid{
+  from {
+    opacity: .12;
+    transform: scale(1.0);
+  }
   to{
-    opacity:.9;
-    transform:scale(1.08)
+    opacity: .25;
+    transform: scale(1.06);
   }
 }
 
