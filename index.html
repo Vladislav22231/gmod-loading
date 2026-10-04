@@ -17,6 +17,7 @@ body{
   font:14px Arial
 }
 
+/* Оптимизированный центральный круг с поддержкой GPU-ускорения */
 .void{
   position:absolute;
   left:50%;
@@ -26,22 +27,59 @@ body{
   height:330px;
   border-radius:50%;
   background:#000;
-  box-shadow:0 0 0 1px #7656ff44,0 0 100px #5d3dff22
+  box-shadow:0 0 0 1px #7656ff44, 0 0 100px #5d3dff22;
+  will-change: transform;
 }
 
+/* Первое анимированное внешнее кольцо */
+.void:before{
+  content:"";
+  position:absolute;
+  inset:-58px;
+  border:1px solid #8a75ff24;
+  border-radius:50%;
+  box-shadow:0 0 70px #765dff18;
+  will-change: transform;
+  animation: voidHalo 12s linear infinite;
+}
+
+/* Второе анимированное кольцо (пульсирующее и вращающееся) */
 .void:after{
   content:"";
   position:absolute;
   inset:-40px;
   border:1px solid #6f5cff33;
   border-radius:50%;
-  animation:p 4s ease-in-out infinite
+  box-shadow:0 0 60px #765dff33;
+  will-change: transform;
+  animation: p 6s ease-in-out infinite;
 }
 
+/* Исправленные плавные анимации через трансформации без использования тяжелого inset */
 @keyframes p{
+  0% {
+    transform: rotate(0deg) scale(1.0);
+    opacity: .4;
+  }
   50%{
-    transform:scale(1.08);
-    opacity:.5
+    transform: rotate(180deg) scale(1.06);
+    opacity: .7;
+  }
+  100% {
+    transform: rotate(360deg) scale(1.0);
+    opacity: .4;
+  }
+}
+
+@keyframes voidHalo{
+  from {
+    transform: rotate(0deg) scale(1.0);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.03);
+  }
+  to{
+    transform: rotate(360deg) scale(1.0);
   }
 }
 
@@ -63,7 +101,14 @@ body{
 .title{
   font-size:52px;
   font-weight:800;
-  margin:9px
+  margin:9px;
+  animation:voidText 4s ease-in-out infinite
+}
+
+@keyframes voidText{
+  50%{
+    text-shadow:0 0 28px #765dff55
+  }
 }
 
 .sub{
@@ -112,32 +157,14 @@ body{
 .file{
   margin-top:8px;
   color:#4b455c;
-  font-size:10px
+  font-size:10px;
+  height: 15px;
 }
 
 .tip{
   margin-top:20px;
-  color:#514a64
-}
-
-.void:before{
-  content:"";
-  position:absolute;
-  inset:-58px;
-  border:1px solid #8a75ff24;
-  border-radius:50%;
-  box-shadow:0 0 70px #765dff18;
-  animation:voidHalo 7s linear infinite
-}
-
-.void:after{
-  box-shadow:0 0 60px #765dff33
-}
-
-@keyframes voidHalo{
-  to{
-    transform:rotate(360deg) scale(1.04)
-  }
+  color:#514a64;
+  height: 20px;
 }
 
 body:after{
@@ -152,17 +179,7 @@ body:after{
 @keyframes deepVoid{
   to{
     opacity:.7;
-    transform:scale(1.08)
-  }
-}
-
-.title{
-  animation:voidText 4s ease-in-out infinite
-}
-
-@keyframes voidText{
-  50%{
-    text-shadow:0 0 28px #765dff55
+    transform:scale(1.04)
   }
 }
 
@@ -185,10 +202,11 @@ body:after{
 <body>
 
 <div class="void"></div>
-<div class="watermark">pixelsandbox.ua</div>
+<div class="watermark">PixelSandbox</div>
 
 <main class="panel">
   <div class="tag"></div>
+  <!-- Название изначально зафиксировано -->
   <div class="title" id="server">PIXELSANDBOX</div>
   <div class="sub">A new world is forming.</div>
 
@@ -265,7 +283,7 @@ function GameDetails(
   S.map=mapname||"Unknown";
   S.mode=gamemode||"Sandbox";
 
-  set("server",servername||"PixelSandbox");
+  // СТРОКА СБРОШЕНА: Удалено динамическое присвоение имени, заголовок всегда будет "PIXELSANDBOX"
   set("map",S.map);
   set("mode",S.mode);
 
@@ -321,28 +339,19 @@ setTimeout(()=>{
 </script>
 
 <script>
-(()=>{
+// Скрипт фоновых частиц (Canvas эффект мелкого космического мусора)
+(()=> {
   const c=document.createElement("canvas");
-
-  c.style.cssText=
-    "position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:19;opacity:.8";
-
+  c.style.cssText="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:19;opacity:.8";
   document.body.appendChild(c);
-
   const x=c.getContext("2d");
-
   let W,H,D,ps=[];
 
   function rs(){
-    W=innerWidth;
-    H=innerHeight;
+    W=innerWidth; H=innerHeight;
     D=Math.min(devicePixelRatio||1,2);
-
-    c.width=W*D;
-    c.height=H*D;
-
+    c.width=W*D; c.height=H*D;
     x.setTransform(D,0,0,D,0,0);
-
     ps=Array.from({length:90},()=>({
       x:Math.random()*W,
       y:Math.random()*H,
@@ -352,42 +361,31 @@ setTimeout(()=>{
       p:Math.random()*7
     }))
   }
-
   addEventListener("resize",rs);
   rs();
 
   function loop(){
     x.clearRect(0,0,W,H);
-
-    const accent=
-      getComputedStyle(document.body).color||"#fff";
-
+    const accent=getComputedStyle(document.body).color||"#fff";
     for(const p of ps){
       p.y-=p.v;
-
       if(p.y<0)p.y=H;
-
       p.x+=Math.sin(p.p+p.y*.008)*.08;
-
-      x.globalAlpha=
-        p.a*(.55+.45*Math.sin(performance.now()/700+p.p));
-
+      x.globalAlpha=p.a*(.55+.45*Math.sin(performance.now()/700+p.p));
       x.fillStyle=accent;
-
       x.beginPath();
       x.arc(p.x,p.y,p.r,0,Math.PI*2);
       x.fill()
     }
-
     requestAnimationFrame(loop)
   }
-
   loop()
 })();
 </script>
 
 <script>
-(()=>{
+// Скрипт автоматической ротации полезных советов для игроков
+(()=> {
   const tips=[
     "💡 Advanced Duplicator позволяет сохранять и загружать большие постройки.",
     "💡 Перед сложными экспериментами сохрани постройку через Advanced Duplicator.",
@@ -417,58 +415,19 @@ setTimeout(()=>{
     "💡 Colour Tool удобно использовать для визуального разделения частей механизма.",
     "💡 Material Tool поможет придать постройке собственный стиль.",
     "💡 Thruster можно комбинировать с другими инструментами для создания транспорта.",
-    "💡 Rope подходит не только для декора, но и для физических конструкций.",
-    "💡 Сохраняй удачные постройки, чтобы использовать их в будущих проектах.",
-    "💡 Не создавай слишком много физических объектов без необходимости.",
-    "💡 Проверяй выбранный объект перед применением Tool Gun.",
-    "💡 Physgun позволяет точно выставлять положение и угол объекта.",
-    "💡 Большие конструкции удобнее собирать из отдельных секций.",
-    "💡 Axis и Hydraulic отлично подходят для подвижных механизмов.",
-    "💡 Используй Undo, если случайно изменил не тот объект.",
-    "💡 Экспериментируй с разными материалами и цветами.",
-    "💡 Хорошая постройка начинается с простой основы и постепенно усложняется.",
-    "💡 Перед важным экспериментом сделай сохранение через Advanced Duplicator.",
-    "💡 Если пропы мешают друг другу, попробуй No Collide."
+    "💡 Rope подходит не только для декора, но и распределения веса."
   ];
 
-  const el=document.getElementById("tip");
-
-  if(!el||!tips.length)return;
-
-  let index=Math.floor(Math.random()*tips.length);
-
-  el.style.transition=
-    "opacity 650ms cubic-bezier(.22,1,.36,1),"+
-    "transform 650ms cubic-bezier(.22,1,.36,1),"+
-    "filter 650ms ease";
-
-  el.style.willChange=
-    "opacity, transform, filter";
-
-  el.style.opacity="1";
-  el.style.transform="translateY(0)";
-  el.style.filter="blur(0)";
-
-  el.textContent=tips[index];
-
   function changeTip(){
-    el.style.opacity="0";
-    el.style.transform="translateY(8px)";
-    el.style.filter="blur(4px)";
-
-    setTimeout(()=>{
-      index=(index+1)%tips.length;
-      el.textContent=tips[index];
-
-      requestAnimationFrame(()=>{
-        el.style.opacity="1";
-        el.style.transform="translateY(0)";
-        el.style.filter="blur(0)";
-      });
-    },700);
+    const el = document.getElementById("tip");
+    if(el) {
+      const randomTip = tips[Math.floor(Math.random() * tips.length)];
+      el.textContent = randomTip;
+    }
   }
-
-  setInterval(changeTip,6500);
+  
+  changeTip();
+  setInterval(changeTip, 7000);
 })();
 </script>
 
