@@ -11,7 +11,65 @@
 body:after{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 42%,#5de5ff08,transparent 35%);animation:portalAtmosphere 3s ease-in-out infinite alternate}
 @keyframes portalAtmosphere{to{opacity:.75;transform:scale(1.08)}}
 
-</style></head><body><div class="space"></div><div class="portal"></div><main class="panel"><div class="title" id="server">PixelSandbox</div><div class="sub">Entering sandbox dimension...</div><div class="meta"><div><span>MAP</span><b id="map">Loading...</b></div><div><span>PLAYERS</span><b><span id="players">—</span>/<span id="maxplayers">—</span></b></div><div><span>MODE</span><b id="mode">Sandbox</b></div></div><div class="head"><span id="status">Opening portal</span><b id="percent">0%</b></div><div class="track"><div class="bar" id="progress"></div></div><div class="file" id="file"></div><div class="tip" id="tip"></div></main>
+
+/* PixelSandbox — larger layout + subtle domain signature */
+.portal {
+  width: 310px;
+  height: 310px;
+}
+.portal:before { inset: 34px; }
+.portal:after {
+  font-size: 58px;
+  letter-spacing: 5px;
+}
+.panel {
+  top: 73%;
+  width: min(900px, 88vw);
+}
+.title { font-size: 42px; }
+.sub { font-size: 16px; margin-top: 9px; }
+.meta { gap: 72px; margin: 28px; }
+.meta span { font-size: 10px; }
+.meta b { font-size: 15px; margin-top: 7px; }
+.head { font-size: 12px; margin-bottom: 9px; }
+.track { height: 5px; }
+.file { font-size: 11px; margin-top: 11px; }
+.tip { font-size: 12px; margin-top: 21px; }
+.domain-signature {
+  position: fixed;
+  left: 24px;
+  bottom: 18px;
+  z-index: 30;
+  color: rgba(157, 170, 198, .38);
+  font: 11px/1 Arial, sans-serif;
+  letter-spacing: 1.1px;
+  pointer-events: none;
+  user-select: none;
+  transition: color .3s ease;
+}
+.domain-signature:hover { color: rgba(157, 170, 198, .55); }
+@media (max-height: 760px) {
+  .portal { width: 260px; height: 260px; }
+  .portal:before { inset: 28px; }
+  .portal:after { font-size: 48px; }
+  .panel { top: 74%; }
+  .title { font-size: 36px; }
+  .meta { margin: 18px; gap: 54px; }
+  .tip { margin-top: 13px; }
+}
+@media (max-width: 600px) {
+  .portal { width: 230px; height: 230px; }
+  .portal:before { inset: 25px; }
+  .portal:after { font-size: 42px; }
+  .panel { top: 70%; width: 92vw; }
+  .title { font-size: 30px; }
+  .meta { gap: 22px; margin: 18px 4px; }
+  .meta b { font-size: 12px; }
+  .tip { white-space: normal; line-height: 1.5; }
+  .domain-signature { left: 14px; bottom: 12px; font-size: 10px; }
+}
+
+</style></head><body><div class="space"></div><div class="portal"></div><div class="domain-signature">pixelsandbox.ua</div><main class="panel"><div class="title" id="server">PixelSandbox</div><div class="sub">Entering sandbox dimension...</div><div class="meta"><div><span>MAP</span><b id="map">Loading...</b></div><div><span>PLAYERS</span><b><span id="players">—</span>/<span id="maxplayers">—</span></b></div><div><span>MODE</span><b id="mode">Sandbox</b></div></div><div class="head"><span id="status">Opening portal</span><b id="percent">0%</b></div><div class="track"><div class="bar" id="progress"></div></div><div class="file" id="file"></div><div class="tip" id="tip"></div></main>
 <script>
 /* PixelSandbox — GMod loading callbacks */
 let state = {
