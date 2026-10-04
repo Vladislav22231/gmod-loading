@@ -1,7 +1,7 @@
 <?php
 // Реальный онлайн GMod-сервера через Source Query (A2S_INFO).
 // Положи рядом с HTML и впиши IP и порт СВОЕГО игрового сервера.
-const SERVER_IP   = '127.0.0.1';
+const SERVER_IP   = '192.168.0.2';
 const SERVER_PORT = 27015;
 const CACHE_SEC   = 5;
 
