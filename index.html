@@ -5,7 +5,7 @@
 <title>PixelSandbox — загрузка</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html{font-size:clamp(8px,.68vw,15px)}
+html{font-size:clamp(7px,.65vw,15px)}
 html,body{width:100%;height:100%;overflow:hidden;background:#08090c;color:#f2f1ec;font-family:'Segoe UI',Arial,sans-serif}
 :root{--o:#19e6a8;--p:rgba(14,15,19,.9);--b:rgba(255,255,255,.08);--g:#9a9aa3}
 
@@ -21,15 +21,16 @@ html,body{width:100%;height:100%;overflow:hidden;background:#08090c;color:#f2f1e
 @keyframes mv{to{background-position:0 4rem}}
 .scan{position:fixed;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.18) 0 1px,transparent 1px 3px);pointer-events:none}
 
-.wrap{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:54rem;display:flex;flex-direction:column;gap:1.6rem}
-.top{text-align:left}
+.wrap{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:100rem;display:flex;flex-direction:column;gap:1.6rem}
+.top{display:flex;justify-content:space-between;align-items:flex-end}
 .logo{font-weight:800;text-transform:uppercase;font-size:4.2rem;line-height:1;letter-spacing:.04em;margin-top:.5rem;color:#f2f1ec}
 .logo span{display:inline-block;color:var(--o);animation:breathe 3.2s ease-in-out infinite}
 @keyframes breathe{0%,100%{opacity:.85;text-shadow:0 0 .4rem rgba(25,230,168,.35),0 0 1.2rem rgba(25,230,168,.2)}50%{opacity:1;text-shadow:0 0 .8rem rgba(25,230,168,.85),0 0 2.6rem rgba(25,230,168,.55),0 0 4.5rem rgba(25,230,168,.25)}}
 
-.card{position:relative;background:rgba(5,6,8,.9);border:1px solid rgba(255,255,255,.05);border-left:3px solid rgba(25,230,168,.8);padding:1.2rem 1.4rem 1.1rem;backdrop-filter:blur(14px);box-shadow:0 0 2rem rgba(0,0,0,.6);transition:box-shadow .6s,border-color .6s}
-.card.done{box-shadow:0 0 2.2rem rgba(25,230,168,.25);border-left-color:#19e6a8}
-.info{display:grid;grid-template-columns:1.7fr .9fr .9fr 1.2fr;gap:0;margin-bottom:1.5rem;border:1px solid var(--b);background:rgba(0,0,0,.35)}
+.unit{display:flex;align-items:stretch;background:rgba(5,6,8,.9);border:1px solid rgba(255,255,255,.05);border-top:2px solid var(--o);backdrop-filter:blur(14px);box-shadow:0 0 2rem rgba(0,0,0,.6);transition:box-shadow .6s,border-color .6s}
+.card{position:relative;flex:1;min-width:0;padding:1.2rem 1.4rem 1.1rem}
+.unit.done{box-shadow:0 0 2.2rem rgba(25,230,168,.25);border-top-color:#8bffd9}
+.info{display:grid;grid-template-columns:1.5fr 1fr;gap:0;margin-bottom:0;border:1px solid var(--b);background:rgba(0,0,0,.35)}
 .info>div{padding:.8rem 1rem;border-right:1px solid var(--b)}.info>div:last-child{border-right:0}
 .info h3{font:.68rem Consolas,monospace;letter-spacing:.2em;text-transform:uppercase;color:var(--g);margin-bottom:.35rem}
 .info b{font-size:1.1rem;font-weight:700;overflow-wrap:anywhere;color:#f2f1ec}
@@ -46,10 +47,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:#08090c;color:#f2f1e
 @keyframes sh{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
 #file{font:.72rem Consolas,monospace;color:#6a6a73;margin-top:.7rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:1em}
 
-.tip{display:flex;gap:.8rem;align-items:center;font-size:1rem;color:#c9c9ce;min-height:2.6rem;transition:opacity .4s}
+.tip{justify-content:center;display:flex;gap:.8rem;align-items:center;font-size:1rem;color:#c9c9ce;min-height:2.6rem;transition:opacity .4s}
 .tip i{font:700 .75rem Consolas,monospace;font-style:normal;padding:.25rem .55rem;border:1px solid var(--o);color:var(--o);letter-spacing:.12em;white-space:nowrap}
 
-.foot{position:fixed;left:5%;bottom:3%;font:.65rem Consolas,monospace;letter-spacing:.14em;color:#2b2d34}
+#dbg{position:fixed;right:14px;bottom:10px;font:.65rem Consolas,monospace;letter-spacing:.14em;color:#ffb020;display:none}
+.foot{position:fixed;left:14px;bottom:10px;font:.65rem Consolas,monospace;letter-spacing:.14em;color:#4a4d57}
 /* лог загрузки в углу + частицы */
 #parts{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;opacity:.7}
 #logwrap{display:flex;justify-content:center;margin-top:.6rem}
@@ -62,6 +64,63 @@ html,body{width:100%;height:100%;overflow:hidden;background:#08090c;color:#f2f1e
 #ready{position:fixed;inset:0;pointer-events:none;background:radial-gradient(40rem 25rem at 50% 50%,rgba(25,230,168,.12),transparent 70%);opacity:0;transition:opacity .8s}
 #ready.on{opacity:1}
 #logo{display:block;pointer-events:none}
+
+/* блок «Информация» в центральной карточке */
+.about{border:1px solid var(--b);border-top:0;background:rgba(0,0,0,.35);margin-bottom:1.5rem}
+.about-h{display:flex;justify-content:space-between;align-items:center;padding:.65rem 1rem;border-bottom:1px solid var(--b);background:rgba(0,0,0,.25)}
+.about-h h3,.about-g h3{font:.68rem Consolas,monospace;letter-spacing:.2em;text-transform:uppercase;color:var(--g)}
+.about-g{display:grid;grid-template-columns:.8fr .9fr 1.2fr 1.2fr 1.1fr}
+.about-g>div{padding:.7rem 1rem;border-right:1px solid var(--b)}.about-g>div:last-child{border-right:0}
+.about-g h3{margin-bottom:.3rem}
+.about-g b{font-size:.85rem;font-weight:600;line-height:1.35;color:#f2f1ec;display:block}
+
+/* угловые метки на рамке окна */
+.unit{position:relative}
+.unit:before{content:"";position:absolute;inset:-.55rem;pointer-events:none;opacity:.85;background:
+ linear-gradient(var(--o),var(--o)) top left/1.3rem 2px no-repeat,
+ linear-gradient(var(--o),var(--o)) top left/2px 1.3rem no-repeat,
+ linear-gradient(var(--o),var(--o)) top right/1.3rem 2px no-repeat,
+ linear-gradient(var(--o),var(--o)) top right/2px 1.3rem no-repeat,
+ linear-gradient(var(--o),var(--o)) bottom left/1.3rem 2px no-repeat,
+ linear-gradient(var(--o),var(--o)) bottom left/2px 1.3rem no-repeat,
+ linear-gradient(var(--o),var(--o)) bottom right/1.3rem 2px no-repeat,
+ linear-gradient(var(--o),var(--o)) bottom right/2px 1.3rem no-repeat}
+/* статус сервера, часы и таймер */
+.stat{text-align:right;font:.72rem/1.8 Consolas,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--g);padding-bottom:.3rem}
+.srv{display:flex;justify-content:flex-end;align-items:center;gap:.55rem;color:#c9c9ce}
+.srv i{width:.5rem;height:.5rem;background:#6a6a73}
+.srv.on i{background:var(--o);box-shadow:0 0 .6rem var(--o);animation:bl 1.6s ease-in-out infinite}
+.srv.on span{color:var(--o)}
+.srv.off i{background:#ff5470;box-shadow:0 0 .6rem #ff5470}
+.srv.off span{color:#ff5470}
+.srv.tech i{background:#ffb020;box-shadow:0 0 .6rem #ffb020;animation:bl 1.2s ease-in-out infinite}
+.srv.tech span{color:#ffb020}
+.srv.idle i{background:#6a6a73}
+.clk b{color:#f2f1ec;font-weight:700;font-size:.95rem;margin-right:.8rem;letter-spacing:.1em}
+
+/* боковые панели: О нас и Правила — части единого окна */
+.side{width:23rem;flex:none;display:flex;flex-direction:column;background:rgba(0,0,0,.28)}
+#sideL{border-right:1px solid var(--b)}
+#sideR{border-left:1px solid var(--b)}
+.side header{display:flex;align-items:baseline;justify-content:space-between;padding:1rem 1.3rem .85rem;border-bottom:1px solid var(--b)}
+.side header h2{font:700 1.05rem 'Segoe UI',Arial,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#f2f1ec}
+.side header span{font:.62rem Consolas,monospace;letter-spacing:.2em;color:var(--o)}
+.side .body{padding:1.1rem 1.3rem 1.2rem;flex:1}
+.side .lead{font-size:.92rem;line-height:1.6;color:#d6d6da;margin-bottom:1.1rem}
+.side .lead b{color:var(--o);font-weight:700}
+.side .note{font-size:.82rem;line-height:1.55;color:#a9a9b0;padding-left:.8rem;border-left:2px solid rgba(25,230,168,.5)}
+.side .note b{color:var(--o);font-weight:700}
+.rules{list-style:none;counter-reset:r}
+.rules li{counter-increment:r;position:relative;padding:.7rem 0 .7rem 2.3rem;border-bottom:1px solid var(--b)}
+.rules li:first-child{padding-top:.1rem}
+.rules li:last-child{border-bottom:0;padding-bottom:.1rem}
+.rules li:before{content:counter(r,decimal-leading-zero);position:absolute;left:0;top:.78rem;font:700 .8rem Consolas,monospace;color:var(--o)}
+.rules li:first-child:before{top:.18rem}
+.rules b{display:block;font-size:.9rem;font-weight:700;color:#f2f1ec;margin-bottom:.15rem}
+.rules span{display:block;font-size:.8rem;line-height:1.45;color:#a9a9b0}
+.side footer{padding:.7rem 1.3rem;border-top:1px solid var(--b);background:rgba(0,0,0,.25);font:.66rem Consolas,monospace;letter-spacing:.1em;color:#6a6a73}
+.side footer b{color:var(--o);font-weight:400}
+@media (max-width:1100px){.side{display:none}.wrap{width:54rem}}
 </style>
 </head>
 <body>
@@ -72,18 +131,57 @@ html,body{width:100%;height:100%;overflow:hidden;background:#08090c;color:#f2f1e
 <div class="wrap">
   <div class="top">
     <canvas id="logo"></canvas>
+    <div class="stat">
+      <div class="srv" id="srv"><i></i><span id="srvt">Проверка…</span></div>
+      <div class="clk"><b id="clk">--:--</b><span id="cd"></span></div>
+    </div>
+  </div>
+
+  <div class="unit">
+  <div class="side" id="sideL">
+    <header><h2>О нас</h2><span>// INFO</span></header>
+    <div class="body">
+      <p class="lead"><b>PixelSandbox</b> — сервер Garry's Mod в режиме Sandbox для творчества и совместной игры. Строй, экспериментируй и объединяйся с другими игроками.</p>
+      <p class="lead">Плановые рестарты проходят с предупреждением в чате за 5 и за 1 минуту — заранее сохраняй постройки через Advanced Duplicator.</p>
+      <p class="note">Привяжи аккаунт командой <b>!link код</b> и получи роль «Проверенный» в нашем Discord.</p>
+    </div>
+    <footer>Ссылки: <b>F4 → Команды и ссылки</b></footer>
   </div>
 
   <div class="card">
     <div class="info">
       <div><h3>Карта</h3><b id="map">—</b></div>
       <div><h3>Игроки</h3><b id="pl">— / —</b></div>
-      <div><h3>Режим</h3><b id="mode">sandbox</b></div>
-      <div><h3>Сервер</h3><b id="sname">PixelSandbox</b></div>
+    </div>
+    <div class="about">
+      <div class="about-h"><h3>Информация</h3></div>
+      <div class="about-g">
+        <div><h3>Режим</h3><b id="mode">Sandbox</b></div>
+        <div><h3>Слоты</h3><b>до 20 игроков</b></div>
+        <div><h3>График</h3><b>ежедневно, 8:00 – 00:00</b></div>
+        <div><h3>Контент</h3><b>Workshop, автоподкачка</b></div>
+        <div><h3>Связь</h3><b>Discord-сообщество</b></div>
+      </div>
     </div>
     <div class="bar-head"><span id="status">Подключение</span><span id="pct">0%</span></div>
     <div class="bar"><div id="fill"></div></div>
     <div id="file"></div>
+  </div>
+
+  <div class="side" id="sideR">
+    <header><h2>Правила</h2><span>// RULES</span></header>
+    <div class="body">
+      <ol class="rules">
+        <li><b>Запрет PropPush</b><span>Нельзя толкать, блокировать и выталкивать игроков чужими пропами.</span></li>
+        <li><b>Читы и эксплойты</b><span>Стороннее ПО и использование багов ради преимущества караются баном.</span></li>
+        <li><b>Нагрузка на сервер</b><span>Краш-пушки, массовые дубликаты и спам взрывчаткой запрещены.</span></li>
+        <li><b>Чужие постройки</b><span>Не блокируйте проходы и базы других игроков.</span></li>
+        <li><b>Общение</b><span>Оскорбления, угрозы и нецензурная лексика в чате — бан.</span></li>
+        <li><b>Реклама</b><span>Любая реклама без согласования с администрацией запрещена.</span></li>
+      </ol>
+    </div>
+    <footer>Жалобы: <b>F4 → Жалобы</b> · Все правила: <b>!rules</b></footer>
+  </div>
   </div>
 
   <div class="tip" id="tipbox"><i id="tipcat">СОВЕТ</i><span id="tip"></span></div>
@@ -92,6 +190,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#08090c;color:#f2f1e
 
 <div id="ready"></div><canvas id="parts"></canvas>
 <div class="foot">PIXELSANDBOX.UA</div>
+<div id="dbg"></div>
 
 <script>
 /* фоновая музыка: громкость 0.5, loop, повтор автозапуска + старт по первому клику/клавише */
@@ -107,11 +206,46 @@ x.globalAlpha=p.a*(.5+.5*Math.sin(t+p.p));x.fillStyle="#19e6a8";x.beginPath();x.
 /* реальный онлайн: бот отдаёт /online (укажи адрес бота, порт = API_PORT из .env) */
 var ONLINE_URL='http://178.150.168.239:3000/online',maxP='—';
 function showOnline(n){$('pl').textContent=n+' / '+maxP}
+var srvOn=null,srvMs=null,isOpen=true;
+function setSrv(on,ms){srvOn=on;srvMs=on?ms:null;renderSrv()}
+function renderSrv(){
+  var e=$('srv'),t=$('srvt'),ms=srvMs!=null?' · '+srvMs+' ms':'',c='srv',txt;
+  if(srvOn===null){txt='Проверка…'}
+  else if(srvOn&&isOpen){c+=' on';txt='Сервер онлайн'+ms}
+  else if(srvOn){c+=' tech';txt='Технические работы'+ms}      /* сервер работает вне графика */
+  else if(isOpen){c+=' off';txt='Сервер офлайн'}
+  else{c+=' idle';txt='Сервер закрыт'}                         /* офлайн вне графика — это норма */
+  e.className=c;t.textContent=txt;
+}
+var pollFails=0;
+function pollFail(){pollFails++;if(pollFails>=2)setSrv(false)}   /* офлайн только после 2 неудач подряд — без мигания */
 function pollOnline(){
-  if(!ONLINE_URL)return;
-  try{var x=new XMLHttpRequest();x.open('GET',ONLINE_URL+'?t='+Date.now(),true);x.timeout=4000;
-    x.onload=function(){try{var d=JSON.parse(x.responseText);if(d&&d.max)maxP=d.max;if(d&&d.ok)showOnline(d.players)}catch(e){}};
-    x.send()}catch(e){}
+  if(!ONLINE_URL||Q.test)return;
+  try{var x=new XMLHttpRequest(),t0=Date.now();x.open('GET',ONLINE_URL+'?t='+t0,true);x.timeout=6000;
+    x.onload=function(){try{var ms=Date.now()-t0,d=JSON.parse(x.responseText);if(d&&d.max)maxP=d.max;
+      if(d&&d.ok){pollFails=0;showOnline(d.players);setSrv(true,ms)}else pollFail()}catch(e){pollFail()}};
+    x.onerror=x.ontimeout=pollFail;
+    x.send()}catch(e){pollFail()}
+}
+/* часы (по Киеву) и таймер: до закрытия / открытия сервера.
+   RESTARTS — часы плановых рестартов по Киеву, например [4] или [4,16]; пусто = не показывать */
+var RESTARTS=[],OPEN_H=8;
+function kyivNow(){
+  if(Q.time){var tm=/^(\d{1,2}):(\d{2})$/.exec(Q.time);if(tm)return[+tm[1]%24,+tm[2],0]}
+  try{var p=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Kiev',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(new Date()).split(':');return[+p[0]%24,+p[1],+p[2]]}
+  catch(e){var d=new Date();return[d.getHours(),d.getMinutes(),d.getSeconds()]}
+}
+function p2(n){return(n<10?'0':'')+n}
+function fmtD(s){var m=Math.ceil(s/60);return p2(Math.floor(m/60))+':'+p2(m%60)}
+function tickClock(){
+  var t=kyivNow(),sec=t[0]*3600+t[1]*60+t[2],best=null,lab='';
+  function cand(at,l){var d=at-sec;if(d>0&&(best===null||d<best)){best=d;lab=l}}
+  if(sec>=OPEN_H*3600){cand(86400,'до закрытия');for(var i=0;i<RESTARTS.length;i++)cand(RESTARTS[i]*3600,'до рестарта')}
+  else cand(OPEN_H*3600,'до открытия');
+  isOpen=sec>=OPEN_H*3600;
+  $('clk').textContent=p2(t[0])+':'+p2(t[1]);
+  $('cd').textContent=(srvOn===true&&!isOpen)?'вне графика работы':(best===null?'':lab+' '+fmtD(best));
+  renderSrv();
 }
 var logLines=[];
 function addLog(t){var d=new Date(),p=function(n){return(n<10?"0":"")+n},ts=p(d.getHours())+":"+p(d.getMinutes())+":"+p(d.getSeconds());
@@ -141,13 +275,12 @@ var total=0,needed=0,pct=0,gotNeeded=false;
 function setPct(p){
   p=Math.max(pct,Math.min(100,Math.round(p)));pct=p;
   $('fill').style.width=p+'%';$('pct').textContent=p+'%';
-  if(pct>=100&&!window.__done){window.__done=1;var c=document.querySelector('.card');if(c)c.className+=' done';$('ready').className='on';$('status').textContent='Готово';addLog('ready')}
+  if(pct>=100&&!window.__done){window.__done=1;var c=document.querySelector('.unit');if(c)c.className+=' done';$('ready').className='on';$('status').textContent='Готово';addLog('ready')}
 }
 function upd(){ if(total>0&&gotNeeded) setPct(Math.min(80,(total-needed)/total*80)) }
 
 /* ---- API загрузочного экрана GMod ---- */
 function GameDetails(servername,serverurl,mapname,maxplayers,steamid,gamemode){
-  if(servername)$('sname').textContent=servername;
   if(mapname){$('map').textContent=mapname;addLog('map '+mapname)}
   if(maxplayers){maxP=maxplayers;$('pl').textContent='— / '+maxplayers}
   if(gamemode)$('mode').textContent=gamemode;
@@ -249,7 +382,27 @@ var ti=Math.floor(Math.random()*tips.length),tb=$('tipbox');
 function showTip(){var t=tips[ti],c=CATS[t[0]]||'#19e6a8',e=$('tipcat');e.textContent=t[0];e.style.color=c;e.style.borderColor=c;$('tip').textContent=t[1];ti=(ti+1)%tips.length}
 showTip();
 setInterval(function(){tb.style.opacity=0;setTimeout(function(){showTip();tb.style.opacity=1},400)},6000);
-pollOnline();setInterval(pollOnline,5000);
+/* ТЕСТ-РЕЖИМ для предпросмотра в браузере (в игре параметров нет, поэтому не влияет):
+   ?test=online | ?test=off  — принудительный статус сервера
+   &time=02:09               — подставить время по Киеву
+   &demo                     — имитация загрузки (карта, игроки, прогресс до 100%)
+   пример: loading.html?test=online&time=02:09&demo */
+var Q={};location.search.replace(/^\?/,'').split('&').forEach(function(x){var k=x.split('=');if(k[0])Q[k[0]]=decodeURIComponent(k[1]||'')});
+if(Q.test){setSrv(Q.test==='online',24)}
+if(Q.demo!==undefined){
+  maxP=20;showOnline(7);GameDetails('PixelSandbox','','gm_bigcity_improved',20,'','sandbox');
+  var ds=['Sending client info...','Client info sent!','Starting Lua...'],tk=0,iv=setInterval(function(){tk++;
+    if(tk<=80){setPct(tk);DownloadingFile('maps/gm_bigcity_improved.bsp')}
+    else{var i=Math.floor((tk-81)/8);if(i<ds.length)SetStatusChanged(ds[i]);else clearInterval(iv)}},120)
+}
+/* горячие клавиши для предпросмотра в браузере: 1–4 состояния, 0 — реальный режим */
+var TESTS={'1':['онлайн, день','online','15:30'],'2':['технические работы, ночь','online','02:09'],'3':['офлайн, день','off','15:30'],'4':['закрыт, ночь','off','03:00']};
+addEventListener('keydown',function(e){
+  if(e.ctrlKey||e.altKey||e.metaKey)return;var k=e.key,d=$('dbg');
+  if(TESTS[k]){var t=TESTS[k];Q.test=t[1];Q.time=t[2];setSrv(t[1]==='online',24);tickClock();d.style.display='block';d.textContent='ТЕСТ: '+t[0]+' ('+t[2]+')'}
+  else if(k==='0'){delete Q.test;delete Q.time;srvOn=null;srvMs=null;d.style.display='none';renderSrv();tickClock();pollOnline()}
+});
+pollOnline();setInterval(pollOnline,5000);tickClock();setInterval(tickClock,1000);
 </script>
 </body>
 </html>
