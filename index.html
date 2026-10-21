@@ -1,153 +1,141 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PixelSandbox — Synth Black</title><style>
-*{box-sizing:border-box}body{margin:0;height:100vh;overflow:hidden;background:#070708;color:#eee;font:14px Arial}.synth{position:absolute;inset:0;background:linear-gradient(120deg,#00e5ff08,#ff00cc08 50%,#7d5cff08)}.panel{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(900px,90vw);text-align:center}.title{font-size:72px;font-weight:900;letter-spacing:9px;background:linear-gradient(90deg,#5efcff,#d967ff);color:transparent;-webkit-background-clip:text;background-clip:text}@supports not ((background-clip:text) or (-webkit-background-clip:text)){.title{color:#b48cff;background:none}}.sub{color:#6d6d7c;letter-spacing:3px}.stats{display:flex;justify-content:center;gap:70px;margin:30px}.stats span{display:block;color:#666575;font-size:9px}.stats b{display:block;margin-top:6px}.head{display:flex;justify-content:space-between;color:#858395;font-size:11px}.track{height:4px;background:#1c1c22;margin-top:8px}.bar{height:100%;width:0;background:linear-gradient(90deg,#5efcff,#d967ff);transition:.2s}.file{margin-top:8px;color:#4e4e59;font-size:10px}.tip{margin-top:20px;color:#5a5967}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>PixelSandbox — загрузка</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{font-size:clamp(8px,.68vw,15px)}
+html,body{width:100%;height:100%;overflow:hidden;background:#08090c;color:#f2f1ec;font-family:'Segoe UI',Arial,sans-serif}
+:root{--o:#19e6a8;--p:rgba(14,15,19,.9);--b:rgba(255,255,255,.08);--g:#9a9aa3}
 
-/* ULTRA ADDON — original Synth Black preserved */
-body:after{content:"";position:fixed;inset:0;pointer-events:none;z-index:20;background:repeating-linear-gradient(0deg,transparent 0 3px,#ffffff05 4px,transparent 5px);mix-blend-mode:screen}
-.synth:after{content:"";position:absolute;inset:-20%;background:radial-gradient(circle at 25% 45%,#5efcff12,transparent 22%),radial-gradient(circle at 75% 55%,#d967ff12,transparent 24%);animation:synthPulse 5s ease-in-out infinite alternate}
-.panel{filter:drop-shadow(0 0 28px #5efcff12)}
-.stats .pl span{display:inline;font-size:inherit;color:inherit}.stats .pl{white-space:nowrap}
-@keyframes synthPulse{from{transform:scale(.96) rotate(-1deg);opacity:.45}to{transform:scale(1.05) rotate(1deg);opacity:1}}
-.title{animation:synthGlitch 4.5s infinite}
-@keyframes synthGlitch{0%,92%,100%{transform:none}94%{transform:translateX(2px);filter:hue-rotate(25deg)}96%{transform:translateX(-2px);filter:hue-rotate(-25deg)}}
+/* фон: сетка + неоновое свечение, как на сайте */
+.bg{position:fixed;inset:0;background:
+  radial-gradient(60rem 40rem at 50% 38%,rgba(25,230,168,.11),transparent 70%),
+  radial-gradient(40rem 30rem at 85% 90%,rgba(25,230,168,.06),transparent 70%),#08090c}
+.grid{position:fixed;inset:-50% -10% -10% -10%;background-image:
+  linear-gradient(rgba(25,230,168,.07) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(25,230,168,.07) 1px,transparent 1px);
+  background-size:4rem 4rem;transform:perspective(40rem) rotateX(62deg);transform-origin:50% 100%;
+  animation:mv 6s linear infinite;mask-image:linear-gradient(to top,#000 10%,transparent 85%);-webkit-mask-image:linear-gradient(to top,#000 10%,transparent 85%)}
+@keyframes mv{to{background-position:0 4rem}}
+.scan{position:fixed;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.18) 0 1px,transparent 1px 3px);pointer-events:none}
 
-.watermark{position:fixed;left:22px;bottom:18px;z-index:30;font-size:10px;font-weight:900;letter-spacing:normal;text-transform:uppercase;background:linear-gradient(90deg,#5efcff,#d967ff);color:transparent;background-clip:text;-webkit-background-clip:text;opacity:.25;pointer-events:none;user-select:none}</style></head><body><!-- Фоновая музыка: положи music.mp3 рядом с этим HTML на сервере, либо замени src на raw-ссылку GitHub (https://raw.githubusercontent.com/USER/REPO/BRANCH/music.mp3) --><audio id="bgm" src="music.mp3" loop autoplay preload="auto"></audio><div class="watermark">pixelsandbox.ua</div><div class="synth"></div><main class="panel"><div class="title" id="server">PIXELSANDBOX</div><div class="stats"><div><span>MAP</span><b id="map">---</b></div><div><span>PLAYERS</span><b class="pl"><span id="players">—</span> / <span id="maxplayers">—</span></b></div><div><span>MODE</span><b id="mode">SANDBOX</b></div></div><div class="head"><span id="status">Connecting</span><b id="percent">0%</b></div><div class="track"><div class="bar" id="progress"></div></div><div class="file" id="file"></div><div class="tip" id="tip"></div></main></body>
+.wrap{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:54rem;display:flex;flex-direction:column;gap:1.6rem}
+.top{text-align:left}
+.logo{font-weight:800;text-transform:uppercase;font-size:4.2rem;line-height:1;letter-spacing:.04em;margin-top:.5rem}
+.logo span{color:var(--o);animation:breathe 3.2s ease-in-out infinite;display:inline-block}
+@keyframes breathe{0%,100%{opacity:.82;text-shadow:0 0 .4rem rgba(25,230,168,.35),0 0 1.2rem rgba(25,230,168,.2)}50%{opacity:1;text-shadow:0 0 .8rem rgba(25,230,168,.85),0 0 2.6rem rgba(25,230,168,.55),0 0 4.5rem rgba(25,230,168,.25)}}
+
+.card{position:relative;background:linear-gradient(160deg,rgba(20,22,28,.92),rgba(10,11,14,.92));border:1px solid var(--b);border-left:3px solid var(--o);padding:1.2rem 1.4rem 1.1rem;backdrop-filter:blur(14px);box-shadow:0 0 3rem rgba(25,230,168,.08),inset 0 0 0 1px rgba(255,255,255,.02)}
+.info{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-bottom:1.5rem;border:1px solid var(--b);background:rgba(255,255,255,.025)}
+.info>div{padding:.8rem 1rem;border-right:1px solid var(--b)}.info>div:last-child{border-right:0}
+.info h3{font:.68rem Consolas,monospace;letter-spacing:.2em;text-transform:uppercase;color:var(--g);margin-bottom:.35rem}
+.info b{font-size:1.1rem;font-weight:700;word-break:break-all;color:#f2f1ec}
+
+.bar-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:.7rem}
+#status{font:.8rem Consolas,monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--g);display:flex;align-items:center;gap:.6rem}
+#status:before{content:"";width:.5rem;height:.5rem;background:var(--o);box-shadow:0 0 .6rem var(--o);animation:bl 1s ease-in-out infinite}
+@keyframes bl{50%{opacity:.25}}
+#pct{font:800 1.8rem/1 'Segoe UI',Arial,sans-serif;color:var(--o);text-shadow:0 0 1rem rgba(25,230,168,.5);letter-spacing:.02em}
+.bar{height:1.1rem;background:rgba(255,255,255,.05);border:1px solid var(--b);padding:2px;position:relative}
+.bar:before{content:"";position:absolute;inset:2px;background:repeating-linear-gradient(90deg,transparent 0 calc(5% - 2px),rgba(8,9,12,.9) calc(5% - 2px) 5%);z-index:2;pointer-events:none}
+#fill{height:100%;width:0%;background:linear-gradient(90deg,#0fa57a,var(--o) 70%,#8bffd9);box-shadow:0 0 1rem rgba(25,230,168,.75);transition:width .35s ease;position:relative;overflow:hidden}
+#fill:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);animation:sh 1.4s linear infinite}
+@keyframes sh{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+#file{font:.72rem Consolas,monospace;color:#6a6a73;margin-top:.7rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:1em}
+
+.tip{display:flex;gap:.8rem;align-items:center;font-size:1rem;color:#c9c9ce;min-height:2.6rem;transition:opacity .4s}
+.tip i{font:700 .75rem Consolas,monospace;font-style:normal;padding:.25rem .55rem;border:1px solid var(--o);color:var(--o);letter-spacing:.12em;white-space:nowrap}
+
+.foot{position:fixed;left:5%;bottom:3%;font:.6rem Consolas,monospace;letter-spacing:.14em;color:#0f1013}
+</style>
+</head>
+<body>
+<!-- Фоновая музыка: положи music.mp3 рядом с этим HTML на хостинге (или замени src на прямую ссылку на mp3) -->
+<audio id="bgm" src="music.mp3" loop autoplay preload="auto"></audio>
+<div class="bg"></div><div class="grid"></div><div class="scan"></div>
+
+<div class="wrap">
+  <div class="top">
+    <div class="logo">Pixel<span>Sandbox</span></div>
+  </div>
+
+  <div class="card">
+    <div class="info">
+      <div><h3>Карта</h3><b id="map">—</b></div>
+      <div><h3>Игроки</h3><b id="pl">— / —</b></div>
+      <div><h3>Режим</h3><b id="mode">sandbox</b></div>
+      <div><h3>Сервер</h3><b id="sname">PixelSandbox</b></div>
+    </div>
+    <div class="bar-head"><span id="status">Подключение</span><span id="pct">0%</span></div>
+    <div class="bar"><div id="fill"></div></div>
+    <div id="file"></div>
+  </div>
+
+  <div class="tip" id="tipbox"><i>СОВЕТ</i><span id="tip"></span></div>
+</div>
+
+<div class="foot">PIXELSANDBOX.UA</div>
+
 <script>
-/* фоновая музыка: громкость 0.5, loop, retry автозапуска + старт по первому клику/клавише */
-(()=>{const b=document.getElementById("bgm");if(!b)return;b.volume=.5;const k=()=>b.play().catch(()=>{});k();addEventListener("pointerdown",k);addEventListener("keydown",k)})();
-let S={map:"Loading world...",players:"—",mode:"Sandbox",status:"Connecting",total:0,needed:0,done:0};
-const $=id=>document.getElementById(id);
-const set=(id,v)=>{if($(id))$(id).textContent=String(v)};
-let P=0,SP=0;
-function progress(){
- /* файлы: до 95%, дальше добивают статусы подключения; бар никогда не откатывается назад */
- let f=S.total>0?Math.max(0,Math.min(95,((S.total-S.needed)/S.total)*95)):Math.min(90,S.done*2);
- P=Math.min(100,Math.max(P,f,SP));
- if($("progress"))$("progress").style.width=P+"%"; set("percent",Math.round(P)+"%");
+/* фоновая музыка: громкость 0.5, loop, повтор автозапуска + старт по первому клику/клавише */
+(function(){var b=document.getElementById("bgm");if(!b)return;b.volume=.5;var k=function(){try{var p=b.play();if(p&&p.catch)p.catch(function(){})}catch(e){}};k();addEventListener("pointerdown",k);addEventListener("keydown",k)})();
+var $=function(i){return document.getElementById(i)};
+var total=0,needed=0,pct=0;
+
+function setPct(p){
+  p=Math.max(pct,Math.min(100,Math.round(p)));pct=p;
+  $('fill').style.width=p+'%';$('pct').textContent=p+'%';
 }
-function statusProgress(s){
- s=String(s||"").toLowerCase();
- let v=0;
- if(/client info sent|connected|spawn/.test(s))v=100;
- else if(/starting lua/.test(s))v=98;
- else if(/workshop|mounting/.test(s))v=60;
- else if(/retrieving server info|server info/.test(s))v=25;
- else if(/sending client info/.test(s))v=15;
- else if(/initial connection|connecting/.test(s))v=5;
- SP=Math.max(SP,v);progress();
+function upd(){ if(total>0) setPct((total-needed)/total*100) }
+
+/* ---- API загрузочного экрана GMod ---- */
+function GameDetails(servername,serverurl,mapname,maxplayers,steamid,gamemode){
+  if(servername)$('sname').textContent=servername;
+  if(mapname)$('map').textContent=mapname;
+  if(maxplayers)$('pl').textContent='— / '+maxplayers;
+  if(gamemode)$('mode').textContent=gamemode;
 }
-function GameDetails(servername,serverurl,mapname,maxplayers,steamid,gamemode,volume,language){
- S.map=mapname||"Unknown"; S.mode=gamemode||"Sandbox";
- set("map",S.map); set("mode",S.mode);
- if($("maxplayers"))set("maxplayers",maxplayers??"—");
+function SetFilesTotal(t){total=+t||0;upd()}
+function SetFilesNeeded(n){needed=+n||0;upd()}
+function DownloadingFile(f){
+  $('status').textContent='Загрузка файлов';
+  $('file').textContent=String(f||'').split('?')[0];
 }
-function SetStatusChanged(status){S.status=status||"Loading";set("status",S.status);statusProgress(S.status)}
-function SetFilesTotal(total){S.total=Number(total)||0;progress()}
-function SetFilesNeeded(needed){S.needed=Number(needed)||0;progress()}
-function DownloadingFile(fileName){S.done++;set("file",fileName||"Preparing files...");progress()}
-async function players(){
- try{let r=await fetch("player_count.php",{cache:"no-store"});if(!r.ok)return;
- let d=await r.json(),n=d.players??d.count??d.player_count;
- if(n!=null){S.players=n;set("players",n)}}catch(e){}
+function SetStatusChanged(s){
+  s=String(s||'');
+  var m={'Sending client info...':'Отправка данных клиента','Workshop Complete':'Workshop загружен','Client info sent!':'Данные отправлены','Starting Lua...':'Запуск Lua','Retrieving server info...':'Получение данных сервера'};
+  $('status').textContent=m[s]||s;
+  if(/Starting Lua/i.test(s)) setPct(97);
+  else if(/Client info sent/i.test(s)) setPct(Math.max(pct,92));
+  else if(/Sending client info/i.test(s)) setPct(Math.max(pct,85));
+  else if(/Workshop Complete/i.test(s)) setPct(Math.max(pct,80));
 }
-players();setInterval(players,5000);
-setTimeout(()=>{if(S.map==="Loading world..."){S.map="gm_construct";set("map",S.map)}},1800);
 
-</script>
-
-<script>
-/* PixelSandbox ULTRA particles — additive layer only */
-(()=>{const c=document.createElement("canvas");c.style.cssText="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:19;opacity:.8";document.body.appendChild(c);
-const x=c.getContext("2d");let W,H,D,ps=[];
-function rs(){W=innerWidth;H=innerHeight;D=Math.min(devicePixelRatio||1,2);c.width=W*D;c.height=H*D;x.setTransform(D,0,0,D,0,0);
-ps=Array.from({length:90},()=>({x:Math.random()*W,y:Math.random()*H,r:.3+Math.random()*1.4,v:.08+Math.random()*.35,a:.12+Math.random()*.5,p:Math.random()*7}))}
-addEventListener("resize",rs);rs();
-function loop(){x.clearRect(0,0,W,H);const accent=(getComputedStyle(document.body).color||"#fff");
-for(const p of ps){p.y-=p.v;if(p.y<0)p.y=H;p.x+=Math.sin(p.p+p.y*.008)*.08;
-x.globalAlpha=p.a*(.55+.45*Math.sin(performance.now()/700+p.p));x.fillStyle=accent;x.beginPath();x.arc(p.x,p.y,p.r,0,Math.PI*2);x.fill()}
-requestAnimationFrame(loop)}loop()})();
-</script>
-
-
-<script>
-(() => {
-  const tips = [
-    "💡 Advanced Duplicator позволяет сохранять и загружать большие постройки.",
-    "💡 Перед сложными экспериментами сохрани постройку через Advanced Duplicator.",
-    "💡 Q открывает меню предметов и инструментов.",
-    "💡 Physgun позволяет брать, перемещать и вращать объекты.",
-    "💡 Замораживай детали Physgun, чтобы удобнее собирать конструкцию.",
-    "💡 Tool Gun содержит множество инструментов для строительства.",
-    "💡 Weld помогает соединять объекты между собой.",
-    "💡 No Collide убирает столкновения между выбранными объектами.",
-    "💡 Colour Tool позволяет менять цвет объектов.",
-    "💡 Material Tool позволяет менять материал объектов.",
-    "💡 Rope можно использовать для подвесов и физических механизмов.",
-    "💡 Thruster позволяет создавать движущиеся конструкции.",
-    "💡 Hydraulic пригодится для создания подвижных механизмов.",
-    "💡 Axis позволяет создавать вращение вокруг выбранной оси.",
-    "💡 Ball Socket создаёт подвижное соединение между объектами.",
-    "💡 Camera удобно использовать для наблюдения за своими постройками.",
-    "💡 Remove позволяет быстро удалить ненужный объект.",
-    "💡 Undo помогает отменить последнее действие.",
-    "💡 Начинай большую постройку с простого замороженного каркаса.",
-    "💡 Собирай сложные механизмы поэтапно: основа → соединения → движение.",
-    "💡 Advanced Duplicator особенно полезен для больших многодетальных построек.",
-    "💡 Перед загрузкой постройки через Duplicator проверь свободное место вокруг.",
-    "💡 Не бойся экспериментировать — Sandbox создан для творчества.",
-    "💡 Если механизм разваливается, проверь соединения и физические ограничения.",
-    "💡 Для аккуратного строительства сначала заморозь основные детали.",
-    "💡 Colour Tool удобно использовать для визуального разделения частей механизма.",
-    "💡 Material Tool поможет придать постройке собственный стиль.",
-    "💡 Thruster можно комбинировать с другими инструментами для создания транспорта.",
-    "💡 Rope подходит не только для декора, но и для физических конструкций.",
-    "💡 Сохраняй удачные постройки, чтобы использовать их в будущих проектах.",
-    "💡 Не создавай слишком много физических объектов без необходимости.",
-    "💡 Проверяй выбранный объект перед применением Tool Gun.",
-    "💡 Physgun позволяет точно выставлять положение и угол объекта.",
-    "💡 Большие конструкции удобнее собирать из отдельных секций.",
-    "💡 Axis и Hydraulic отлично подходят для подвижных механизмов.",
-    "💡 Используй Undo, если случайно изменил не тот объект.",
-    "💡 Экспериментируй с разными материалами и цветами.",
-    "💡 Хорошая постройка начинается с простой основы и постепенно усложняется.",
-    "💡 Перед важным экспериментом сделай сохранение через Advanced Duplicator.",
-    "💡 Если пропы мешают друг другу, попробуй No Collide."
-  ];
-
-  const el = document.getElementById("tip");
-  if (!el || !tips.length) return;
-
-  let index = Math.floor(Math.random() * tips.length);
-
-  el.style.transition =
-    "opacity 650ms cubic-bezier(.22,1,.36,1), " +
-    "transform 650ms cubic-bezier(.22,1,.36,1), " +
-    "filter 650ms ease";
-
-  el.style.willChange = "opacity, transform, filter";
-  el.style.opacity = "1";
-  el.style.transform = "translateY(0)";
-  el.style.filter = "blur(0)";
-
-  el.textContent = tips[index];
-
-  function changeTip() {
-    el.style.opacity = "0";
-    el.style.transform = "translateY(8px)";
-    el.style.filter = "blur(4px)";
-
-    setTimeout(() => {
-      index = (index + 1) % tips.length;
-      el.textContent = tips[index];
-
-      requestAnimationFrame(() => {
-        el.style.opacity = "1";
-        el.style.transform = "translateY(0)";
-        el.style.filter = "blur(0)";
-      });
-    }, 700);
-  }
-
-  setInterval(changeTip, 6500);
+/* параметры из URL (на случай sv_loadingurl с подстановкой) */
+(function(){
+  var q=location.search.replace('?','').split('&');
+  for(var i=0;i<q.length;i++){var kv=q[i].split('=');
+    if(kv[0]=='map')$('map').textContent=decodeURIComponent(kv[1]||'');
+    if(kv[0]=='max')$('pl').textContent='— / '+decodeURIComponent(kv[1]||'');}
 })();
+
+/* ---- советы ---- */
+var tips=[
+ 'Не бойся экспериментировать — Sandbox создан для творчества.',
+ 'Сохраняй постройки через Advanced Duplicator — перед рестартом сервера.',
+ 'Нажми F4, чтобы открыть меню: профиль, правила и жалобы.',
+ 'Привяжи Discord командой !link в игровом чате и получи роль «Проверенный».',
+ 'Увидел нарушителя? Подай жалобу через F4 → Жалобы.',
+ 'Не толкай чужие пропы через PhysGun — это PropPush и наказуемо.',
+ 'Сервер работает ежедневно с 8:00 до 00:00. Плановые рестарты — с предупреждением в чате.',
+ 'Хочешь в команду? Заявка на стафф — в нашем Discord.'
+];
+var ti=Math.floor(Math.random()*tips.length),tb=$('tipbox');
+function showTip(){$('tip').textContent=tips[ti];ti=(ti+1)%tips.length}
+showTip();
+setInterval(function(){tb.style.opacity=0;setTimeout(function(){showTip();tb.style.opacity=1},400)},6000);
 </script>
+</body>
 </html>
