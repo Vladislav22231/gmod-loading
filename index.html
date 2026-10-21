@@ -49,18 +49,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:#08090c;color:#f2f1e
 .tip i{font:700 .75rem Consolas,monospace;font-style:normal;padding:.25rem .55rem;border:1px solid var(--o);color:var(--o);letter-spacing:.12em;white-space:nowrap}
 
 .foot{position:fixed;left:5%;bottom:3%;font:.65rem Consolas,monospace;letter-spacing:.14em;color:#2b2d34}
-/* помехи как в консоли: зерно + бегущая полоса + лёгкое мерцание */
-#noise{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;opacity:.07;image-rendering:pixelated;mix-blend-mode:screen}
-.roll{position:fixed;left:0;right:0;height:9rem;top:-10rem;pointer-events:none;background:linear-gradient(to bottom,transparent,rgba(25,230,168,.035) 45%,rgba(25,230,168,.06) 50%,rgba(25,230,168,.035) 55%,transparent);animation:roll 7s linear infinite}
-@keyframes roll{to{transform:translateY(calc(100vh + 20rem))}}
-.flick{position:fixed;inset:0;pointer-events:none;background:#fff;opacity:0;animation:flick 5.5s steps(1) infinite}
-@keyframes flick{0%,100%{opacity:0}46%{opacity:0}47%{opacity:.018}48%{opacity:0}49%{opacity:.03}50%{opacity:0}}
 </style>
 </head>
 <body>
 <!-- Фоновая музыка: положи music.mp3 рядом с этим HTML на хостинге (или замени src на прямую ссылку на mp3) -->
 <audio id="bgm" src="music.mp3" loop autoplay preload="auto"></audio>
-<div class="bg"></div><div class="grid"></div><div class="scan"></div><canvas id="noise"></canvas><div class="roll"></div><div class="flick"></div>
+<div class="bg"></div><div class="grid"></div><div class="scan"></div>
 
 <div class="wrap">
   <div class="top">
@@ -87,10 +81,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#08090c;color:#f2f1e
 <script>
 /* фоновая музыка: громкость 0.5, loop, повтор автозапуска + старт по первому клику/клавише */
 (function(){var b=document.getElementById("bgm");if(!b)return;b.volume=.5;var k=function(){try{var p=b.play();if(p&&p.catch)p.catch(function(){})}catch(e){}};k();addEventListener("pointerdown",k);addEventListener("keydown",k)})();
-/* зерно-помехи (малое разрешение, ~12 кадров/сек — не грузит игру) */
-(function(){var c=document.getElementById("noise");if(!c)return;var w=c.width=192,h=c.height=108,x=c.getContext("2d"),im=x.createImageData(w,h),d=im.data;
-function f(){for(var i=0;i<d.length;i+=4){var v=Math.random()*255|0;d[i]=d[i+1]=d[i+2]=v;d[i+3]=Math.random()<.5?255:0}x.putImageData(im,0,0)}
-f();setInterval(f,85)})();
 var $=function(i){return document.getElementById(i)};
 var total=0,needed=0,pct=0;
 
