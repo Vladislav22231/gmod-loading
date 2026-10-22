@@ -206,7 +206,7 @@ x.globalAlpha=p.a*(.5+.5*Math.sin(t+p.p));x.fillStyle="#19e6a8";x.beginPath();x.
 /* реальный онлайн: бот отдаёт /online (укажи адрес бота, порт = API_PORT из .env) */
 var ONLINE_URL='http://178.150.168.239:3000/online',maxP='—';
 function showOnline(n){$('pl').textContent=n+' / '+maxP}
-var srvOn=null,srvMs=null,isOpen=true;
+var srvOn=null,srvMs=null,isOpen=true,inGame=false;   /* inGame: игра сама вызвала GameDetails — значит мы уже подключаемся к серверу */
 function setSrv(on,ms){srvOn=on;srvMs=on?ms:null;renderSrv()}
 function renderSrv(){
   var e=$('srv'),t=$('srvt'),ms=srvMs!=null?' · '+srvMs+' ms':'',c='srv',txt;
@@ -218,7 +218,9 @@ function renderSrv(){
   e.className=c;t.textContent=txt;
 }
 var pollFails=0;
-function pollFail(){pollFails++;if(pollFails>=2)setSrv(false)}   /* офлайн только после 2 неудач подряд — без мигания */
+function pollFail(){
+  if(inGame){if(srvOn!==true&&!Q.test)setSrv(true,null);return}   /* игрок уже грузится на сервер → он точно онлайн, даже если бот недоступен */
+  pollFails++;if(pollFails>=2)setSrv(false)}   /* офлайн только после 2 неудач подряд — без мигания */
 function pollOnline(){
   if(!ONLINE_URL||Q.test)return;
   try{var x=new XMLHttpRequest(),t0=Date.now();x.open('GET',ONLINE_URL+'?t='+t0,true);x.timeout=6000;
@@ -236,7 +238,7 @@ function kyivNow(){
   catch(e){var d=new Date();return[d.getHours(),d.getMinutes(),d.getSeconds()]}
 }
 function p2(n){return(n<10?'0':'')+n}
-function fmtD(s){var m=Math.ceil(s/60);return p2(Math.floor(m/60))+':'+p2(m%60)}
+function fmtD(s){var m=Math.ceil(s/60),h=Math.floor(m/60);m=m%60;return h?h+' ч'+(m?' '+m+' мин':''):m+' мин'}
 function tickClock(){
   var t=kyivNow(),sec=t[0]*3600+t[1]*60+t[2],best=null,lab='';
   function cand(at,l){var d=at-sec;if(d>0&&(best===null||d<best)){best=d;lab=l}}
@@ -281,6 +283,7 @@ function upd(){ if(total>0&&gotNeeded) setPct(Math.min(80,(total-needed)/total*8
 
 /* ---- API загрузочного экрана GMod ---- */
 function GameDetails(servername,serverurl,mapname,maxplayers,steamid,gamemode){
+  inGame=true;if(srvOn!==true&&!Q.test)setSrv(true,null);
   if(mapname){$('map').textContent=mapname;addLog('map '+mapname)}
   if(maxplayers){maxP=maxplayers;$('pl').textContent='— / '+maxplayers}
   if(gamemode)$('mode').textContent=gamemode;
