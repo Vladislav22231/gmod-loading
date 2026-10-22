@@ -5,7 +5,7 @@
 <title>PixelSandbox — загрузка</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html{font-size:clamp(7px,.65vw,15px)}
+html{font-size:clamp(7px,.70vw,16px)}
 html,body{width:100%;height:100%;overflow:hidden;background:#08090c;color:#f2f1ec;font-family:'Segoe UI',Arial,sans-serif}
 :root{--o:#19e6a8;--p:rgba(14,15,19,.9);--b:rgba(255,255,255,.08);--g:#9a9aa3}
 
@@ -74,17 +74,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#08090c;color:#f2f1e
 .about-g h3{margin-bottom:.3rem}
 .about-g b{font-size:.85rem;font-weight:600;line-height:1.35;color:#f2f1ec;display:block}
 
-/* угловые метки на рамке окна */
-.unit{position:relative}
-.unit:before{content:"";position:absolute;inset:-.55rem;pointer-events:none;opacity:.85;background:
- linear-gradient(var(--o),var(--o)) top left/1.3rem 2px no-repeat,
- linear-gradient(var(--o),var(--o)) top left/2px 1.3rem no-repeat,
- linear-gradient(var(--o),var(--o)) top right/1.3rem 2px no-repeat,
- linear-gradient(var(--o),var(--o)) top right/2px 1.3rem no-repeat,
- linear-gradient(var(--o),var(--o)) bottom left/1.3rem 2px no-repeat,
- linear-gradient(var(--o),var(--o)) bottom left/2px 1.3rem no-repeat,
- linear-gradient(var(--o),var(--o)) bottom right/1.3rem 2px no-repeat,
- linear-gradient(var(--o),var(--o)) bottom right/2px 1.3rem no-repeat}
 /* статус сервера, часы и таймер */
 .stat{text-align:right;font:.72rem/1.8 Consolas,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--g);padding-bottom:.3rem}
 .srv{display:flex;justify-content:flex-end;align-items:center;gap:.55rem;color:#c9c9ce}
